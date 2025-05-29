@@ -1,0 +1,231 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_9</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Tanimoto similarity search using ChEMBL + RDKit</h1>
+<hr />
+<p>Okay, I understand. As a Pharmaceutical Research and Development Specialist, I'll help you structure your Chembl 35 data analysis project using RDKit, addressing your specific requirements and the errors you've encountered. I'll provide SQL and Python code snippets, aiming for a streamlined and reproducible workflow within your AIMLops template structure.</p>
+<p><strong>1. Analysis Model</strong></p>
+<p>The core of this project involves extracting relevant chemical and biological data from the ChEMBL database, cleaning it, transforming it, and then applying machine learning techniques to identify potential relationships between molecular properties and biological activity.  The goal is to extract information that can be used for drug design.</p>
+<p>Here's a breakdown:</p>
+<ul>
+<li><strong>Data Extraction (SQL):</strong>  We'll use SQL to query the ChEMBL database to extract compound information (e.g., SMILES strings) and bioactivity data (e.g., IC50 values) for a specific target or a set of targets. The SQL code will also handle filtering to limit the number of rows returned (as you requested, ~100 rows) and address the numeric comparison error you reported.</li>
+<li><strong>Data Preparation (Python):</strong><ul>
+<li><strong>RDKit for Molecular Representation:</strong> RDKit will be used to generate molecular fingerprints (e.g., Morgan fingerprints, also known as ECFP) from the SMILES strings. These fingerprints are numerical representations of molecular structure, suitable for machine learning algorithms.</li>
+<li><strong>Bioactivity Data Transformation:</strong> Bioactivity data (like IC50) often needs to be transformed (e.g., converted to pIC50) to provide a more suitable scale for modeling.  We will perform this transformation.</li>
+<li><strong>Data Cleaning:</strong>  Handling missing values and outliers is crucial for model performance.</li>
+</ul>
+</li>
+<li><strong>Model Building (Python):</strong><ul>
+<li><strong>Feature Selection:</strong> We'll explore different feature selection methods to identify the most relevant molecular properties for predicting activity.</li>
+<li><strong>Model Selection:</strong> We'll use a supervised learning technique. This could be a simple regression model (e.g., Linear Regression) or a more complex model (e.g., Random Forest, Support Vector Machine).  Given the small dataset size, Linear Regression or a simpler tree-based model might be a good starting point.</li>
+<li><strong>Model Evaluation:</strong>  We'll split the data into training and test sets and use appropriate metrics (e.g., Mean Squared Error, R-squared) to evaluate the model's performance.</li>
+</ul>
+</li>
+</ul>
+<p><strong>2. Code (SQL &amp; Python)</strong></p>
+<p><strong>SQL Code (saved as <code>../data/chembl_35_9.sql</code>):</strong></p>
+<p>```sql
+-- Select 100 rows for demonstration purposes
+SELECT
+    cmpd.chembl_id,
+    cmpd.pref_name,
+    act.standard_value,
+    act.standard_units,
+    act.standard_type,
+    act.activity_comment,
+    act.relation,
+    md.molecule_structures AS smiles
+FROM
+    compound_structures md
+JOIN
+    molecule_dictionary cmpd ON md.molregno = cmpd.molregno
+JOIN
+    activities act ON cmpd.molregno = act.molregno
+JOIN
+    target_dictionary tgt ON act.tid = tgt.tid
+WHERE
+    tgt.target_type = 'SINGLE PROTEIN'
+    AND tgt.pref_name = 'Dopamine D2 receptor'
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL  -- Ensure standard_value is not null
+    AND act.standard_value::TEXT ~ '^[0-9.]+$'  -- Check if standard_value is numeric
+ORDER BY random()
+LIMIT 100;</p>
+<p>-- Copy the result to a CSV file (run this in psql after connecting to the database)
+\copy (SELECT
+    cmpd.chembl_id,
+    cmpd.pref_name,
+    act.standard_value,
+    act.standard_units,
+    act.standard_type,
+    act.activity_comment,
+    act.relation,
+    md.molecule_structures AS smiles
+FROM
+    compound_structures md
+JOIN
+    molecule_dictionary cmpd ON md.molregno = cmpd.molregno
+JOIN
+    activities act ON cmpd.molregno = act.molregno
+JOIN
+    target_dictionary tgt ON act.tid = tgt.tid
+WHERE
+    tgt.target_type = 'SINGLE PROTEIN'
+    AND tgt.pref_name = 'Dopamine D2 receptor'
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL  -- Ensure standard_value is not null
+    AND act.standard_value::TEXT ~ '^[0-9.]+$'  -- Check if standard_value is numeric
+ORDER BY random()
+LIMIT 100) TO '../data/chembl_35_9.csv' DELIMITER ',' CSV HEADER;</p>
+<p>```</p>
+<p><strong>Explanation of SQL Code:</strong></p>
+<ul>
+<li><strong><code>SELECT ... FROM ... JOIN ... WHERE ...</code></strong>:  This is a standard SQL query to select data from multiple tables. We are joining <code>compound_structures</code>, <code>molecule_dictionary</code>, <code>activities</code>, and <code>target_dictionary</code> tables to get compound information, bioactivity data, and target information.</li>
+<li><strong><code>tgt.target_type = 'SINGLE PROTEIN'</code></strong>: This filters for single protein targets.</li>
+<li><strong><code>tgt.pref_name = 'Dopamine D2 receptor'</code></strong>: This filters specifically for the Dopamine D2 receptor. You can change this to any target you're interested in.</li>
+<li><strong><code>act.standard_type = 'IC50'</code></strong>:  This filters for IC50 values.</li>
+<li><strong><code>act.standard_units = 'nM'</code></strong>: This filters for IC50 values in nanomolar units.</li>
+<li><strong><code>act.standard_value IS NOT NULL</code></strong>:  Crucially, this avoids missing values, which cause errors in later steps.</li>
+<li><strong><code>AND act.standard_value::TEXT ~ '^[0-9\.]+$'</code></strong>: This part addresses the error you encountered.  It converts the <code>standard_value</code> column to text and uses a regular expression (<code>^[0-9\.]+$</code>) to check if the value contains only numbers and decimal points.  This ensures that you're only working with numeric values. The type conversion to <code>TEXT</code> and the use of <code>~</code> operator performs the intended filtering.</li>
+<li><strong><code>ORDER BY random()</code></strong>: This randomizes the results.</li>
+<li><strong><code>LIMIT 100</code></strong>: This limits the result set to 100 rows.</li>
+<li><strong><code>\copy ... TO ...</code></strong>:  This is a psql command to copy the results of the query directly to a CSV file. Make sure you run this command <em>within</em> the psql terminal after connecting to your database.  This avoids having to export the data manually from pgAdmin.</li>
+</ul>
+<p><strong>Python Code (<code>notebook/Topic_CheMBL_35_9_1.ipynb</code>):</strong></p>
+<p>```python
+import os
+import pandas as pd
+import numpy as np
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import math  # Import the math module</p>
+<h1>Define the base path</h1>
+<p>base_path = ".." # Assuming notebook is in the 'notebook' directory
+data_path = os.path.join(base_path, "data")
+csv_file = os.path.join(data_path, "chembl_35_9.csv")</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(csv_file)
+    print(f"Data loaded successfully from {csv_file}")
+except FileNotFoundError:
+    print(f"Error: File not found at {csv_file}.  Make sure you've run the SQL and copied the data.")
+    exit()</p>
+<h1>Data Cleaning and Transformation</h1>
+<p>df = df.dropna(subset=['standard_value', 'smiles']) # Drop rows with missing values in these columns</p>
+<h1>Convert IC50 to pIC50</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'].astype(float) / 1e9)  # Convert nM to M, then to pIC50</p>
+<h1>RDKit Molecular Fingerprint Generation</h1>
+<p>def generate_fingerprint(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is not None:
+            fp = AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=2048)  # ECFP4 fingerprint
+            return np.array(fp)
+        else:
+            return None
+    except:
+        return None</p>
+<p>df['fingerprint'] = df['smiles'].apply(generate_fingerprint)
+df = df.dropna(subset=['fingerprint']) # Drop rows where fingerprint generation failed</p>
+<h1>Prepare data for machine learning</h1>
+<p>X = np.vstack(df['fingerprint'].values)
+y = df['pIC50'].values</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a Linear Regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Example Predictions</h1>
+<p>print("\nExample Predictions:")
+for i in range(5): # Show predictions for the first 5 compounds in the test set
+    print(f"Actual pIC50: {y_test[i]:.2f}, Predicted pIC50: {y_pred[i]:.2f}")
+```</p>
+<p><strong>Explanation of Python Code:</strong></p>
+<ul>
+<li><strong>Import Libraries:</strong> Imports necessary libraries, including pandas for data manipulation, RDKit for cheminformatics, and scikit-learn for machine learning.</li>
+<li><strong>File Path Handling:</strong> Uses <code>os.path.join</code> to construct file paths, making the code more robust and portable.</li>
+<li><strong>Data Loading:</strong> Loads the CSV file into a pandas DataFrame.  Includes error handling for the case where the file is not found.</li>
+<li><strong>Data Cleaning:</strong> Drops rows with missing SMILES strings or standard values.</li>
+<li><strong>pIC50 Conversion:</strong>  Calculates pIC50 values from IC50 values.  Note the conversion from nM to M before taking the negative logarithm.</li>
+<li><strong>Fingerprint Generation:</strong> Defines a function <code>generate_fingerprint</code> to generate ECFP4 fingerprints using RDKit. It handles potential errors in SMILES parsing.</li>
+<li><strong>Data Preparation:</strong> Converts the fingerprint column to a NumPy array suitable for scikit-learn.</li>
+<li><strong>Train/Test Split:</strong> Splits the data into training and test sets.</li>
+<li><strong>Model Training:</strong> Creates a Linear Regression model and trains it on the training data.</li>
+<li><strong>Model Evaluation:</strong>  Calculates the Mean Squared Error and R-squared on the test data.</li>
+<li><strong>Example Predictions:</strong>  Prints the actual and predicted pIC50 values for the first 5 compounds in the test set.</li>
+</ul>
+<p><strong>Addressing the Error in Mean Squared Error (older scikit-learn versions):</strong></p>
+<p>The <code>squared=False</code> parameter in <code>mean_squared_error</code> was introduced in a later version of scikit-learn. If you are using an older version, you can calculate the Root Mean Squared Error (RMSE) manually:</p>
+<p><code>python
+mse = mean_squared_error(y_test, y_pred)
+rmse = math.sqrt(mse)  # Use the math module to calculate the square root
+print(f"Root Mean Squared Error: {rmse}")</code></p>
+<p><strong>3. Examples (based on the code above):</strong></p>
+<p>Here are 5 examples of things you can do with this code, reflecting common tasks in drug discovery:</p>
+<ol>
+<li><strong>Change the Target:</strong> Modify the SQL query to target a different protein.  For example, change <code>tgt.pref_name = 'Dopamine D2 receptor'</code> to <code>tgt.pref_name = 'EGFR'</code>. You'll need to find the correct target name in the ChEMBL database.</li>
+<li><strong>Change the Activity Type:</strong> Instead of IC50, you might be interested in Ki values. Change <code>act.standard_type = 'IC50'</code> to <code>act.standard_type = 'Ki'</code>.  You'll also need to adjust the pIC50 calculation accordingly if the units are different.</li>
+<li><strong>Change the Fingerprint Type:</strong> Experiment with different RDKit fingerprints.  For example, try using <code>Chem.RDKFingerprint(mol)</code> instead of <code>AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=2048)</code>. You'll need to research the different fingerprint types and their parameters.</li>
+<li><strong>Try a Different Model:</strong> Replace the <code>LinearRegression()</code> model with a different model, such as <code>RandomForestRegressor()</code> or <code>SVR()</code>. You'll need to import the corresponding class from scikit-learn and potentially tune the model's hyperparameters.</li>
+<li><strong>Feature Selection:</strong> Before training the model, try using feature selection techniques to reduce the dimensionality of the fingerprint data.  Scikit-learn provides various feature selection methods, such as <code>SelectKBest</code> or <code>RFE</code> (Recursive Feature Elimination).</li>
+</ol>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>Database Connection:</strong>  Make sure you have a working connection to your ChEMBL database and that the user <code>rd</code> has the necessary permissions to query the data.</li>
+<li><strong>RDKit Installation:</strong> Ensure that RDKit is installed correctly in your Jupyter Notebook environment.</li>
+<li><strong>Dependencies:</strong>  Install all the necessary Python libraries (pandas, numpy, scikit-learn, rdkit). You can use <code>pip install pandas numpy scikit-learn rdkit</code>.</li>
+<li><strong>Error Handling:</strong> The code includes basic error handling, but you may need to add more robust error handling for production use.</li>
+<li><strong>Documentation:</strong>  Document your code thoroughly, explaining the purpose of each step and the rationale behind your choices.  This will make it easier to maintain and extend the code in the future.</li>
+</ul>
+<p><strong>In Summary (en français):</strong></p>
+<p>Ce projet vous permet d'extraire des données de la base de données ChEMBL, de préparer ces données avec RDKit (pour la représentation moléculaire), et d'appliquer des techniques d'apprentissage automatique pour explorer les relations entre les propriétés moléculaires et l'activité biologique. Le code SQL vous aide à récupérer les données pertinentes, et le code Python utilise RDKit pour générer des empreintes digitales moléculaires et scikit-learn pour construire et évaluer des modèles prédictifs. Les exemples fournis vous montrent comment modifier le code pour cibler différentes protéines, types d'activité, et algorithmes d'apprentissage automatique.  N'oubliez pas de vérifier vos connexions de base de données, d'installer toutes les dépendances nécessaires et de documenter soigneusement votre code.</p>
+<p>Let me know if you have any further questions. Good luck with your project!</p>
+        </body>
+        </html>
+        

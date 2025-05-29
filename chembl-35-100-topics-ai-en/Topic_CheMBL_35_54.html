@@ -1,0 +1,355 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_54</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Neuropsychiatric drug insights from ChEMBL</h1>
+<hr />
+<p>Okay, I understand. You're working with Chembl 35 data using RDKit and PostgreSQL, following an AIMLops template, and encountering some errors. Let's break down the analysis model, address the errors, and provide code examples.</p>
+<p><strong>1. Analysis Model Overview</strong></p>
+<p>The goal is to analyze Chembl 35 data, likely focusing on specific chemical properties or biological activities. Given the use of RDKit, you're probably interested in featurizing molecules (converting them into numerical representations) and then applying machine learning or statistical methods to understand relationships between molecular structure and activity. Here's a general analysis pipeline we can build on:</p>
+<ul>
+<li>
+<p><strong>Data Extraction (SQL):</strong>  Select relevant data from the Chembl 35 database based on the Topic. This includes molecule structures (SMILES strings or other formats), activity data (e.g., IC50, Ki values), target information (protein targets), and any relevant metadata.  The SQL query should be optimized to retrieve only the necessary columns and filter to a manageable number of rows (100 in your case).</p>
+</li>
+<li>
+<p><strong>Data Preprocessing (Python):</strong></p>
+<ul>
+<li><strong>Loading Data:</strong> Read the extracted data from the CSV file into a Pandas DataFrame.</li>
+<li><strong>Data Cleaning:</strong> Handle missing values, remove duplicates, and filter based on data quality criteria (e.g., activity type, units). The error <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code> suggests an issue with how you're filtering numeric values in your SQL query. It's likely trying to use a regular expression operator (<code>~</code>) on a numeric column.</li>
+<li><strong>Unit Conversion:</strong> Standardize activity values to a common unit (e.g., uM).</li>
+<li><strong>Molecule Featurization:</strong> Use RDKit to generate molecular descriptors or fingerprints (e.g., Morgan fingerprints, physicochemical properties) from the SMILES strings. This converts molecules into numerical vectors that can be used in machine learning models.</li>
+</ul>
+</li>
+<li>
+<p><strong>Exploratory Data Analysis (EDA):</strong></p>
+<ul>
+<li><strong>Descriptive Statistics:</strong> Calculate summary statistics for activity values and molecular descriptors.</li>
+<li><strong>Visualization:</strong> Create scatter plots, histograms, and other visualizations to explore relationships between features and activity.</li>
+<li><strong>Correlation Analysis:</strong> Identify highly correlated features.</li>
+</ul>
+</li>
+<li>
+<p><strong>Model Building (Python):</strong></p>
+<ul>
+<li><strong>Feature Selection:</strong> Select relevant features based on EDA or feature importance scores from machine learning models.</li>
+<li><strong>Model Selection:</strong> Choose an appropriate machine learning model based on the type of data and the research question (e.g., linear regression, random forest, support vector machine).</li>
+<li><strong>Model Training:</strong> Train the model on the prepared data.</li>
+<li><strong>Model Evaluation:</strong> Evaluate the model's performance using appropriate metrics (e.g., R-squared, RMSE, AUC). The error <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code> means you need to either upgrade your scikit-learn version or remove the <code>squared=False</code> parameter. Upgrading is generally the best option.</li>
+</ul>
+</li>
+<li>
+<p><strong>Interpretation and Reporting:</strong></p>
+<ul>
+<li><strong>Feature Importance Analysis:</strong> Determine which features are most important for predicting activity.</li>
+<li><strong>Model Interpretation:</strong> Interpret the model's predictions and draw conclusions about the relationships between molecular structure and activity.</li>
+<li><strong>Reporting:</strong> Document the entire analysis process, including data cleaning, preprocessing, model building, and evaluation.</li>
+</ul>
+</li>
+</ul>
+<p><strong>2. SQL Code (for data extraction - example for Topic_CheMBL_35_54)</strong></p>
+<p>```sql
+-- Extract data for a specific target (replace with your target of interest)
+-- and limit the results to 100 rows.
+SELECT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.chembl_id = 'CHEMBL205'  -- Replace with your target of interest related to Topic_CheMBL_35_54
+    AND act.standard_type = 'IC50' -- Or other activity type of interest
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL  -- Ensure numeric columns are checked for null <em>before</em> applying numeric constraints
+    AND act.standard_value BETWEEN 0 AND 100000 -- Filter out extreme values
+    AND act.standard_units = 'nM'  -- Ensure consistent units
+LIMIT 100;</p>
+<p>-- Save this to ../data/chembl_35_54_data.csv (using pgAdmin's export feature)
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Target Selection:</strong>  I've used <code>td.chembl_id = 'CHEMBL205'</code> as an example.  You need to replace this with the specific Chembl ID related to your <code>Topic_CheMBL_35_54</code>.  You'll need to investigate the Chembl database to find a relevant target ID.</li>
+<li><strong>Activity Type:</strong> I've used <code>act.standard_type = 'IC50'</code>.  Adjust this to the specific activity type you're interested in.</li>
+<li><strong>Value Filtering:</strong> <code>act.standard_value BETWEEN 0 AND 100000</code> filters the activity values to a reasonable range.  Adjust the upper and lower bounds as needed.  This is crucial because attempting to use regex (<code>~</code>) on non-text fields will cause an error.  The <code>IS NOT NULL</code> check is <em>essential</em> before any numerical comparison.</li>
+<li><strong>Unit Consistency:</strong> <code>act.standard_units = 'nM'</code> ensures you're working with consistent units.</li>
+<li><strong>Limiting Results:</strong> <code>LIMIT 100</code> restricts the number of rows returned.</li>
+<li><strong>Saving to CSV:</strong>  Save the output of this query to <code>../data/chembl_35_54_data.csv</code> using pgAdmin's export functionality.</li>
+</ul>
+<p><strong>Addressing the SQL Error:</strong></p>
+<p>The error <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code> occurs because you're trying to use the regular expression operator (<code>~</code>) on a numeric column (<code>act.standard_value</code>).  Instead of using a regular expression, use numeric comparisons like:</p>
+<ul>
+<li><code>act.standard_value IS NOT NULL</code> (Check for null values FIRST!)</li>
+<li><code>act.standard_value &gt; 0</code></li>
+<li><code>act.standard_value &lt; 1000</code></li>
+<li><code>act.standard_value BETWEEN 10 AND 100</code></li>
+</ul>
+<p>The corrected SQL query above implements this.</p>
+<p><strong>3. Python Code (Jupyter Notebook - <code>Topic_CheMBL_35_54_1_Data_Loading_and_Preprocessing.ipynb</code>)</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler  # Feature Scaling</p>
+<h1>Define base path</h1>
+<p>base_path = os.path.abspath(os.path.join(os.getcwd(), ".."))  # Assumes notebook is in a subfolder
+data_path = os.path.join(base_path, "data", "chembl_35_54_data.csv")</p>
+<p>print(f"Base path: {base_path}")
+print(f"Data path: {data_path}")</p>
+<h1>Load data</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}. Make sure the SQL query was run and the file was saved correctly.")
+    exit()</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>print("\nData Cleaning and Preprocessing...")</p>
+<h1>Handle missing values (replace with median for numeric columns)</h1>
+<p>for col in df.select_dtypes(include=np.number).columns:
+    df[col] = df[col].fillna(df[col].median())</p>
+<h1>Remove duplicates based on molecule ID</h1>
+<p>df = df.drop_duplicates(subset=['chembl_id'])</p>
+<h1>Standardize activity values (convert to pIC50)</h1>
+<p>def convert_to_pic50(ic50_nM):
+    """Converts IC50 in nM to pIC50."""
+    if ic50_nM is None or pd.isna(ic50_nM):
+        return None
+    try:
+        pIC50 = -np.log10(ic50_nM * 1e-9)  # Convert nM to M and then to pIC50
+        return pIC50
+    except:
+        return None</p>
+<p>df['pIC50'] = df['standard_value'].apply(convert_to_pic50)
+df = df.dropna(subset=['pIC50', 'canonical_smiles']) # Drop rows with missing pIC50 or SMILES</p>
+<p>print(df.head())
+print(df.describe())</p>
+<h1>Molecule Featurization</h1>
+<p>print("\nMolecule Featurization...")</p>
+<p>def generate_descriptors(smiles):
+    """Generates RDKit descriptors for a given SMILES string."""
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MW'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)</p>
+<pre><code># Calculate Morgan Fingerprint
+info = {}
+fp = AllChem.GetMorganFingerprint(mol, radius=2, bitInfo=info)
+descriptors['MorganFP'] = fp  # Store the fingerprint object
+
+return descriptors
+</code></pre>
+<p>df['descriptors'] = df['canonical_smiles'].apply(generate_descriptors)
+df = df.dropna(subset=['descriptors']) # Drop rows where descriptor generation failed
+df = df[df['descriptors'].apply(lambda x: isinstance(x, dict))] # ensure descriptors are dictionaries</p>
+<h1>Convert descriptors to columns, handling fingerprints</h1>
+<p>def unpack_descriptors(row):
+    descriptors = row['descriptors']
+    if isinstance(descriptors, dict):
+      return pd.Series(descriptors)
+    else:
+      return pd.Series([None] * 6, index=['MW', 'LogP', 'HBD', 'HBA', 'TPSA', 'MorganFP']) # Return series of Nones
+df = pd.concat([df, df.apply(unpack_descriptors, axis=1)], axis=1)</p>
+<h1>Drop rows with missing descriptor values after expansion</h1>
+<p>df = df.dropna(subset=['MW', 'LogP', 'HBD', 'HBA', 'TPSA', 'MorganFP'])</p>
+<h1>Function to convert Morgan Fingerprints to sparse arrays</h1>
+<p>def fingerprint_to_array(fp):
+    if fp is None:
+        return None
+    info = {}
+    fp_vect = np.zeros((2048,), dtype=int) # set vector size
+    for bit, count in fp.GetNonzeroElements().items():
+        fp_vect[bit] = count
+    return fp_vect</p>
+<p>df['MorganFP'] = df['MorganFP'].apply(fingerprint_to_array)</p>
+<h1>Filter out rows where Morgan Fingerprint conversion resulted in None</h1>
+<p>df = df.dropna(subset=['MorganFP'])</p>
+<h1>Convert Morgan Fingerprints to columns</h1>
+<p>morgan_fingerprint_df = pd.DataFrame(df['MorganFP'].tolist())
+morgan_fingerprint_df = morgan_fingerprint_df.add_prefix('MorganFP_')
+df = pd.concat([df, morgan_fingerprint_df], axis=1)
+df = df.drop(columns=['descriptors', 'MorganFP'])</p>
+<h1>Feature Scaling</h1>
+<p>numerical_cols = df.select_dtypes(include=np.number).columns.tolist()
+numerical_cols.remove('pIC50') # Don't scale the target variable
+scaler = StandardScaler()
+df[numerical_cols] = scaler.fit_transform(df[numerical_cols])</p>
+<p>print("\nData Preprocessing Complete.")
+print(df.head())</p>
+<h1>Save the preprocessed data</h1>
+<p>preprocessed_data_path = os.path.join(base_path, "data", "chembl_35_54_preprocessed_data.csv")
+df.to_csv(preprocessed_data_path, index=False)
+print(f"Preprocessed data saved to: {preprocessed_data_path}")
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Base Path:</strong> The <code>base_path</code> is correctly set to move one level up from the notebook directory.</li>
+<li><strong>Data Loading:</strong>  Loads the CSV data using Pandas. The <code>try...except</code> block handles the <code>FileNotFoundError</code>.</li>
+<li><strong>Data Cleaning:</strong><ul>
+<li>Handles missing values by filling with the median.</li>
+<li>Removes duplicate molecules based on <code>chembl_id</code>.</li>
+<li>Converts activity values to pIC50. This is a crucial step for standardizing the data and making it suitable for modeling.</li>
+<li>Drops rows with missing pIC50 or SMILES values.</li>
+</ul>
+</li>
+<li><strong>Molecule Featurization:</strong><ul>
+<li>The <code>generate_descriptors</code> function calculates a set of basic RDKit descriptors (MW, LogP, HBD, HBA, TPSA). <strong>Important:</strong> I've added Morgan Fingerprint calculation as well, since they are commonly used.</li>
+<li>The function stores the Morgan fingerprint object directly.</li>
+<li>The <code>.apply</code> function applies the <code>generate_descriptors</code> function to each SMILES string in the DataFrame.</li>
+<li>The <code>unpack_descriptors</code> function transforms the descriptors (dictionary) into separate columns in the DataFrame.  This makes the descriptors usable in machine learning models.</li>
+<li>Rows where descriptor generation fails are dropped.</li>
+<li>The code converts Morgan Fingerprints to sparse arrays and create individual columns for each bit using the <code>fingerprint_to_array</code> function.</li>
+</ul>
+</li>
+<li><strong>Feature Scaling:</strong> StandardScaler is used to scale numerical features.</li>
+<li><strong>Saving Preprocessed Data:</strong> The preprocessed data is saved to a new CSV file.</li>
+</ul>
+<p><strong>4. Python Code (Jupyter Notebook - <code>Topic_CheMBL_35_54_2_Model_Building_and_Evaluation.ipynb</code>)</strong></p>
+<p>```python
+import os
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np</p>
+<h1>Define base path</h1>
+<p>base_path = os.path.abspath(os.path.join(os.getcwd(), ".."))  # Assumes notebook is in a subfolder
+preprocessed_data_path = os.path.join(base_path, "data", "chembl_35_54_preprocessed_data.csv")</p>
+<h1>Load preprocessed data</h1>
+<p>try:
+    df = pd.read_csv(preprocessed_data_path)
+    print("Preprocessed data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: File not found at {preprocessed_data_path}. Make sure the preprocessing notebook was run.")
+    exit()</p>
+<h1>Prepare data for modeling</h1>
+<p>X = df.drop(['chembl_id', 'canonical_smiles', 'standard_type', 'standard_value', 'standard_units', 'pIC50'], axis=1, errors='ignore') # Drop non-feature columns
+y = df['pIC50']</p>
+<h1>Handle any non-numeric values that might have slipped in</h1>
+<p>X = X.apply(pd.to_numeric, errors='coerce')  # Convert all columns to numeric, coercing errors to NaN
+X = X.fillna(X.mean())  # Fill remaining NaNs with the column mean</p>
+<h1>Train/Test Split</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Model Training</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Model Evaluation</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Feature Importance (for Linear Regression)</h1>
+<p>if hasattr(model, 'coef_'):
+    feature_importance = pd.DataFrame({'Feature': X.columns, 'Importance': model.coef_})
+    feature_importance = feature_importance.sort_values('Importance', ascending=False)
+    print("\nFeature Importance:")
+    print(feature_importance)
+else:
+    print("\nFeature importance not available for this model.")</p>
+<h1>Save the model (optional)</h1>
+<h1>import joblib</h1>
+<h1>model_path = os.path.join(base_path, "models", "chembl_35_54_linear_regression_model.joblib")</h1>
+<h1>joblib.dump(model, model_path)</h1>
+<h1>print(f"Model saved to: {model_path}")</h1>
+<p>```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Data Loading:</strong> Loads the preprocessed data.</li>
+<li><strong>Data Preparation:</strong><ul>
+<li>Splits the data into features (X) and target (y).  It's crucial to drop non-feature columns like IDs, SMILES strings, and the original activity values. The <code>errors='ignore'</code> prevents errors if some of these columns don't exist.</li>
+<li><strong>Handling Non-Numeric Values:</strong>  This is a <em>critical</em> addition.  Even after preprocessing, there's a chance that some non-numeric values might have slipped in.  The <code>X = X.apply(pd.to_numeric, errors='coerce')</code> line attempts to convert all columns in the feature matrix <code>X</code> to numeric values.  If a value cannot be converted (e.g., it's a string), it's replaced with <code>NaN</code>.  Then, <code>X = X.fillna(X.mean())</code> fills any remaining <code>NaN</code> values with the mean of the column.  This ensures that the model receives numeric input.</li>
+</ul>
+</li>
+<li><strong>Train/Test Split:</strong> Splits the data into training and testing sets.</li>
+<li><strong>Model Training:</strong> Trains a Linear Regression model.  You can easily substitute this with other models.</li>
+<li><strong>Model Evaluation:</strong> Evaluates the model using Mean Squared Error (MSE) and R-squared.</li>
+<li><strong>Feature Importance:</strong>  Prints the feature importance scores (only applicable to linear models).</li>
+<li><strong>Model Saving (Optional):</strong>  Shows how to save the trained model using <code>joblib</code>.  Uncomment the lines to save the model.  You'll also need to <code>import joblib</code>.</li>
+</ul>
+<p><strong>Addressing the scikit-learn Error:</strong></p>
+<p>The error  <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code> means one of two things:</p>
+<ol>
+<li><strong>Upgrade scikit-learn:</strong> This is the <em>recommended</em> solution.  In your Jupyter Notebook, run <code>!pip install --upgrade scikit-learn</code>.  Then, restart the kernel.</li>
+<li><strong>Remove <code>squared=False</code>:</strong> If you cannot upgrade scikit-learn, simply remove the <code>squared=False</code> argument from the <code>mean_squared_error</code> function.  However, this will return the Mean Squared Error (MSE) instead of the Root Mean Squared Error (RMSE).</li>
+</ol>
+<p><strong>5. Examples</strong></p>
+<p>Here are five examples focusing on different aspects of the analysis:</p>
+<ol>
+<li>
+<p><strong>Target Selection and Activity Type Exploration:</strong>  Focus on exploring the different target IDs and activity types available in your dataset. Modify the SQL query to select different target IDs and activity types (e.g., Ki, EC50) and then analyze the distribution of activity values for each combination.</p>
+</li>
+<li>
+<p><strong>Descriptor Selection and Correlation Analysis:</strong> Explore different RDKit descriptors beyond the basic ones I included.  Calculate a wider range of descriptors and then perform a correlation analysis to identify highly correlated descriptors.  Remove redundant descriptors before model building.</p>
+</li>
+<li>
+<p><strong>Model Comparison:</strong>  Experiment with different machine learning models (e.g., Random Forest, Support Vector Machine) and compare their performance on the same dataset.  Use cross-validation to obtain robust estimates of model performance.</p>
+</li>
+<li>
+<p><strong>Feature Selection Techniques:</strong> Implement different feature selection techniques, such as Recursive Feature Elimination (RFE) or SelectKBest, to identify the most relevant features for predicting activity. Compare the performance of models trained with and without feature selection.</p>
+</li>
+<li>
+<p><strong>Handling Different Activity Units:</strong> Extend the code to handle different activity units (e.g., uM, nM, pM). Implement a unit conversion function to standardize all activity values to a common unit before modeling.</p>
+</li>
+</ol>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>Chembl Version:</strong> Ensure you are using the correct Chembl version (35) consistently throughout your analysis.</li>
+<li><strong>Database Connection:</strong> Double-check your database connection parameters (IP address, username, password, database name) and ensure that you have the necessary permissions to access the database.</li>
+<li><strong>Error Handling:</strong> Implement robust error handling throughout your code to catch potential issues and provide informative error messages.</li>
+<li><strong>Documentation:</strong> Document your code thoroughly, including comments explaining each step of the analysis.</li>
+</ul>
+<p>By following this guide and adapting the code examples to your specific research question, you should be able to successfully analyze Chembl 35 data using RDKit and PostgreSQL. Remember to address the errors I highlighted and adjust the code based on your specific needs. Good luck!</p>
+        </body>
+        </html>
+        

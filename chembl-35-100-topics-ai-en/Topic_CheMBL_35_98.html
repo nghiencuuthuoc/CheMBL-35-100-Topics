@@ -1,0 +1,338 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_98</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Drug synergy potential prediction using ChEMBL</h1>
+<hr />
+<p>Okay, I understand. As a Pharmaceutical Research and Development Specialist, I can guide you through your Chembl 35 data analysis project using RDKit and address the errors you've encountered.  We'll focus on retrieving a manageable dataset (100 rows) for demonstration and analysis. We will utilize a simplified ML regression model.</p>
+<p><strong>1. Analysis Model Overview</strong></p>
+<p>Our analysis will focus on exploring bioactivity data from ChEMBL 35 and building a simple predictive model. Here's a breakdown:</p>
+<ul>
+<li><strong>Data Extraction (SQL):</strong><ul>
+<li>Retrieve activity data (e.g., IC50 values) and corresponding molecule information (e.g., SMILES strings) from the ChEMBL 35 database.  We'll filter to get a small subset (100 rows) for demonstration.</li>
+</ul>
+</li>
+<li><strong>Data Preprocessing (Python/RDKit):</strong><ul>
+<li>Clean and prepare the data. This includes:<ul>
+<li>Handling missing values.</li>
+<li>Converting IC50 values to pIC50 (a more convenient scale for machine learning).</li>
+<li>Converting SMILES strings to RDKit Mol objects.</li>
+<li>Generating molecular descriptors (features) using RDKit.  These descriptors are numerical representations of molecular properties that can be used in machine learning.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Model Building (Python/Scikit-learn):</strong><ul>
+<li>Select a simple regression model (e.g., Linear Regression, Ridge Regression) to predict pIC50 values based on the molecular descriptors.</li>
+<li>Split the data into training and testing sets.</li>
+<li>Train the model on the training data.</li>
+<li>Evaluate the model's performance on the testing data using metrics like Mean Squared Error (MSE) or R-squared.</li>
+</ul>
+</li>
+</ul>
+<p><strong>2. Code (SQL &amp; Python)</strong></p>
+<p>Here's the code, addressing your specific requirements and errors.</p>
+<p><strong>2.1 SQL Code (<code>Topic_CheMBL_35_98_SQL.sql</code>)</strong></p>
+<p>```sql
+-- Connect to the chembl_35 database</p>
+<p>-- Extract data: molecule structures and bioactivity.  Limiting to 100 for demonstration.
+SELECT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type = 'IC50'  -- Focus on IC50 values
+    AND act.standard_units = 'nM' -- Ensure units are consistent
+    --AND act.standard_value ~ '^[0-9.]+$'  -- Filter for valid numeric values (see explanation below)
+    AND cs.canonical_smiles IS NOT NULL
+    AND act.standard_value IS NOT NULL
+LIMIT 100;</p>
+<p>-- Save the query results as a CSV file.  This is done through pgAdmin's export functionality.
+```</p>
+<p><strong>Explanation of the SQL Code and the Error (ERROR: operator does not exist: numeric ~ unknown):</strong></p>
+<ul>
+<li>
+<p>The original SQL query included <code>AND act.standard_value ~ '^[0-9\.]+$'</code>. This was intended to filter out <code>standard_value</code> entries that were not purely numeric. However, the error message "operator does not exist: numeric ~ unknown" indicates that PostgreSQL can't directly use regular expressions (<code>~</code>) to match against a <code>numeric</code> column.  The column <code>standard_value</code> is likely defined as <code>numeric</code> in your database.</p>
+</li>
+<li>
+<p><strong>Solution:</strong> Remove the line <code>AND act.standard_value ~ '^[0-9\.]+$'</code> . Instead, handle invalid values in the Python code after importing the CSV file. This is a more robust approach, allowing you to handle potential errors gracefully. We will use <code>pd.to_numeric</code> with <code>errors='coerce'</code> to handle this in the python code.</p>
+</li>
+<li>
+<p>The SQL query is designed to extract data from the <code>molecule_dictionary</code>, <code>compound_structures</code>, and <code>activities</code> tables in ChEMBL. It joins these tables based on their shared identifiers (<code>molregno</code>). It filters the data to include only IC50 values measured in nM and ensures both the SMILES string and the IC50 value are not null. Finally, it limits the output to 100 rows.</p>
+</li>
+</ul>
+<p><strong>2.2 Python Code (<code>notebook/Topic_CheMBL_35_98_1_DataPrep_Modeling.ipynb</code>)</strong></p>
+<p>```python
+import os
+import pandas as pd
+import numpy as np
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
+import math</p>
+<h1>Define the base path for your project (adjust as needed)</h1>
+<p>base_path = "../data"
+csv_file_path = os.path.join(base_path, "Topic_CheMBL_35_98_SQL.csv")</p>
+<h1>1. Data Loading and Preprocessing</h1>
+<p>try:
+    df = pd.read_csv(csv_file_path)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: File not found at {csv_file_path}")
+    exit()</p>
+<h1>Handle missing values (important!)</h1>
+<p>df.dropna(subset=['canonical_smiles', 'standard_value'], inplace=True)</p>
+<h1>Convert 'standard_value' to numeric, handling errors</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df.dropna(subset=['standard_value'], inplace=True) # Drop rows where conversion failed</p>
+<h1>Convert IC50 to pIC50</h1>
+<p>def ic50_to_pic50(ic50):
+    """Converts IC50 (nM) to pIC50."""
+    pIC50 = 9 - np.log10(ic50)
+    return pIC50</p>
+<p>df['pIC50'] = df['standard_value'].apply(ic50_to_pic50)</p>
+<h1>RDKit Mol Objects and Descriptors</h1>
+<p>def smiles_to_descriptors(smiles):
+    """Converts SMILES string to RDKit Mol object and calculates descriptors."""
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None, None  # Handle invalid SMILES
+    # Add hydrogens to the molecule
+    mol = Chem.AddHs(mol)
+    # Calculate 3D coordinates
+    AllChem.EmbedMolecule(mol, AllChem.ETKDGv2())
+    descriptors = Descriptors.CalcMolDescriptors(mol)
+    return mol, descriptors</p>
+<p>df[['mol', 'descriptors']] = df['canonical_smiles'].apply(lambda x: pd.Series(smiles_to_descriptors(x)))</p>
+<h1>Drop rows with invalid SMILES</h1>
+<p>df.dropna(subset=['mol', 'descriptors'], inplace=True)</p>
+<h1>Extract descriptors into a feature matrix</h1>
+<p>def extract_descriptor_values(descriptors):
+    if descriptors is None:
+        return None
+    return list(descriptors.<strong>dict</strong>.values())</p>
+<p>df['descriptor_values'] = df['descriptors'].apply(extract_descriptor_values)
+df.dropna(subset=['descriptor_values'], inplace=True)  # Drop if descriptor calculation failed</p>
+<h1>Convert the list of descriptor values into a format suitable for scikit-learn</h1>
+<p>X = np.array(df['descriptor_values'].tolist())
+y = df['pIC50'].values</p>
+<h1>2. Data Splitting and Scaling</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Scale the features using StandardScaler</h1>
+<p>scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)</p>
+<h1>3. Model Training</h1>
+<p>model = LinearRegression()  # Or try Ridge Regression
+model.fit(X_train, y_train)</p>
+<h1>4. Model Evaluation</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Example predictions (first 5)</h1>
+<p>print("\nExample Predictions:")
+for i in range(min(5, len(y_test))):
+    print(f"Actual: {y_test[i]:.2f}, Predicted: {y_pred[i]:.2f}")
+```</p>
+<p><strong>Explanation of the Python Code:</strong></p>
+<ol>
+<li><strong>Import Libraries:</strong> Import necessary libraries like <code>pandas</code> for data manipulation, <code>RDKit</code> for cheminformatics tasks, and <code>scikit-learn</code> for machine learning.</li>
+<li><strong>Load Data:</strong> Load the CSV file you created from the SQL query using <code>pd.read_csv()</code>. Handle the <code>FileNotFoundError</code> exception.</li>
+<li><strong>Data Cleaning:</strong><ul>
+<li><strong>Handle Missing Values:</strong> Use <code>df.dropna()</code> to remove rows with missing values in the 'canonical_smiles' or 'standard_value' columns.  This is <em>crucial</em>.</li>
+<li><strong>Convert to Numeric:</strong> Convert the <code>standard_value</code> column to numeric using <code>pd.to_numeric(errors='coerce')</code>. <code>errors='coerce'</code> will turn any non-numeric values into <code>NaN</code>, which can then be removed using <code>df.dropna()</code>. This resolves the original SQL error workaround.</li>
+</ul>
+</li>
+<li><strong>IC50 to pIC50 Conversion:</strong> Converts IC50 values to pIC50 using the formula: pIC50 = 9 - log10(IC50).</li>
+<li><strong>SMILES to RDKit Mol Objects and Descriptors:</strong><ul>
+<li>The <code>smiles_to_descriptors</code> function converts SMILES strings to RDKit Mol objects. It also calculates a set of molecular descriptors using <code>Descriptors.CalcMolDescriptors</code>.  Crucially, it handles potential errors where a SMILES string might be invalid.  It also adds Hydrogens to the molecule and calculates 3D coordinates before calculating descriptors - this is very important.</li>
+<li>The code then applies this function to each SMILES string in the DataFrame and stores the Mol objects and descriptors.</li>
+<li>It handles invalid SMILES by dropping rows where <code>mol</code> or <code>descriptors</code> are <code>None</code>.</li>
+</ul>
+</li>
+<li><strong>Feature Extraction:</strong> Extracts the calculated descriptors into a numerical feature matrix <code>X</code>.</li>
+<li><strong>Data Splitting:</strong> Splits the data into training and testing sets using <code>train_test_split</code>.</li>
+<li><strong>Scaling:</strong> Scale the training and testing features using <code>StandardScaler</code>. This is <em>important</em> for many machine learning algorithms, especially those based on distance calculations.</li>
+<li><strong>Model Training:</strong> Creates a <code>LinearRegression</code> model and trains it on the training data.  You can easily swap this out for another regression model like <code>Ridge</code> or <code>RandomForestRegressor</code>.</li>
+<li><strong>Model Evaluation:</strong> Predicts pIC50 values for the test set and evaluates the model's performance using Mean Squared Error (MSE) and R-squared.</li>
+<li><strong>Example Predictions:</strong> Prints a few example predictions to show how the model is performing.</li>
+</ol>
+<p><strong>Addressing Error 4b: old scikit-learn version does not support parameters squared=False in the mean_squared_error function</strong></p>
+<p>The parameter <code>squared=False</code> in <code>mean_squared_error</code> is used to return the Root Mean Squared Error (RMSE) instead of the MSE.  Since your scikit-learn version doesn't support it, simply remove the <code>squared=False</code> argument to get the MSE.  The code above reflects this change: <code>mse = mean_squared_error(y_test, y_pred)</code>.  If you need the RMSE, calculate it manually: <code>rmse = math.sqrt(mse)</code>.</p>
+<p><strong>3. Creating the AIMLops Standard folder tree</strong></p>
+<p>Create the following directory structure:</p>
+<p><code>Topic_CheMBL_35_98/
+├── data/
+│   └── Topic_CheMBL_35_98_SQL.csv
+├── notebooks/
+│   └── Topic_CheMBL_35_98_1_DataPrep_Modeling.ipynb
+└── models/
+    └── (Placeholder for saved models - not used in this example)</code></p>
+<ul>
+<li><strong><code>data/</code>:</strong>  This folder will contain the <code>Topic_CheMBL_35_98_SQL.csv</code> file generated from your SQL query.</li>
+<li><strong><code>notebooks/</code>:</strong> This folder will contain the Jupyter Notebook (<code>Topic_CheMBL_35_98_1_DataPrep_Modeling.ipynb</code>).</li>
+<li><strong><code>models/</code>:</strong>  This folder is a placeholder for saving trained models.  In this simplified example, we're not saving the model, but in a real project, you would use this folder.  You can save the trained model using <code>pickle</code> or <code>joblib</code>.</li>
+</ul>
+<p><strong>4. Running the Code</strong></p>
+<ol>
+<li><strong>Execute the SQL Query:</strong> Run the SQL query (<code>Topic_CheMBL_35_98_SQL.sql</code>) in pgAdmin connected to your ChEMBL 35 database (ip: 192.168.206.136, user: rd, pass: rd, database: chembl_35). Save the results as a CSV file named <code>Topic_CheMBL_35_98_SQL.csv</code> in the <code>data/</code> folder.  <strong>Important:</strong>  In pgAdmin, right-click on the query results and choose "Copy with Headers" to copy the data to your clipboard. Then, paste the contents of your clipboard into the file <code>Topic_CheMBL_35_98_SQL.csv</code> after creating the file.  Make sure the headers from the SQL query are included in the file.</li>
+<li><strong>Open the Jupyter Notebook:</strong> Open the Jupyter Notebook (<code>Topic_CheMBL_35_98_1_DataPrep_Modeling.ipynb</code>) in the <code>notebooks/</code> folder.</li>
+<li><strong>Run the Notebook:</strong> Execute each cell in the notebook sequentially. The code will load the data, perform preprocessing, train the model, and evaluate its performance.  Pay attention to the output of each cell to identify any errors or warnings.</li>
+</ol>
+<p><strong>5. Example Results (Output from the Python Code)</strong></p>
+<p>The output you see will depend on the specific data extracted from your ChEMBL 35 database. Here's an example of what the output might look like:</p>
+<p>```
+Data loaded successfully.
+Mean Squared Error: 1.253456789012345
+R-squared: 0.6789012345678901</p>
+<p>Example Predictions:
+Actual: 6.50, Predicted: 7.12
+Actual: 8.20, Predicted: 7.85
+Actual: 5.90, Predicted: 6.23
+Actual: 7.10, Predicted: 6.98
+Actual: 9.00, Predicted: 8.55
+```</p>
+<p><strong>Key Takeaways and Next Steps</strong></p>
+<ul>
+<li><strong>Error Handling:</strong> The code includes error handling for file loading and SMILES conversion, making it more robust.</li>
+<li><strong>Data Cleaning:</strong> Handling missing values and converting to numeric types are critical steps in data preprocessing.</li>
+<li><strong>Feature Engineering:</strong>  Molecular descriptors are important features for modeling bioactivity.</li>
+<li><strong>Model Selection:</strong>  Linear Regression is a simple starting point.  Experiment with other regression models like Ridge Regression, Random Forest, or Gradient Boosting for potentially better performance.</li>
+<li><strong>Hyperparameter Tuning:</strong>  Tune the hyperparameters of your chosen model using techniques like cross-validation to optimize its performance.</li>
+<li><strong>Model Validation:</strong> Use a separate validation set to assess the model's generalization ability.</li>
+<li><strong>Save the Model:</strong>  Use <code>pickle</code> or <code>joblib</code> to save the trained model so you can reuse it later without retraining.</li>
+<li><strong>Further Exploration:</strong> Explore other molecular descriptors and feature selection techniques to improve the model's accuracy.</li>
+</ul>
+<p><strong>6. Five Examples of How to Extend the Analysis</strong></p>
+<p>Here are five examples of things you could do to further extend this analysis, along with brief code snippets to get you started:</p>
+<ol>
+<li><strong>Try Different Molecular Descriptors:</strong>  Experiment with different sets of molecular descriptors.</li>
+</ol>
+<p>```python
+from rdkit.Chem import Descriptors3D  # 3D descriptors
+from rdkit.Chem import Lipinski  # Lipinski's Rule of Five descriptors</p>
+<p>def smiles_to_extended_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None, None
+    mol = Chem.AddHs(mol)
+    AllChem.EmbedMolecule(mol, AllChem.ETKDGv2())</p>
+<pre><code># Calculate a few more descriptors as an example
+mw = Descriptors.MolWt(mol)
+logp = Descriptors.MolLogP(mol)
+hba = Lipinski.NumHAcceptors(mol)
+hbd = Lipinski.NumHDonors(mol)
+tpsa = Descriptors3D.TPSA(mol)
+
+return mol, (mw, logp, hba, hbd, tpsa)
+</code></pre>
+<p>df[['mol', 'extended_descriptors']] = df['canonical_smiles'].apply(lambda x: pd.Series(smiles_to_extended_descriptors(x)))</p>
+<h1>Extract the new descriptors into a numpy array</h1>
+<p>def extract_extended_descriptor_values(descriptors):
+  if descriptors is None:
+      return None
+  return list(descriptors)</p>
+<p>df['extended_descriptor_values'] = df['extended_descriptors'].apply(extract_extended_descriptor_values)</p>
+<h1>Drop rows where extended_descriptor_values are null</h1>
+<p>df.dropna(subset=['extended_descriptor_values'], inplace=True)</p>
+<h1>Convert the list of extended descriptor values into a format suitable for scikit-learn</h1>
+<p>X_extended = np.array(df['extended_descriptor_values'].tolist())
+```</p>
+<ol>
+<li><strong>Use a Different Regression Model:</strong>  Try a non-linear model like <code>RandomForestRegressor</code> or <code>GradientBoostingRegressor</code>.</li>
+</ol>
+<p>```python
+from sklearn.ensemble import RandomForestRegressor</p>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42) # Example parameters
+model.fit(X_train, y_train)</p>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Random Forest Mean Squared Error: {mse}")
+print(f"Random Forest R-squared: {r2}")
+```</p>
+<ol>
+<li><strong>Implement Cross-Validation:</strong>  Use cross-validation to get a more robust estimate of the model's performance.</li>
+</ol>
+<p>```python
+from sklearn.model_selection import cross_val_score, KFold</p>
+<p>kf = KFold(n_splits=5, shuffle=True, random_state=42)  # 5-fold cross-validation
+cv_scores = cross_val_score(model, X, y, cv=kf, scoring='neg_mean_squared_error')
+cv_mse = -cv_scores.mean()  # Convert back to positive MSE
+print(f"Cross-Validation Mean Squared Error: {cv_mse}")
+```</p>
+<ol>
+<li><strong>Visualize the Results:</strong>  Create scatter plots of predicted vs. actual pIC50 values.</li>
+</ol>
+<p>```python
+import matplotlib.pyplot as plt</p>
+<p>plt.scatter(y_test, y_pred)
+plt.xlabel("Actual pIC50")
+plt.ylabel("Predicted pIC50")
+plt.title("Actual vs. Predicted pIC50 Values")
+plt.show()
+```</p>
+<ol>
+<li><strong>Implement Feature Selection:</strong> Use feature selection techniques to identify the most important descriptors.
+```python
+from sklearn.feature_selection import SelectKBest, f_regression</li>
+</ol>
+<h1>Use SelectKBest to select the 10 best features based on f_regression</h1>
+<p>selector = SelectKBest(score_func=f_regression, k=10)
+X_new = selector.fit_transform(X, y)</p>
+<h1>Get the indices of the selected features</h1>
+<p>selected_indices = selector.get_support(indices=True)</p>
+<h1>Print the selected features</h1>
+<p>print("Selected feature indices:", selected_indices)</p>
+<p>```
+This is a starting point.  The specific techniques and code will need to be adapted to your specific data and research questions. Remember to consult the RDKit and scikit-learn documentation for more information on the available functions and options. Remember the models folder should contain model files to ensure AIMLops structure
+Let me know if you have any more questions.</p>
+        </body>
+        </html>
+        

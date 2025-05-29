@@ -1,0 +1,390 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_32</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Dự đoán cách thức gắn ligand bằng docking</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 kết hợp RDKit theo chuẩn MLOps. Dựa trên thông tin bạn cung cấp, chúng ta sẽ cùng nhau xây dựng quy trình làm việc hiệu quả và giải quyết các vấn đề phát sinh.</p>
+<p><strong>1. Phân tích mô hình phân tích (Analysis of the Analysis Model)</strong></p>
+<p>Chúng ta sẽ tập trung vào việc xây dựng một quy trình làm việc rõ ràng, dễ theo dõi và có khả năng mở rộng. Dưới đây là các bước chính:</p>
+<ul>
+<li><strong>Truy vấn dữ liệu từ ChEMBL 35:</strong> Sử dụng SQL để trích xuất thông tin cần thiết từ cơ sở dữ liệu ChEMBL 35. Chúng ta sẽ tập trung vào các bảng như <code>activities</code>, <code>molecule_dictionary</code>, và <code>compound_structures</code> để thu thập dữ liệu về hoạt tính sinh học, thông tin phân tử, và cấu trúc hóa học.</li>
+<li><strong>Tiền xử lý dữ liệu:</strong> Làm sạch và chuẩn hóa dữ liệu, xử lý các giá trị thiếu, và chuyển đổi dữ liệu về định dạng phù hợp cho phân tích.</li>
+<li><strong>Tính toán đặc trưng phân tử:</strong> Sử dụng RDKit để tính toán các đặc trưng phân tử (molecular features) từ cấu trúc hóa học của các hợp chất. Các đặc trưng này có thể bao gồm các thuộc tính vật lý hóa học, descriptor cấu trúc, và fingerprint.</li>
+<li><strong>Phân tích thống kê và mô hình hóa:</strong> Sử dụng các kỹ thuật thống kê và học máy để khám phá mối quan hệ giữa các đặc trưng phân tử và hoạt tính sinh học. Chúng ta có thể sử dụng các mô hình như hồi quy tuyến tính, random forest, hoặc mạng neural để dự đoán hoạt tính của các hợp chất mới.</li>
+<li><strong>Đánh giá mô hình:</strong> Đánh giá hiệu suất của mô hình bằng cách sử dụng các chỉ số phù hợp như RMSE, R-squared, và AUC.</li>
+<li><strong>Trực quan hóa dữ liệu:</strong> Sử dụng các công cụ trực quan hóa để khám phá dữ liệu và trình bày kết quả một cách dễ hiểu.</li>
+</ul>
+<p><strong>2. Hướng dẫn song ngữ (Bilingual Guidance)</strong></p>
+<p><strong>2.1. SQL</strong></p>
+<ul>
+<li><strong>Mục tiêu:</strong> Trích xuất dữ liệu hoạt tính sinh học (bioactivity data) và thông tin phân tử (molecule information) từ cơ sở dữ liệu ChEMBL.</li>
+<li><strong>Ví dụ:</strong></li>
+</ul>
+<p>```sql
+-- English
+-- Extracting activity data and molecule information for a specific target
+SELECT
+    act.activity_id,
+    mol.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    cs.canonical_smiles
+FROM
+    activities act
+JOIN
+    molecule_dictionary mol ON act.molregno = mol.molregno
+JOIN
+    compound_structures cs ON mol.molregno = cs.molregno
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0
+    AND act.standard_value ~ '^[0-9.]+$' -- Ensure standard_value contains only numbers and dots
+LIMIT 100;</p>
+<p>-- Vietnamese
+-- Trích xuất dữ liệu hoạt tính và thông tin phân tử cho một mục tiêu cụ thể
+SELECT
+    act.activity_id,
+    mol.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    cs.canonical_smiles
+FROM
+    activities act
+JOIN
+    molecule_dictionary mol ON act.molregno = mol.molregno
+JOIN
+    compound_structures cs ON mol.molregno = cs.molregno
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0
+    AND act.standard_value ~ '^[0-9.]+$' -- Đảm bảo standard_value chỉ chứa số và dấu chấm
+LIMIT 100;
+```</p>
+<ul>
+<li><strong>Giải thích:</strong><ul>
+<li>Câu truy vấn này chọn các cột <code>activity_id</code>, <code>chembl_id</code>, <code>standard_type</code>, <code>standard_value</code>, <code>standard_units</code>, và <code>canonical_smiles</code> từ các bảng <code>activities</code>, <code>molecule_dictionary</code>, và <code>compound_structures</code>.</li>
+<li>Nó lọc dữ liệu để chỉ bao gồm các hoạt động có <code>standard_type</code> là 'IC50' và <code>standard_units</code> là 'nM', và <code>standard_value</code> không rỗng, lớn hơn 0, và chỉ chứa số và dấu chấm.</li>
+<li><code>LIMIT 100</code> giới hạn kết quả trả về 100 dòng.</li>
+</ul>
+</li>
+<li><strong>Sửa lỗi:</strong><ul>
+<li>Lỗi <code>ERROR: operator does not exist: numeric ~ unknown</code> xảy ra do bạn đang cố gắng sử dụng toán tử <code>~</code> (regex match) trên cột kiểu số (<code>standard_value</code>). Để khắc phục, bạn có thể ép kiểu <code>standard_value</code> sang kiểu text trước khi so sánh:</li>
+</ul>
+</li>
+</ul>
+<p><code>sql
+AND CAST(act.standard_value AS TEXT) ~ '^[0-9\.]+$'</code></p>
+<p><strong>2.2. Python</strong></p>
+<ul>
+<li><strong>Mục tiêu:</strong> Đọc dữ liệu từ file CSV, tính toán đặc trưng phân tử bằng RDKit, và xây dựng mô hình học máy.</li>
+<li><strong>Ví dụ:</strong></li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import os
+import numpy as np</p>
+<h1>Define base path</h1>
+<p>base_path = "../data"  # Adjust if needed</p>
+<h1>Load data from CSV</h1>
+<p>csv_file = "chembl_activity_data.csv" # Replace with your actual CSV file name
+data_path = os.path.join(base_path, csv_file)
+df = pd.read_csv(data_path)</p>
+<h1>Function to calculate molecular weight</h1>
+<p>def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return np.nan</p>
+<h1>Apply the function to create a new column 'molecular_weight'</h1>
+<p>df['molecular_weight'] = df['canonical_smiles'].apply(calculate_mw)</p>
+<h1>Drop rows with NaN values in 'standard_value' or 'molecular_weight'</h1>
+<p>df = df.dropna(subset=['standard_value', 'molecular_weight'])</p>
+<h1>Prepare data for modeling</h1>
+<p>X = df[['molecular_weight']]  # Feature: Molecular Weight
+y = df['standard_value']       # Target: standard_value</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a linear regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions on the test set</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Vietnamese</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import os
+import numpy as np</p>
+<h1>Định nghĩa đường dẫn gốc</h1>
+<p>base_path = "../data"  # Điều chỉnh nếu cần</p>
+<h1>Tải dữ liệu từ file CSV</h1>
+<p>csv_file = "chembl_activity_data.csv" # Thay thế bằng tên file CSV của bạn
+data_path = os.path.join(base_path, csv_file)
+df = pd.read_csv(data_path)</p>
+<h1>Hàm tính toán khối lượng phân tử</h1>
+<p>def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return np.nan</p>
+<h1>Áp dụng hàm để tạo cột mới 'molecular_weight'</h1>
+<p>df['molecular_weight'] = df['canonical_smiles'].apply(calculate_mw)</p>
+<h1>Loại bỏ các hàng có giá trị NaN trong 'standard_value' hoặc 'molecular_weight'</h1>
+<p>df = df.dropna(subset=['standard_value', 'molecular_weight'])</p>
+<h1>Chuẩn bị dữ liệu cho mô hình hóa</h1>
+<p>X = df[['molecular_weight']]  # Đặc trưng: Khối lượng phân tử
+y = df['standard_value']       # Mục tiêu: standard_value</p>
+<h1>Chia dữ liệu thành tập huấn luyện và tập kiểm tra</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Huấn luyện mô hình hồi quy tuyến tính</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Dự đoán trên tập kiểm tra</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Đánh giá mô hình</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<ul>
+<li><strong>Giải thích:</strong><ul>
+<li>Đoạn code này đọc dữ liệu từ file CSV, tính toán khối lượng phân tử từ SMILES sử dụng RDKit, và xây dựng một mô hình hồi quy tuyến tính để dự đoán <code>standard_value</code> dựa trên khối lượng phân tử.</li>
+<li>Nó chia dữ liệu thành tập huấn luyện và tập kiểm tra, huấn luyện mô hình trên tập huấn luyện, và đánh giá hiệu suất của mô hình trên tập kiểm tra.</li>
+</ul>
+</li>
+<li><strong>Sửa lỗi:</strong><ul>
+<li>Nếu bạn gặp lỗi <code>TypeError: mean_squared_error() got an unexpected keyword argument 'squared'</code>, điều này có nghĩa là phiên bản scikit-learn của bạn quá cũ. Bạn có thể nâng cấp scikit-learn bằng lệnh <code>pip install -U scikit-learn</code>. Nếu bạn không muốn nâng cấp, bạn có thể bỏ tham số <code>squared=False</code> (trong phiên bản cũ, mặc định <code>squared=True</code>, trả về MSE thay vì RMSE).</li>
+</ul>
+</li>
+</ul>
+<p><strong>3. Ví dụ code SQL và Python mẫu (Example SQL and Python Code Snippets)</strong></p>
+<p>Dưới đây là 5 ví dụ code SQL và Python mẫu để bạn tham khảo:</p>
+<p><strong>Ví dụ 1: Lọc dữ liệu theo khoảng giá trị (Filtering data by value range)</strong></p>
+<ul>
+<li><strong>SQL:</strong></li>
+</ul>
+<p>```sql
+-- English
+-- Select compounds with IC50 values between 100 and 1000 nM
+SELECT mol.chembl_id, act.standard_value
+FROM activities act
+JOIN molecule_dictionary mol ON act.molregno = mol.molregno
+WHERE act.standard_type = 'IC50'
+AND act.standard_units = 'nM'
+AND act.standard_value &gt;= 100
+AND act.standard_value &lt;= 1000
+LIMIT 100;</p>
+<p>-- Vietnamese
+-- Chọn các hợp chất có giá trị IC50 nằm giữa 100 và 1000 nM
+SELECT mol.chembl_id, act.standard_value
+FROM activities act
+JOIN molecule_dictionary mol ON act.molregno = mol.molregno
+WHERE act.standard_type = 'IC50'
+AND act.standard_units = 'nM'
+AND act.standard_value &gt;= 100
+AND act.standard_value &lt;= 1000
+LIMIT 100;
+```</p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<h1>Filter DataFrame for IC50 values between 100 and 1000</h1>
+<p>filtered_df = df[(df['standard_type'] == 'IC50') &amp; (df['standard_units'] == 'nM') &amp; (df['standard_value'] &gt;= 100) &amp; (df['standard_value'] &lt;= 1000)]</p>
+<h1>Vietnamese</h1>
+<h1>Lọc DataFrame cho các giá trị IC50 nằm giữa 100 và 1000</h1>
+<p>filtered_df = df[(df['standard_type'] == 'IC50') &amp; (df['standard_units'] == 'nM') &amp; (df['standard_value'] &gt;= 100) &amp; (df['standard_value'] &lt;= 1000)]
+```</p>
+<p><strong>Ví dụ 2: Tính toán logP sử dụng RDKit (Calculating logP using RDKit)</strong></p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<p>from rdkit.Chem import Crippen</p>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Crippen.MolLogP(mol)
+    else:
+        return None</p>
+<p>df['logp'] = df['canonical_smiles'].apply(calculate_logp)</p>
+<h1>Vietnamese</h1>
+<p>from rdkit.Chem import Crippen</p>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Crippen.MolLogP(mol)
+    else:
+        return None</p>
+<p>df['logp'] = df['canonical_smiles'].apply(calculate_logp)
+```</p>
+<p><strong>Ví dụ 3: Trích xuất dữ liệu cho một protein cụ thể (Extracting data for a specific protein)</strong></p>
+<ul>
+<li><strong>SQL:</strong></li>
+</ul>
+<p>```sql
+-- English
+-- Select activity data for a specific target (e.g., with target_chembl_id 'CHEMBL205')
+SELECT act.activity_id, mol.chembl_id, act.standard_value
+FROM activities act
+JOIN molecule_dictionary mol ON act.molregno = mol.molregno
+JOIN target_dictionary td ON act.tid = td.tid
+WHERE td.target_chembl_id = 'CHEMBL205'
+AND act.standard_type = 'IC50'
+AND act.standard_units = 'nM'
+LIMIT 100;</p>
+<p>-- Vietnamese
+-- Chọn dữ liệu hoạt tính cho một mục tiêu cụ thể (ví dụ, với target_chembl_id 'CHEMBL205')
+SELECT act.activity_id, mol.chembl_id, act.standard_value
+FROM activities act
+JOIN molecule_dictionary mol ON act.molregno = mol.molregno
+JOIN target_dictionary td ON act.tid = td.tid
+WHERE td.target_chembl_id = 'CHEMBL205'
+AND act.standard_type = 'IC50'
+AND act.standard_units = 'nM'
+LIMIT 100;
+```</p>
+<p><strong>Ví dụ 4: Sử dụng Random Forest để dự đoán hoạt tính (Using Random Forest to predict activity)</strong></p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<p>from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score</p>
+<h1>Assuming you have features X and target y</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)</p>
+<p>y_pred = model.predict(X_test)</p>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Vietnamese</h1>
+<p>from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score</p>
+<h1>Giả sử bạn có các đặc trưng X và mục tiêu y</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)</p>
+<p>y_pred = model.predict(X_test)</p>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>Ví dụ 5: Tính toán Tanimoto similarity giữa các phân tử (Calculating Tanimoto similarity between molecules)</strong></p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<p>from rdkit import DataStructs
+from rdkit.Chem import AllChem</p>
+<p>def calculate_tanimoto_similarity(smiles1, smiles2):
+    mol1 = Chem.MolFromSmiles(smiles1)
+    mol2 = Chem.MolFromSmiles(smiles2)</p>
+<pre><code>if mol1 and mol2:
+    fp1 = AllChem.GetMorganFingerprintAsBitVect(mol1, 2, nBits=2048)
+    fp2 = AllChem.GetMorganFingerprintAsBitVect(mol2, 2, nBits=2048)
+    return DataStructs.TanimotoSimilarity(fp1, fp2)
+else:
+    return None
+</code></pre>
+<h1>Example usage:</h1>
+<p>smiles1 = "CC(=O)Oc1ccccc1C(=O)O" # Aspirin
+smiles2 = "CC(=O)Nc1ccccc1O" # Paracetamol
+similarity = calculate_tanimoto_similarity(smiles1, smiles2)
+print(f"Tanimoto Similarity: {similarity}")</p>
+<h1>Vietnamese</h1>
+<p>from rdkit import DataStructs
+from rdkit.Chem import AllChem</p>
+<p>def calculate_tanimoto_similarity(smiles1, smiles2):
+    mol1 = Chem.MolFromSmiles(smiles1)
+    mol2 = Chem.MolFromSmiles(smiles2)</p>
+<pre><code>if mol1 and mol2:
+    fp1 = AllChem.GetMorganFingerprintAsBitVect(mol1, 2, nBits=2048)
+    fp2 = AllChem.GetMorganFingerprintAsBitVect(mol2, 2, nBits=2048)
+    return DataStructs.TanimotoSimilarity(fp1, fp2)
+else:
+    return None
+</code></pre>
+<h1>Ví dụ sử dụng:</h1>
+<p>smiles1 = "CC(=O)Oc1ccccc1C(=O)O" # Aspirin
+smiles2 = "CC(=O)Nc1ccccc1O" # Paracetamol
+similarity = calculate_tanimoto_similarity(smiles1, smiles2)
+print(f"Tanimoto Similarity: {similarity}")
+```</p>
+<p><strong>Lưu ý quan trọng:</strong></p>
+<ul>
+<li>Hãy thay thế các tên file và đường dẫn phù hợp với cấu trúc thư mục của bạn.</li>
+<li>Điều chỉnh các tham số của mô hình học máy để đạt được hiệu suất tốt nhất.</li>
+<li>Sử dụng các kỹ thuật tiền xử lý dữ liệu phù hợp để làm sạch và chuẩn hóa dữ liệu.</li>
+<li>Thường xuyên kiểm tra và đánh giá mô hình của bạn để đảm bảo rằng nó hoạt động tốt.</li>
+<li>Khi gặp lỗi, hãy đọc kỹ thông báo lỗi và tìm kiếm giải pháp trên Google hoặc Stack Overflow.</li>
+</ul>
+<p>Chúc bạn thành công với dự án của mình! Nếu bạn có bất kỳ câu hỏi nào, đừng ngần ngại hỏi.</p>
+        </body>
+        </html>
+        

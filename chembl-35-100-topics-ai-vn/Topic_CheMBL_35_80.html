@@ -1,0 +1,346 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_80</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Dòng thời gian về ngày phê duyệt thuốc</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 bằng RDKit. Với vai trò là một chuyên gia R&amp;D dược học, tôi hiểu rõ tầm quan trọng của việc khai thác dữ liệu lớn để đẩy nhanh quá trình phát triển thuốc. Dưới đây là phân tích chi tiết, hướng dẫn song ngữ, code mẫu SQL và Python để bạn tham khảo:</p>
+<p><strong>1. Phân tích Mô hình Phân tích (Analysis of Analytical Model)</strong></p>
+<p>Dựa trên thông tin bạn cung cấp, tôi hình dung quy trình phân tích dữ liệu của bạn như sau:</p>
+<ul>
+<li>
+<p><strong>Giai đoạn 1: Trích xuất dữ liệu từ ChEMBL 35 (Data Extraction from ChEMBL 35)</strong></p>
+<ul>
+<li>Sử dụng PostgreSQL (psql) và pgAdmin để truy vấn cơ sở dữ liệu ChEMBL 35.</li>
+<li>Viết các câu lệnh SQL để lọc, chọn và kết hợp dữ liệu cần thiết (ví dụ: cấu trúc hóa học, hoạt tính sinh học, thông tin về protein mục tiêu).</li>
+<li>Lưu kết quả truy vấn vào các file CSV (Comma Separated Values) để dễ dàng xử lý bằng Python.</li>
+<li>
+<p><strong>Giai đoạn 2: Tiền xử lý và Phân tích Dữ liệu bằng RDKit và scikit-learn (Data Preprocessing and Analysis using RDKit and scikit-learn)</strong></p>
+</li>
+<li>
+<p>Sử dụng RDKit để xử lý cấu trúc hóa học (ví dụ: tính toán descriptor phân tử, chuyển đổi SMILES sang các định dạng khác).</p>
+</li>
+<li>Sử dụng scikit-learn để xây dựng các mô hình học máy (ví dụ: dự đoán hoạt tính, phân loại hợp chất).</li>
+<li>Sử dụng Jupyter Notebook để viết và chạy code Python, trực quan hóa kết quả.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Mô hình phân tích chi tiết hơn:</strong></p>
+<ol>
+<li><strong>Data Acquisition:</strong> Connect to the ChEMBL database using SQL queries to extract relevant information about compounds and their bioactivity. This includes compound structures (SMILES strings), activity values (IC50, Ki, etc.), and target information.</li>
+<li><strong>Data Cleaning and Preprocessing:</strong> Handle missing data, convert activity values to a consistent unit (e.g., pIC50), and filter out irrelevant or unreliable data points. Address the error related to the <code>numeric ~ unknown</code> operator by ensuring consistent data types and proper casting.</li>
+<li><strong>Feature Engineering:</strong> Use RDKit to generate molecular descriptors from SMILES strings. These descriptors represent various physicochemical properties of the molecules, such as molecular weight, LogP, hydrogen bond donors/acceptors, etc.</li>
+<li><strong>Model Building and Evaluation:</strong> Train machine learning models (e.g., regression, classification) using the generated features and activity data. Evaluate the models using appropriate metrics (e.g., RMSE, R-squared for regression; accuracy, precision, recall for classification).  Address the <code>squared=False</code> error by updating scikit-learn or using <code>squared=True</code> if necessary.</li>
+<li><strong>Interpretation and Visualization:</strong> Analyze the model results to identify important features that contribute to bioactivity. Visualize the data and model predictions to gain insights into structure-activity relationships (SAR).</li>
+</ol>
+<p><strong>2. Hướng dẫn song ngữ (Bilingual Instructions)</strong></p>
+<p><strong>English:</strong></p>
+<p>This guide provides step-by-step instructions for analyzing ChEMBL 35 data using RDKit and scikit-learn. It covers data extraction, preprocessing, feature engineering, model building, and evaluation. Code examples in both SQL and Python are provided.</p>
+<p><strong>Tiếng Việt:</strong></p>
+<p>Hướng dẫn này cung cấp các bước chi tiết để phân tích dữ liệu ChEMBL 35 bằng RDKit và scikit-learn. Nó bao gồm trích xuất dữ liệu, tiền xử lý, trích xuất đặc trưng, xây dựng mô hình và đánh giá. Các ví dụ mã bằng cả SQL và Python được cung cấp.</p>
+<p><strong>3. Code mẫu SQL và Python (SQL and Python Code Examples)</strong></p>
+<p><strong>SQL (Ví dụ 1: Lấy thông tin cơ bản về hợp chất và hoạt tính)</strong></p>
+<p><code>sql
+-- Lấy 100 hợp chất có hoạt tính trên một mục tiêu cụ thể (ví dụ: CHEMBL205 - Tyrosine-protein kinase)
+-- Get 100 compounds with activity against a specific target (e.g., CHEMBL205 - Tyrosine-protein kinase)
+SELECT
+    cmp.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    mol.molfile
+FROM
+    compound_structures cmp
+JOIN
+    activities act ON cmp.molregno = act.molregno
+JOIN
+    molecule_dictionary mol ON cmp.molregno = mol.molregno
+WHERE
+    act.target_chembl_id = 'CHEMBL205'
+    AND act.standard_type = 'IC50'
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_units = 'nM'
+LIMIT 100;</code></p>
+<p><strong>SQL (Ví dụ 2: Lọc các giá trị hoạt tính số)</strong></p>
+<p><code>sql
+-- Lọc các hoạt động chỉ với các giá trị số
+-- Filter activities with only numeric values
+SELECT
+    act.molregno,
+    act.standard_value
+FROM
+    activities act
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value ~ '^[0-9\.]+$' -- Sửa lỗi: Đảm bảo giá trị là số
+LIMIT 100;</code></p>
+<p><strong>Khắc phục lỗi "operator does not exist: numeric ~ unknown"</strong>: Lỗi này xảy ra do bạn đang cố gắng sử dụng toán tử <code>~</code> (regular expression match) trên một cột kiểu <code>numeric</code>. Để khắc phục, bạn cần đảm bảo cột <code>act.standard_value</code> được ép kiểu về <code>text</code> trước khi so sánh với regular expression. Tuy nhiên, cách tốt nhất là kiểm tra xem giá trị có phải là số bằng các hàm số học của SQL.</p>
+<p><strong>SQL (Ví dụ 3: Sửa lỗi "operator does not exist")</strong></p>
+<p><code>sql
+-- Lọc các hoạt động chỉ với các giá trị số (sửa lỗi)
+-- Filter activities with only numeric values (error fixed)
+SELECT
+    act.molregno,
+    act.standard_value
+FROM
+    activities act
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9\.]+$'  -- Ép kiểu về text trước khi so sánh
+LIMIT 100;</code></p>
+<p>Hoặc, bạn có thể sử dụng một cách tiếp cận khác để kiểm tra xem giá trị có phải là số mà không cần sử dụng regular expression:</p>
+<p><code>sql
+-- Lọc các hoạt động chỉ với các giá trị số (cách khác)
+-- Filter activities with only numeric values (alternative approach)
+SELECT
+    act.molregno,
+    act.standard_value
+FROM
+    activities act
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0  -- Đảm bảo giá trị lớn hơn 0 (giả định IC50 luôn dương)
+LIMIT 100;</code></p>
+<p><strong>Python (Ví dụ 1: Đọc dữ liệu CSV và tính toán descriptor)</strong></p>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import os</p>
+<h1>Đường dẫn cơ sở của dự án (thay đổi nếu cần)</h1>
+<h1>Base path of the project (change if needed)</h1>
+<p>base_path = "../data"  # Thay đổi đường dẫn nếu cần / Change the path if needed</p>
+<h1>Đọc file CSV (ví dụ)</h1>
+<h1>Read CSV file (example)</h1>
+<p>csv_file = os.path.join(base_path, "chembl_data.csv")  # Thay đổi tên file nếu cần / Change the filename if needed
+df = pd.read_csv(csv_file)</p>
+<h1>Hàm tính toán Molecular Weight</h1>
+<h1>Function to calculate Molecular Weight</h1>
+<p>def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<h1>Áp dụng hàm tính toán MW cho cột 'smiles' (giả sử cột này chứa SMILES)</h1>
+<h1>Apply the MW calculation function to the 'smiles' column (assuming this column contains SMILES)</h1>
+<p>df['molecular_weight'] = df['smiles'].apply(calculate_mw)</p>
+<p>print(df.head())
+```</p>
+<p><strong>Python (Ví dụ 2: Xây dựng mô hình dự đoán hoạt tính)</strong></p>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import os</p>
+<h1>Đường dẫn cơ sở của dự án (thay đổi nếu cần)</h1>
+<h1>Base path of the project (change if needed)</h1>
+<p>base_path = "../data"  # Thay đổi đường dẫn nếu cần / Change the path if needed</p>
+<h1>Đọc file CSV (ví dụ)</h1>
+<h1>Read CSV file (example)</h1>
+<p>csv_file = os.path.join(base_path, "chembl_data.csv")  # Thay đổi tên file nếu cần / Change the filename if needed
+df = pd.read_csv(csv_file)</p>
+<h1>Tiền xử lý dữ liệu (ví dụ: chuyển đổi IC50 sang pIC50)</h1>
+<h1>Data preprocessing (e.g., convert IC50 to pIC50)</h1>
+<p>df = df.dropna(subset=['standard_value']) # Loại bỏ các hàng có giá trị 'standard_value' bị thiếu / Remove rows with missing 'standard_value'</p>
+<h1>Define pIC50 transformation function</h1>
+<p>def pIC50(IC50_nM):
+    pIC50 = -np.log10(IC50_nM<em>(10</em>*-9))
+    return pIC50</p>
+<p>df['pIC50'] = df['standard_value'].apply(pIC50) # Apply pIC50 transformation function
+df = df.replace([np.inf, -np.inf], np.nan) # Replace infinity values with NaN
+df = df.dropna(subset=['pIC50']) # Drop rows with NaN values</p>
+<h1>Hàm tính toán descriptor (ví dụ: Molecular Weight)</h1>
+<h1>Function to calculate descriptors (e.g., Molecular Weight)</h1>
+<p>def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<p>df['molecular_weight'] = df['smiles'].apply(calculate_mw) # Calculate molecular weight
+df = df.dropna(subset=['molecular_weight']) # Drop rows with missing MW</p>
+<h1>Chọn features và target</h1>
+<h1>Select features and target</h1>
+<p>X = df[['molecular_weight']]  # Ví dụ: chỉ sử dụng MW làm feature / Example: use only MW as a feature
+y = df['pIC50']</p>
+<h1>Chia dữ liệu thành tập huấn luyện và tập kiểm tra</h1>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Xây dựng mô hình Linear Regression</h1>
+<h1>Build Linear Regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Dự đoán trên tập kiểm tra</h1>
+<h1>Predict on the test set</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Đánh giá mô hình</h1>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>Khắc phục lỗi "squared=False"</strong>: Nếu bạn gặp lỗi này, hãy đảm bảo rằng bạn đang sử dụng phiên bản scikit-learn mới nhất. Nếu không thể nâng cấp, bạn có thể bỏ tham số <code>squared=False</code> (nó chỉ ảnh hưởng đến việc trả về MSE hay RMSE).</p>
+<p><strong>4. Thêm 3 ví dụ code SQL và Python mẫu (3 More SQL and Python Code Examples)</strong></p>
+<p><strong>SQL (Ví dụ 4: Lấy số lượng hợp chất cho mỗi target)</strong></p>
+<p><code>sql
+-- Lấy số lượng hợp chất có trong mỗi mục tiêu
+-- Get the number of compounds for each target
+SELECT
+    act.target_chembl_id,
+    COUNT(DISTINCT cmp.molregno) AS num_compounds
+FROM
+    activities act
+JOIN
+    compound_structures cmp ON act.molregno = cmp.molregno
+GROUP BY
+    act.target_chembl_id
+ORDER BY
+    num_compounds DESC
+LIMIT 100;</code></p>
+<p><strong>SQL (Ví dụ 5: Tìm các hợp chất có hoạt tính trên nhiều mục tiêu)</strong></p>
+<p><code>sql
+-- Tìm các hợp chất có hoạt tính trên nhiều mục tiêu
+-- Find compounds that are active against multiple targets
+SELECT
+    cmp.chembl_id,
+    COUNT(DISTINCT act.target_chembl_id) AS num_targets
+FROM
+    compound_structures cmp
+JOIN
+    activities act ON cmp.molregno = act.molregno
+GROUP BY
+    cmp.chembl_id
+HAVING
+    COUNT(DISTINCT act.target_chembl_id) &gt; 1
+ORDER BY
+    num_targets DESC
+LIMIT 100;</code></p>
+<p><strong>Python (Ví dụ 3: Tính toán LogP bằng RDKit)</strong></p>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from rdkit.Chem import Crippen
+import os</p>
+<h1>Đường dẫn cơ sở của dự án (thay đổi nếu cần)</h1>
+<h1>Base path of the project (change if needed)</h1>
+<p>base_path = "../data"  # Thay đổi đường dẫn nếu cần / Change the path if needed</p>
+<h1>Đọc file CSV (ví dụ)</h1>
+<h1>Read CSV file (example)</h1>
+<p>csv_file = os.path.join(base_path, "chembl_data.csv")  # Thay đổi tên file nếu cần / Change the filename if needed
+df = pd.read_csv(csv_file)</p>
+<h1>Hàm tính toán LogP</h1>
+<h1>Function to calculate LogP</h1>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Crippen.MolLogP(mol)
+    else:
+        return None</p>
+<h1>Áp dụng hàm tính toán LogP cho cột 'smiles'</h1>
+<h1>Apply the LogP calculation function to the 'smiles' column</h1>
+<p>df['logp'] = df['smiles'].apply(calculate_logp)</p>
+<p>print(df.head())
+```</p>
+<p><strong>Python (Ví dụ 4: Trực quan hóa kết quả với matplotlib)</strong></p>
+<p>```python
+import pandas as pd
+import matplotlib.pyplot as plt
+import os</p>
+<h1>Đường dẫn cơ sở của dự án (thay đổi nếu cần)</h1>
+<h1>Base path of the project (change if needed)</h1>
+<p>base_path = "../data"  # Thay đổi đường dẫn nếu cần / Change the path if needed</p>
+<h1>Đọc file CSV (ví dụ)</h1>
+<h1>Read CSV file (example)</h1>
+<p>csv_file = os.path.join(base_path, "chembl_data.csv")  # Thay đổi tên file nếu cần / Change the filename if needed
+df = pd.read_csv(csv_file)</p>
+<h1>Vẽ biểu đồ scatter giữa Molecular Weight và pIC50 (ví dụ)</h1>
+<h1>Create a scatter plot between Molecular Weight and pIC50 (example)</h1>
+<p>plt.scatter(df['molecular_weight'], df['pIC50'])
+plt.xlabel('Molecular Weight')
+plt.ylabel('pIC50')
+plt.title('Molecular Weight vs pIC50')
+plt.show()
+```</p>
+<p><strong>Python (Ví dụ 5: Tính toán TPSA - Topological Polar Surface Area)</strong></p>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors3D
+import os</p>
+<h1>Đường dẫn cơ sở của dự án (thay đổi nếu cần)</h1>
+<h1>Base path of the project (change if needed)</h1>
+<p>base_path = "../data"  # Thay đổi đường dẫn nếu cần / Change the path if needed</p>
+<h1>Đọc file CSV (ví dụ)</h1>
+<h1>Read CSV file (example)</h1>
+<p>csv_file = os.path.join(base_path, "chembl_data.csv")  # Thay đổi tên file nếu cần / Change the filename if needed
+df = pd.read_csv(csv_file)</p>
+<h1>Hàm tính toán TPSA</h1>
+<h1>Function to calculate TPSA</h1>
+<p>def calculate_tpsa(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors3D.TPSA(mol)
+    else:
+        return None</p>
+<h1>Áp dụng hàm tính toán TPSA cho cột 'smiles'</h1>
+<h1>Apply the TPSA calculation function to the 'smiles' column</h1>
+<p>df['tpsa'] = df['smiles'].apply(calculate_tpsa)</p>
+<p>print(df.head())
+```</p>
+<p><strong>Lưu ý quan trọng:</strong></p>
+<ul>
+<li>Hãy nhớ thay đổi đường dẫn file và tên file CSV cho phù hợp với cấu trúc thư mục và dữ liệu của bạn.</li>
+<li>Các ví dụ trên chỉ là điểm khởi đầu. Bạn cần điều chỉnh code cho phù hợp với mục tiêu nghiên cứu cụ thể của mình.</li>
+<li>Hãy luôn kiểm tra và làm sạch dữ liệu trước khi phân tích để đảm bảo kết quả chính xác.</li>
+<li>Nếu bạn gặp bất kỳ vấn đề nào khác, đừng ngần ngại hỏi!</li>
+</ul>
+<p>Chúc bạn thành công với dự án của mình!</p>
+        </body>
+        </html>
+        

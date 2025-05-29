@@ -1,0 +1,367 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_49</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Phân tích thuốc ChEMBL đã được FDA phê duyệt</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 này. Với vai trò là một chuyên gia R&amp;D dược học, tôi hiểu rõ tầm quan trọng của việc khai thác dữ liệu ChEMBL để tìm kiếm các hợp chất tiềm năng. Dưới đây là phân tích chi tiết, hướng dẫn song ngữ và các ví dụ code để bạn tham khảo:</p>
+<p><strong>1. Phân tích và Mô hình Phân tích (Analysis and Analytical Model)</strong></p>
+<p><strong>1.1. Mục tiêu (Objective)</strong></p>
+<ul>
+<li>Xây dựng mô hình dự đoán hoạt tính sinh học của các hợp chất dựa trên cấu trúc hóa học của chúng.</li>
+<li>Phân tích mối quan hệ giữa các đặc tính cấu trúc (descriptors) và hoạt tính sinh học.</li>
+<li>Tìm kiếm các hợp chất tiềm năng có hoạt tính mong muốn.</li>
+</ul>
+<p><strong>1.2. Dữ liệu (Data)</strong></p>
+<ul>
+<li><strong>Nguồn:</strong> ChEMBL 35 (cơ sở dữ liệu lớn chứa thông tin về các phân tử sinh học và hoạt tính của chúng).</li>
+<li><strong>Bảng chính:</strong><ul>
+<li><code>activities</code>: Chứa thông tin về hoạt tính sinh học của các hợp chất (ví dụ: IC50, Ki, EC50).</li>
+<li><code>molecule_dictionary</code>: Chứa thông tin về cấu trúc hóa học của các hợp chất (ví dụ: SMILES).</li>
+<li><code>compound_structures</code>: Chứa cấu trúc hóa học của các hợp chất ở nhiều định dạng.</li>
+</ul>
+</li>
+<li><strong>Đặc trưng hóa học (Chemical descriptors):</strong> Sử dụng RDKit để tính toán các đặc trưng hóa học từ cấu trúc SMILES. Các đặc trưng này có thể bao gồm:<ul>
+<li>Molecular Weight (Khối lượng phân tử)</li>
+<li>LogP (Hệ số phân vùng octanol-water)</li>
+<li>Hydrogen Bond Donors (Số lượng liên kết hydro cho)</li>
+<li>Hydrogen Bond Acceptors (Số lượng liên kết hydro nhận)</li>
+<li>Topological Polar Surface Area (Diện tích bề mặt cực topo)</li>
+<li>Số vòng (Number of rings)</li>
+<li>... và nhiều đặc trưng khác.</li>
+</ul>
+</li>
+</ul>
+<p><strong>1.3. Mô hình (Model)</strong></p>
+<p>Chúng ta có thể sử dụng nhiều mô hình khác nhau để dự đoán hoạt tính sinh học, tùy thuộc vào mục tiêu cụ thể và tính chất của dữ liệu. Dưới đây là một số lựa chọn phổ biến:</p>
+<ul>
+<li><strong>Hồi quy tuyến tính (Linear Regression):</strong> Đơn giản, dễ hiểu, phù hợp khi có mối quan hệ tuyến tính giữa các đặc trưng và hoạt tính.</li>
+<li><strong>Hồi quy Ridge/Lasso (Ridge/Lasso Regression):</strong> Cải thiện hồi quy tuyến tính bằng cách thêm các điều kiện ràng buộc để tránh overfitting.</li>
+<li><strong>Máy vector hỗ trợ (Support Vector Machines - SVM):</strong> Hiệu quả trong không gian đặc trưng cao, có thể xử lý dữ liệu phi tuyến tính.</li>
+<li><strong>Rừng ngẫu nhiên (Random Forest):</strong> Mạnh mẽ, có khả năng chống overfitting, cung cấp thông tin về tầm quan trọng của các đặc trưng.</li>
+<li><strong>Mạng nơ-ron (Neural Networks):</strong> Linh hoạt, có khả năng học các mối quan hệ phức tạp, nhưng đòi hỏi lượng dữ liệu lớn và điều chỉnh cẩn thận.</li>
+</ul>
+<p><strong>1.4. Quy trình (Process)</strong></p>
+<ol>
+<li><strong>Thu thập và chuẩn bị dữ liệu (Data Collection and Preparation):</strong><ul>
+<li>Truy vấn dữ liệu từ cơ sở dữ liệu ChEMBL bằng SQL.</li>
+<li>Làm sạch và tiền xử lý dữ liệu (xử lý giá trị thiếu, loại bỏ các giá trị ngoại lệ).</li>
+<li>Chuyển đổi dữ liệu SMILES thành các đối tượng phân tử RDKit.</li>
+<li>Tính toán các đặc trưng hóa học bằng RDKit.</li>
+</ul>
+</li>
+<li><strong>Lựa chọn đặc trưng (Feature Selection):</strong><ul>
+<li>Chọn các đặc trưng quan trọng nhất bằng các phương pháp như:<ul>
+<li>Phân tích phương sai (Variance Thresholding)</li>
+<li>Lựa chọn đặc trưng đơn biến (Univariate Feature Selection)</li>
+<li>Lựa chọn đặc trưng dựa trên cây (Tree-based Feature Selection)</li>
+<li>Loại bỏ đệ quy đặc trưng (Recursive Feature Elimination)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Xây dựng và huấn luyện mô hình (Model Building and Training):</strong><ul>
+<li>Chia dữ liệu thành tập huấn luyện và tập kiểm tra.</li>
+<li>Chọn một mô hình phù hợp và huấn luyện nó trên tập huấn luyện.</li>
+</ul>
+</li>
+<li><strong>Đánh giá mô hình (Model Evaluation):</strong><ul>
+<li>Đánh giá hiệu suất của mô hình trên tập kiểm tra bằng các độ đo phù hợp (ví dụ: R-squared, RMSE, MAE).</li>
+</ul>
+</li>
+<li><strong>Tối ưu hóa mô hình (Model Optimization):</strong><ul>
+<li>Điều chỉnh các siêu tham số của mô hình để cải thiện hiệu suất.</li>
+</ul>
+</li>
+<li><strong>Dự đoán và phân tích (Prediction and Analysis):</strong><ul>
+<li>Sử dụng mô hình đã huấn luyện để dự đoán hoạt tính của các hợp chất mới.</li>
+<li>Phân tích tầm quan trọng của các đặc trưng để hiểu rõ hơn về mối quan hệ cấu trúc-hoạt tính.</li>
+</ul>
+</li>
+</ol>
+<p><strong>2. Hướng dẫn Song ngữ (Bilingual Guide)</strong></p>
+<p>| Bước (Step)                       | Tiếng Anh (English)                                                                                                | Tiếng Việt (Vietnamese)                                                                                             |
+| :--------------------------------- | :------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------- |
+| 1. Kết nối CSDL (Connect DB)     | Connect to the ChEMBL database using the provided credentials.                                                    | Kết nối đến cơ sở dữ liệu ChEMBL bằng thông tin đăng nhập được cung cấp.                                           |
+| 2. Truy vấn dữ liệu (Query data) | Query the <code>activities</code>, <code>molecule_dictionary</code>, and <code>compound_structures</code> tables to retrieve relevant data.            | Truy vấn các bảng <code>activities</code>, <code>molecule_dictionary</code> và <code>compound_structures</code> để lấy dữ liệu liên quan.           |
+| 3. Tiền xử lý (Preprocessing)    | Clean and preprocess the data (handle missing values, outliers).                                                    | Làm sạch và tiền xử lý dữ liệu (xử lý giá trị thiếu, giá trị ngoại lệ).                                              |
+| 4. Đặc trưng (Feature Eng)      | Calculate chemical descriptors using RDKit from SMILES strings.                                                      | Tính toán các đặc trưng hóa học bằng RDKit từ chuỗi SMILES.                                                            |
+| 5. Xây dựng mô hình (Model Build) | Build and train a machine learning model to predict biological activity.                                              | Xây dựng và huấn luyện một mô hình học máy để dự đoán hoạt tính sinh học.                                            |
+| 6. Đánh giá (Evaluation)          | Evaluate the model's performance using appropriate metrics.                                                          | Đánh giá hiệu suất của mô hình bằng các độ đo phù hợp.                                                                |
+| 7. Phân tích (Analysis)           | Analyze the results and identify potential lead compounds.                                                           | Phân tích kết quả và xác định các hợp chất tiềm năng.                                                                |</p>
+<p><strong>3. Code SQL và Python (SQL and Python Code)</strong></p>
+<p><strong>3.1. SQL (ví dụ lấy 100 dòng)</strong></p>
+<p>```sql
+-- English
+-- Select 100 activities with standard_type 'IC50' and valid standard_value
+SELECT act.molregno, md.chembl_id, act.standard_value, act.standard_units,md.molecule_structures
+FROM activities act
+JOIN molecule_dictionary md ON act.molregno = md.molregno
+WHERE act.standard_type = 'IC50'
+  AND act.standard_relation = '='
+  AND act.standard_value IS NOT NULL
+  AND act.standard_value &gt; 0
+  AND act.standard_units = 'nM'
+  AND md.molecule_structures IS NOT NULL
+  AND md.molecule_structures LIKE '%SMILES%'</p>
+<p>LIMIT 100;</p>
+<p>-- Vietnamese
+-- Chọn 100 hoạt động có standard_type là 'IC50' và standard_value hợp lệ
+SELECT act.molregno, md.chembl_id, act.standard_value, act.standard_units,md.molecule_structures
+FROM activities act
+JOIN molecule_dictionary md ON act.molregno = md.molregno
+WHERE act.standard_type = 'IC50'
+  AND act.standard_relation = '='
+  AND act.standard_value IS NOT NULL
+  AND act.standard_value &gt; 0
+  AND act.standard_units = 'nM'
+  AND md.molecule_structures IS NOT NULL
+  AND md.molecule_structures LIKE '%SMILES%'
+LIMIT 100;
+```</p>
+<p><strong>Lưu ý:</strong> Lỗi <code>ERROR: operator does not exist: numeric ~ unknown</code> thường xảy ra khi bạn cố gắng sử dụng toán tử <code>~</code> (regular expression match) trên một cột kiểu số. Để khắc phục, bạn có thể chuyển đổi cột số thành kiểu text trước khi so sánh:
+Không cần thiết vì đã lọc <code>act.standard_value IS NOT NULL AND act.standard_value &gt; 0</code></p>
+<p><strong>3.2. Python (ví dụ tính toán đặc trưng và xây dựng mô hình)</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+import numpy as np</p>
+<h1>Define the base path</h1>
+<p>base_path = "../data"</p>
+<h1>Load data from CSV</h1>
+<p>data = pd.read_csv(os.path.join(base_path, "chembl_ic50_data.csv"))</p>
+<h1>Function to calculate molecular descriptors</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        descriptors = {desc[0]: desc<a href="mol">1</a> for desc in Descriptors.descList}
+        return descriptors
+    else:
+        return None</p>
+<h1>Apply descriptor calculation and handle errors</h1>
+<p>descriptors_list = []
+for index, row in data.iterrows():
+    try:
+        smiles = row['molecule_structures'].split('"')[3]
+        descriptors = calculate_descriptors(smiles)
+        if descriptors is not None:
+            descriptors['molregno'] = row['molregno']  # Keep molregno for merging
+            descriptors_list.append(descriptors)
+        else:
+            print(f"Could not compute descriptors for molregno {row['molregno']}")
+    except Exception as e:
+        print(f"Error processing molregno {row['molregno']}: {e}")</p>
+<h1>Convert list of descriptors to DataFrame</h1>
+<p>descriptors_df = pd.DataFrame(descriptors_list)</p>
+<h1>Merge descriptors with activity data</h1>
+<p>merged_data = pd.merge(data[['molregno', 'standard_value']], descriptors_df, on='molregno', how='inner')</p>
+<h1>Handle missing values by filling with the mean</h1>
+<p>merged_data.fillna(merged_data.mean(), inplace=True)</p>
+<h1>Prepare data for modeling</h1>
+<p>X = merged_data.drop(['molregno', 'standard_value'], axis=1)
+y = merged_data['standard_value']</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a linear regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions and evaluate the model</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+print(f"Mean Squared Error: {mse}")</p>
+<h1>--- Vietnamese ---</h1>
+<h1>Import các thư viện cần thiết</h1>
+<h1>Đường dẫn cơ sở đến thư mục dữ liệu</h1>
+<h1>Đọc dữ liệu từ file CSV</h1>
+<h1>Hàm tính toán các đặc trưng phân tử</h1>
+<h1>Áp dụng tính toán đặc trưng và xử lý lỗi</h1>
+<h1>Chuyển đổi danh sách các đặc trưng thành DataFrame</h1>
+<h1>Gộp các đặc trưng với dữ liệu hoạt tính</h1>
+<h1>Xử lý giá trị thiếu bằng cách điền bằng giá trị trung bình</h1>
+<h1>Chuẩn bị dữ liệu cho mô hình hóa</h1>
+<h1>Chia dữ liệu thành tập huấn luyện và tập kiểm tra</h1>
+<h1>Huấn luyện mô hình hồi quy tuyến tính</h1>
+<h1>Dự đoán và đánh giá mô hình</h1>
+<h1>In ra lỗi bình phương trung bình</h1>
+<p>```</p>
+<p><strong>Lưu ý:</strong> Nếu bạn gặp lỗi liên quan đến phiên bản scikit-learn, hãy cập nhật lên phiên bản mới nhất hoặc loại bỏ tham số <code>squared=False</code> nếu không cần thiết.</p>
+<p><strong>4. Ví dụ Code (Code Examples)</strong></p>
+<p>Dưới đây là 5 ví dụ code SQL và Python mẫu để bạn tham khảo:</p>
+<p><strong>Ví dụ 1: Lọc dữ liệu theo khoảng giá trị hoạt tính (Filtering data by activity range)</strong></p>
+<ul>
+<li><strong>SQL:</strong></li>
+</ul>
+<p>```sql
+-- English
+-- Select compounds with IC50 values between 100 and 1000 nM
+SELECT md.chembl_id, act.standard_value
+FROM activities act
+JOIN molecule_dictionary md ON act.molregno = md.molregno
+WHERE act.standard_type = 'IC50'
+  AND act.standard_relation = '='
+  AND act.standard_value &gt;= 100
+  AND act.standard_value &lt;= 1000
+LIMIT 100;</p>
+<p>-- Vietnamese
+-- Chọn các hợp chất có giá trị IC50 nằm trong khoảng từ 100 đến 1000 nM
+SELECT md.chembl_id, act.standard_value
+FROM activities act
+JOIN molecule_dictionary md ON act.molregno = md.molregno
+WHERE act.standard_type = 'IC50'
+  AND act.standard_relation = '='
+  AND act.standard_value &gt;= 100
+  AND act.standard_value &lt;= 1000
+LIMIT 100;
+```</p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<h1>Filter compounds with IC50 values between 100 and 1000 nM</h1>
+<p>filtered_data = data[(data['standard_value'] &gt;= 100) &amp; (data['standard_value'] &lt;= 1000)]
+print(filtered_data.head())</p>
+<h1>Vietnamese</h1>
+<h1>Lọc các hợp chất có giá trị IC50 nằm trong khoảng từ 100 đến 1000 nM</h1>
+<p>filtered_data = data[(data['standard_value'] &gt;= 100) &amp; (data['standard_value'] &lt;= 1000)]
+print(filtered_data.head())
+```</p>
+<p><strong>Ví dụ 2: Tính toán LogP (Calculating LogP)</strong></p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<h1>Function to calculate LogP using RDKit</h1>
+<p>from rdkit.Chem import AllChem
+from rdkit import DataStructs</p>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        logp = Descriptors.MolLogP(mol)
+        return logp
+    else:
+        return None</p>
+<h1>Apply LogP calculation</h1>
+<p>data['logp'] = data['molecule_structures'].apply(lambda x: calculate_logp(x.split('"')[3]) if isinstance(x, str) else None)
+print(data[['molecule_structures', 'logp']].head())</p>
+<h1>Vietnamese</h1>
+<h1>Hàm tính toán LogP sử dụng RDKit</h1>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        logp = Descriptors.MolLogP(mol)
+        return logp
+    else:
+        return None</p>
+<h1>Áp dụng tính toán LogP</h1>
+<p>data['logp'] = data['molecule_structures'].apply(lambda x: calculate_logp(x.split('"')[3]) if isinstance(x, str) else None)
+print(data[['molecule_structures', 'logp']].head())
+```</p>
+<p><strong>Ví dụ 3: Sử dụng Random Forest để dự đoán hoạt tính (Using Random Forest for activity prediction)</strong></p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<h1>Use Random Forest to predict activity</h1>
+<p>from sklearn.ensemble import RandomForestRegressor</p>
+<h1>Prepare data (assuming X and y are already defined)</h1>
+<p>X = merged_data.drop(['molregno', 'standard_value'], axis=1)
+y = merged_data['standard_value']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a Random Forest model</h1>
+<p>rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+rf_model.fit(X_train, y_train)</p>
+<h1>Make predictions and evaluate the model</h1>
+<p>y_pred = rf_model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+print(f"Mean Squared Error (Random Forest): {mse}")</p>
+<h1>Vietnamese</h1>
+<h1>Sử dụng Random Forest để dự đoán hoạt tính</h1>
+<h1>Chuẩn bị dữ liệu (giả sử X và y đã được định nghĩa)</h1>
+<h1>Huấn luyện mô hình Random Forest</h1>
+<h1>Dự đoán và đánh giá mô hình</h1>
+<p>```</p>
+<p><strong>Ví dụ 4: Phân tích tầm quan trọng của đặc trưng (Feature importance analysis)</strong></p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<h1>Analyze feature importance</h1>
+<p>import matplotlib.pyplot as plt</p>
+<p>importances = rf_model.feature_importances_
+feature_names = X.columns
+feature_importances = pd.DataFrame({'feature': feature_names, 'importance': importances})
+feature_importances = feature_importances.sort_values('importance', ascending=False)</p>
+<p>plt.figure(figsize=(10, 6))
+plt.bar(feature_importances['feature'], feature_importances['importance'])
+plt.xticks(rotation=90)
+plt.xlabel('Features')
+plt.ylabel('Importance')
+plt.title('Feature Importance')
+plt.tight_layout()
+plt.show()</p>
+<h1>Vietnamese</h1>
+<h1>Phân tích tầm quan trọng của đặc trưng</h1>
+<h1>Lấy tầm quan trọng của các đặc trưng từ mô hình</h1>
+<h1>Vẽ biểu đồ tầm quan trọng của các đặc trưng</h1>
+<p>```</p>
+<p><strong>Ví dụ 5: Lưu kết quả dự đoán (Saving prediction results)</strong></p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<h1>Save prediction results</h1>
+<p>predictions = pd.DataFrame({'actual': y_test, 'predicted': y_pred})
+predictions.to_csv(os.path.join(base_path, "predictions.csv"), index=False)
+print("Predictions saved to predictions.csv")</p>
+<h1>Vietnamese</h1>
+<h1>Lưu kết quả dự đoán</h1>
+<h1>Tạo DataFrame chứa giá trị thực tế và giá trị dự đoán</h1>
+<h1>Lưu DataFrame vào file CSV</h1>
+<p>```</p>
+<p>Hy vọng những hướng dẫn và ví dụ này sẽ giúp bạn tiến xa hơn trong dự án của mình. Nếu bạn có bất kỳ câu hỏi nào khác, đừng ngần ngại hỏi!</p>
+        </body>
+        </html>
+        

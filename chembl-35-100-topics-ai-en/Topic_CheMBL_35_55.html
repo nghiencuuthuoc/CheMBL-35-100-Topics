@@ -1,0 +1,593 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_55</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Drug safety flags and bioactivity profile</h1>
+<hr />
+<p>Okay, I understand. I'm playing the role of a Pharmaceutical Research and Development Specialist, and I will help you set up your Chembl 35 data analysis project using RDKit, focusing on the "Topic_CheMBL_35_55" code. I will provide SQL and Python code snippets, address the identified errors, limit the dataset to 100 rows, and follow the requested AIMLops structure.</p>
+<p><strong>1. Analysis of the Analysis Model</strong></p>
+<p>This project likely involves exploring structure-activity relationships (SAR) within the ChEMBL 35 database.  You are querying the database to extract bioactivity data (likely IC50, Ki, EC50 values) and molecular properties.  RDKit will then be used to generate molecular descriptors, and machine learning models will be trained to predict bioactivity based on these descriptors. By focusing on a limited dataset of 100 rows, we are essentially creating a proof-of-concept. This will allows to test the workflow, address errors and adjust parameters before scaling up the analysis to a larger dataset.
+<strong>Key Analysis steps</strong>
+*   <strong>Data Extraction (SQL):</strong>  Retrieve relevant data (molecular structures, bioactivity data) from ChEMBL.
+*   <strong>Data Preprocessing (Python):</strong> Clean and filter the data (e.g., handle missing values, standardize units).  Convert SMILES strings to RDKit molecules.
+*   <strong>Feature Generation (Python/RDKit):</strong> Calculate molecular descriptors using RDKit (e.g., molecular weight, logP, topological polar surface area (TPSA), number of rotatable bonds).
+*   <strong>Model Building (Python/Scikit-learn):</strong> Train a machine learning model (e.g., linear regression, random forest, support vector machine) to predict bioactivity based on the generated descriptors.
+*   <strong>Model Evaluation (Python):</strong> Evaluate the model's performance using appropriate metrics (e.g., R-squared, RMSE, MAE) on a held-out test set.</p>
+<p><strong>2. SQL and Python Code (with Corrections)</strong></p>
+<p><strong>File Structure:</strong>
+Let's assume your project structure looks like this:</p>
+<p><code>chembl_35_project/
+├── data/
+│   └── chembl35_activity_data.csv  # CSV file generated from SQL
+├── notebooks/
+│   └── Topic_CheMBL_35_55_1_data_extraction.ipynb
+│   └── Topic_CheMBL_35_55_2_model_building.ipynb
+└── README.md</code></p>
+<p><strong>2.1 SQL Code (save as <code>extract_chembl_data.sql</code> and run via pgAdmin to generate <code>chembl35_activity_data.csv</code>):</strong></p>
+<p>```sql
+-- Extracting data from ChEMBL 35 for Topic_CheMBL_35_55.
+-- Limited to 100 rows for testing.</p>
+<p>SELECT
+    act.molregno,
+    act.standard_type,
+    act.standard_relation,
+    act.standard_value,
+    act.standard_units,
+    cmp.canonical_smiles
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+JOIN
+    compound_structures cmp ON md.molregno = cmp.molregno
+WHERE
+    act.standard_type IN ('IC50', 'Ki', 'EC50')  -- Focus on relevant activity types
+    AND act.standard_relation = '='             -- Only consider exact values
+    AND act.standard_value IS NOT NULL          -- Exclude missing values
+    AND cmp.canonical_smiles IS NOT NULL       -- Exclude missing SMILES
+    AND act.standard_value::text ~ '^[0-9.]+$'  -- Corrected regex for numeric values. Cast to text before regex.
+LIMIT 100;</p>
+<p>-- Save the results to a CSV file using pgAdmin's export feature.
+```</p>
+<p><strong>Explanation of SQL Changes:</strong></p>
+<ul>
+<li><strong>Error 4.a Fix:</strong>  The error <code>ERROR: operator does not exist: numeric ~ unknown</code> arises because PostgreSQL's <code>~</code> operator (regex match) doesn't directly work on numeric types. To fix this, I've explicitly cast <code>act.standard_value</code> to <code>text</code> using <code>act.standard_value::text</code>.  This allows the regex <code>^[0-9\.]+$</code> (which matches strings consisting of only digits and periods) to work correctly.  This ensures that the <code>standard_value</code> is indeed a numeric representation.</li>
+<li><strong>Limit:</strong> The <code>LIMIT 100</code> clause restricts the query to the first 100 rows to avoid overwhelming your machine during testing.</li>
+<li><strong>Clarity:</strong>  Added comments to explain each section of the SQL query.</li>
+<li><strong>Data Integrity:</strong> Added <code>AND act.standard_relation = '='</code> to only get exact values of activities.</li>
+<li><strong>Missing Values:</strong> Added <code>AND act.standard_value IS NOT NULL</code> to avoid errors in downstream analysis.</li>
+</ul>
+<p><strong>After running the SQL query in pgAdmin, export the result as a CSV file named <code>chembl35_activity_data.csv</code> and save it in the <code>data/</code> directory.</strong></p>
+<p><strong>2.2 Python Code (in <code>notebooks/Topic_CheMBL_35_55_1_data_extraction.ipynb</code>):</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np #add for handle nan error
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score</p>
+<h1>Define base path</h1>
+<p>base_path = os.path.dirname(os.getcwd()) #Go up to the directory above notebooks
+data_path = os.path.join(base_path, 'data', 'chembl35_activity_data.csv')
+print(f"Data path: {data_path}")</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}.  Make sure you ran the SQL script and saved the CSV file in the correct location.")
+    exit()</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value']) # Drop rows with missing SMILES or activity values
+df = df[df['standard_value'].astype(str).str.match(r'^[0-9.]+$')] # Keep only numeric activity values as strings
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')  # Convert to numeric, handle errors, convert unconvertible values to NaN</p>
+<h1>Handle NaN values by removing them</h1>
+<p>df = df.dropna(subset=['standard_value'])</p>
+<p>print(f"Number of rows after cleaning: {len(df)}")
+print(df.head())
+```</p>
+<p><strong>Explanation of Python Code (<code>Topic_CheMBL_35_55_1_data_extraction.ipynb</code>):</strong></p>
+<ul>
+<li><strong>Path Handling:</strong> Uses <code>os.path.join</code> to create platform-independent file paths, adhering to AIMLops standards.</li>
+<li><strong>Error Handling:</strong> Includes a <code>try-except</code> block to handle <code>FileNotFoundError</code> in case the CSV file is not found.</li>
+<li><strong>Data Loading:</strong> Loads the CSV file into a Pandas DataFrame.</li>
+<li><strong>Data Cleaning:</strong><ul>
+<li>Removes rows with missing SMILES strings or <code>standard_value</code>s.</li>
+<li><strong>Ensures Numeric <code>standard_value</code>s:</strong>  This part is CRUCIAL.  It uses <code>.astype(str).str.match(r'^[0-9\.]+$')</code>  to <em>explicitly</em> filter <code>standard_value</code> to <em>only</em> those strings that represent numeric values (digits and periods). It addresses cases where the values are of mixed types due to issues with the original data. The explicit check with string-based regex avoids potential issues during the numeric conversion in the next step.</li>
+<li>Converts the <code>standard_value</code> column to numeric type using <code>pd.to_numeric</code>, handling potential conversion errors by setting invalid values to <code>NaN</code>.</li>
+<li>Removes any rows that resulted in <code>NaN</code> in the <code>standard_value</code> column after the conversion.</li>
+</ul>
+</li>
+</ul>
+<p><strong>2.3 Python Code (in <code>notebooks/Topic_CheMBL_35_55_2_model_building.ipynb</code>):</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np #add for handle nan error
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score</p>
+<h1>Define base path</h1>
+<p>base_path = os.path.dirname(os.getcwd()) #Go up to the directory above notebooks
+data_path = os.path.join(base_path, 'data', 'chembl35_activity_data.csv')</p>
+<h1>Load the data (same as before, but crucial to be included in this notebook too!)</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}.  Make sure you ran the SQL script and saved the CSV file in the correct location.")
+    exit()</p>
+<h1>Data Cleaning and Preprocessing (same as before, crucial to be included in this notebook too!)</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value']) # Drop rows with missing SMILES or activity values
+df = df[df['standard_value'].astype(str).str.match(r'^[0-9.]+$')] # Keep only numeric activity values as strings
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')  # Convert to numeric, handle errors, convert unconvertible values to NaN</p>
+<h1>Handle NaN values by removing them</h1>
+<p>df = df.dropna(subset=['standard_value'])</p>
+<h1>Feature Engineering (RDKit descriptors)</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None  # Handle invalid SMILES
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['RotBonds'] = Descriptors.NumRotatableBonds(mol)
+    return descriptors</p>
+<p>df['descriptors'] = df['canonical_smiles'].apply(calculate_descriptors)
+df = df.dropna(subset=['descriptors'])  # Remove rows where descriptor calculation failed (invalid SMILES)
+df = df[df['descriptors'].apply(lambda x: isinstance(x, dict))] #Ensure descriptors is a dictionary, removes rows where the lambda function returns none</p>
+<h1>Expand the descriptor column into separate columns</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Model Building</h1>
+<p>X = df[['MolWt', 'LogP', 'TPSA', 'HBD', 'HBA', 'RotBonds']]
+y = df['standard_value']</p>
+<h1>Handle any potential NaN values that might have been introduced in descriptor calculation</h1>
+<p>X = X.fillna(X.mean()) #Impute missing values with the mean</p>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Prediction and Evaluation</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Error 4.b Fix: Remove squared = False</h1>
+<p>mse = mean_squared_error(y_test, y_pred) #Remove squared = False
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>Explanation of Python Code (<code>Topic_CheMBL_35_55_2_model_building.ipynb</code>):</strong></p>
+<ul>
+<li><strong>Dependencies:</strong> Imports necessary libraries.</li>
+<li><strong>Path Handling:</strong> Same as before.  Uses <code>os.path.join</code> for robust path construction.</li>
+<li><strong>Data Loading and Cleaning:</strong>  <strong>CRITICAL:</strong>  The data loading and <em>identical</em> cleaning steps from <code>Topic_CheMBL_35_55_1_data_extraction.ipynb</code> are REPEATED here.  This is essential because this notebook runs independently.  It cannot rely on the state of the previous notebook. This prevents errors that occur if these processes are not done.</li>
+<li><strong>Feature Engineering:</strong><ul>
+<li>Defines a function <code>calculate_descriptors</code> that takes a SMILES string, converts it to an RDKit molecule, and calculates a set of molecular descriptors. Returns <code>None</code> if the SMILES is invalid.</li>
+<li>Applies this function to the <code>canonical_smiles</code> column to create a new <code>descriptors</code> column.</li>
+<li>Handles the cases where the SMILES strings are invalid by:<ul>
+<li>Removing rows where the <code>descriptors</code> calculation failed (SMILES strings were invalid). <code>df = df.dropna(subset=['descriptors'])</code></li>
+<li>Ensuring descriptors is a dictionary and that rows are removed where the lambda function returns none with  <code>df = df[df['descriptors'].apply(lambda x: isinstance(x, dict))]</code></li>
+</ul>
+</li>
+<li>Expands the <code>descriptors</code> column into separate columns for each descriptor.</li>
+</ul>
+</li>
+<li><strong>Model Building:</strong><ul>
+<li>Selects the descriptor columns as features (X) and the <code>standard_value</code> column as the target variable (y).</li>
+<li>Splits the data into training and testing sets.</li>
+<li>Creates a linear regression model, trains it on the training data, and makes predictions on the test data.</li>
+</ul>
+</li>
+<li><strong>Model Evaluation:</strong><ul>
+<li>Calculates the mean squared error (MSE) and R-squared (R2) to evaluate the model's performance.</li>
+</ul>
+</li>
+<li><strong>Error 4.b Fix:</strong> Removes the <code>squared=False</code> parameter from the <code>mean_squared_error</code> function. This is because older versions of scikit-learn do not support this parameter.</li>
+</ul>
+<p><strong>Important Considerations and Best Practices:</strong></p>
+<ul>
+<li><strong>Data Exploration:</strong> Before running the model, perform exploratory data analysis (EDA) to understand the distributions of the variables, identify potential outliers, and look for correlations between features.</li>
+<li><strong>Feature Selection/Engineering:</strong> The choice of descriptors can significantly impact model performance. Consider using feature selection techniques to identify the most relevant descriptors or engineering new features based on domain knowledge.</li>
+<li><strong>Model Selection:</strong> Linear regression is a simple model but may not be appropriate for all datasets. Experiment with other machine learning models, such as random forests, support vector machines, or neural networks.</li>
+<li><strong>Hyperparameter Tuning:</strong> Optimize the hyperparameters of the chosen model using techniques like cross-validation and grid search.</li>
+<li><strong>Scaling/Normalization:</strong> Consider scaling or normalizing the features before training the model, especially if you are using models that are sensitive to feature scaling (e.g., support vector machines).</li>
+<li><strong>Logging:</strong> Use a logging library to track the progress of your experiments, record important parameters and metrics, and facilitate reproducibility.</li>
+</ul>
+<p><strong>3. Five Examples of How to Run the Code</strong></p>
+<p>These examples show how to integrate the code in different scenarios.  They assume you have the correct folder structure and that the <code>chembl35_activity_data.csv</code> file is in the <code>data</code> directory.</p>
+<p><strong>Example 1: Running the entire pipeline from start to finish (CLI)</strong></p>
+<ol>
+<li>
+<p><strong>Execute SQL:</strong>  Using your terminal or command prompt (assuming <code>psql</code> is in your PATH) navigate to the <code>chembl_35_project</code> directory.
+    <code>bash
+    psql -h 192.168.206.136 -U rd -d chembl_35 -f extract_chembl_data.sql -o data/chembl35_activity_data.csv -P "header=on" -P "delimiter=," -P "format=csv"</code>
+    <em>(This assumes you have <code>extract_chembl_data.sql</code> in the project root.) Note: The specific command-line options for exporting to CSV depend on the database system; you may need to adjust them based on your psql version and preferences.</em></p>
+</li>
+<li>
+<p><strong>Run the Notebooks:</strong></p>
+<ul>
+<li>Open a terminal and navigate to the <code>chembl_35_project</code> directory.</li>
+<li>Activate your Conda environment (if you are using one): <code>conda activate &lt;your_env_name&gt;</code></li>
+<li>Run the notebooks in order:
+    <code>bash
+    jupyter notebook notebooks/Topic_CheMBL_35_55_1_data_extraction.ipynb
+    jupyter notebook notebooks/Topic_CheMBL_35_55_2_model_building.ipynb</code><ul>
+<li>This will open the notebooks in your web browser.  Run all cells in each notebook sequentially.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p><strong>Example 2:  Running from a single Python script (after SQL execution):</strong></p>
+<p>Create a new Python file (e.g., <code>run_analysis.py</code>) in your project directory with the following content:</p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score</p>
+<h1>--- Data Loading and Cleaning (Combined from both notebooks) ---</h1>
+<p>base_path = os.path.dirname(os.path.abspath(<strong>file</strong>))  # Get the directory of the script
+data_path = os.path.join(base_path, 'data', 'chembl35_activity_data.csv')</p>
+<p>try:
+    df = pd.read_csv(data_path)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}.  Make sure you ran the SQL script and saved the CSV file in the correct location.")
+    exit()</p>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])
+df = df[df['standard_value'].astype(str).str.match(r'^[0-9.]+$')]
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value'])</p>
+<h1>--- Feature Engineering ---</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['RotBonds'] = Descriptors.NumRotatableBonds(mol)
+    return descriptors</p>
+<p>df['descriptors'] = df['canonical_smiles'].apply(calculate_descriptors)
+df = df.dropna(subset=['descriptors'])
+df = df[df['descriptors'].apply(lambda x: isinstance(x, dict))]
+df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>--- Model Building and Evaluation ---</h1>
+<p>X = df[['MolWt', 'LogP', 'TPSA', 'HBD', 'HBA', 'RotBonds']]
+y = df['standard_value']
+X = X.fillna(X.mean())</p>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<p>y_pred = model.predict(X_test)</p>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<ul>
+<li><strong>Run from Terminal:</strong>  <code>python run_analysis.py</code></li>
+</ul>
+<p><strong>Example 3:  Using a Configuration File:</strong></p>
+<p>This is a more sophisticated approach for managing parameters.</p>
+<ol>
+<li>
+<p><strong>Create a Config File (e.g., <code>config.yaml</code>):</strong></p>
+<p><code>yaml
+database:
+  host: 192.168.206.136
+  user: rd
+  password: rd
+  name: chembl_35
+data_path: data/chembl35_activity_data.csv
+model:
+  test_size: 0.2
+  random_state: 42
+features:
+  - MolWt
+  - LogP
+  - TPSA
+  - HBD
+  - HBA
+  - RotBonds</code></p>
+</li>
+<li>
+<p><strong>Modify the Python Script (e.g., <code>run_analysis_config.py</code>):</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import yaml  # Import the YAML library</p>
+<h1>Load configuration from YAML file</h1>
+<p>with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)</p>
+<h1>--- Data Loading and Cleaning ---</h1>
+<p>base_path = os.path.dirname(os.path.abspath(<strong>file</strong>))  # Get the directory of the script
+data_path = os.path.join(base_path, config['data_path'])</p>
+<p>try:
+    df = pd.read_csv(data_path)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}.")
+    exit()</p>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])
+df = df[df['standard_value'].astype(str).str.match(r'^[0-9.]+$')]
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value'])</p>
+<h1>--- Feature Engineering ---</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['RotBonds'] = Descriptors.NumRotatableBonds(mol)
+    return descriptors</p>
+<p>df['descriptors'] = df['canonical_smiles'].apply(calculate_descriptors)
+df = df.dropna(subset=['descriptors'])
+df = df[df['descriptors'].apply(lambda x: isinstance(x, dict))]
+df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>--- Model Building and Evaluation ---</h1>
+<p>X = df[config['features']]
+y = df['standard_value']
+X = X.fillna(X.mean())</p>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=config['model']['test_size'], random_state=config['model']['random_state'])</p>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<p>y_pred = model.predict(X_test)</p>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+</li>
+<li>
+<p><strong>Run from Terminal:</strong> <code>python run_analysis_config.py</code></p>
+</li>
+</ol>
+<p><strong>Example 4:  Modularizing the code into functions</strong></p>
+<p>This is a good way to reuse functions.</p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score</p>
+<p>def load_and_clean_data(data_path):
+    """Loads data from CSV, cleans it, and returns a Pandas DataFrame."""
+    try:
+        df = pd.read_csv(data_path)
+        print("Data loaded successfully.")
+    except FileNotFoundError:
+        print(f"Error: File not found at {data_path}.")
+        exit()</p>
+<pre><code>df = df.dropna(subset=['canonical_smiles', 'standard_value'])
+df = df[df['standard_value'].astype(str).str.match(r'^[0-9\.]+$')]
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value'])
+return df
+</code></pre>
+<p>def calculate_descriptors(smiles):
+    """Calculates RDKit descriptors for a given SMILES string."""
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['RotBonds'] = Descriptors.NumRotatableBonds(mol)
+    return descriptors</p>
+<p>def feature_engineering(df):
+  """Calculate the descriptors and return a dataframe with the new features"""
+  df['descriptors'] = df['canonical_smiles'].apply(calculate_descriptors)
+  df = df.dropna(subset=['descriptors'])
+  df = df[df['descriptors'].apply(lambda x: isinstance(x, dict))]
+  df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)
+  return df</p>
+<p>def build_and_evaluate_model(X, y, test_size=0.2, random_state=42):
+    """Builds and evaluates a linear regression model."""
+    X = X.fillna(X.mean()) # Handle NaN values</p>
+<pre><code>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+return model #Return the model for later use if needed
+</code></pre>
+<p>if <strong>name</strong> == "<strong>main</strong>":
+    base_path = os.path.dirname(os.path.abspath(<strong>file</strong>))
+    data_path = os.path.join(base_path, 'data', 'chembl35_activity_data.csv')</p>
+<pre><code># Load and clean the data
+df = load_and_clean_data(data_path)
+
+# Feature Engineering
+df = feature_engineering(df)
+
+# Define features and target
+X = df[['MolWt', 'LogP', 'TPSA', 'HBD', 'HBA', 'RotBonds']]
+y = df['standard_value']
+
+# Build and evaluate the model
+model = build_and_evaluate_model(X, y)
+</code></pre>
+<p>```</p>
+<p><strong>Example 5: Creating a class for better organization</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score</p>
+<p>class BioactivityModel:
+    def <strong>init</strong>(self, data_path):
+        self.data_path = data_path
+        self.df = None #Initialize dataframe</p>
+<pre><code>def load_and_clean_data(self):
+    """Loads data from CSV, cleans it, and stores it in self.df."""
+    try:
+        self.df = pd.read_csv(self.data_path)
+        print("Data loaded successfully.")
+    except FileNotFoundError:
+        print(f"Error: File not found at {self.data_path}.")
+        exit()
+
+    self.df = self.df.dropna(subset=['canonical_smiles', 'standard_value'])
+    self.df = self.df[self.df['standard_value'].astype(str).str.match(r'^[0-9\.]+$')]
+    self.df['standard_value'] = pd.to_numeric(self.df['standard_value'], errors='coerce')
+    self.df = self.df.dropna(subset=['standard_value'])
+
+def calculate_descriptors(self, smiles):
+    """Calculates RDKit descriptors for a given SMILES string."""
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['RotBonds'] = Descriptors.NumRotatableBonds(mol)
+    return descriptors
+
+def feature_engineering(self):
+    """Calculate the descriptors and add them to the dataframe."""
+    if self.df is None:
+        print("Error: Dataframe is not loaded. Call load_and_clean_data() first.")
+        return
+
+    self.df['descriptors'] = self.df['canonical_smiles'].apply(self.calculate_descriptors)
+    self.df = self.df.dropna(subset=['descriptors'])
+    self.df = self.df[self.df['descriptors'].apply(lambda x: isinstance(x, dict))]
+    self.df = pd.concat([self.df.drop(['descriptors'], axis=1), self.df['descriptors'].apply(pd.Series)], axis=1)
+
+def build_and_evaluate_model(self, features, target, test_size=0.2, random_state=42):
+    """Builds and evaluates a linear regression model."""
+    if self.df is None:
+        print("Error: Dataframe is not loaded. Call load_and_clean_data() first.")
+        return
+
+    X = self.df[features]
+    y = self.df[target]
+
+    X = X.fillna(X.mean()) # Handle NaN values
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+
+    y_pred = model.predict(X_test)
+
+    mse = mean_squared_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
+
+    print(f"Mean Squared Error: {mse}")
+    print(f"R-squared: {r2}")
+    return model
+</code></pre>
+<p>if <strong>name</strong> == "<strong>main</strong>":
+    base_path = os.path.dirname(os.path.abspath(<strong>file</strong>))
+    data_path = os.path.join(base_path, 'data', 'chembl35_activity_data.csv')</p>
+<pre><code># Create an instance of the BioactivityModel class
+model = BioactivityModel(data_path)
+
+# Load and clean the data
+model.load_and_clean_data()
+
+# Feature Engineering
+model.feature_engineering()
+
+# Define features and target
+features = ['MolWt', 'LogP', 'TPSA', 'HBD', 'HBA', 'RotBonds']
+target = 'standard_value'
+
+# Build and evaluate the model
+linear_model = model.build_and_evaluate_model(features, target)
+</code></pre>
+<p>```</p>
+<p><strong>Important Notes for All Examples:</strong></p>
+<ul>
+<li><strong>Environment:</strong> Ensure you have the necessary Python libraries installed (pandas, RDKit, scikit-learn).  Use <code>pip install pandas rdkit scikit-learn pyyaml</code> to install them if you don't.</li>
+<li><strong>Adapt Paths:</strong>  Adjust the file paths (especially <code>data_path</code>) to match your actual project structure.</li>
+<li><strong>Data Validation:</strong>  Thoroughly inspect your data after each step (loading, cleaning, feature engineering) to ensure it's in the expected format and that no unexpected data loss has occurred.</li>
+<li><strong>Error Handling:</strong>  Implement more robust error handling (e.g., logging exceptions) in production code.</li>
+<li><strong>Experiment:</strong>  These examples are a starting point.  Experiment with different machine learning models, feature engineering techniques, and hyperparameter settings to improve the performance of your model.</li>
+</ul>
+<p>I hope this helps! Let me know if you have any other questions.</p>
+<hr />
+<p><strong>Analyse en Français (French Analysis):</strong></p>
+<p>Ce projet vise à explorer les relations structure-activité (SAR) dans la base de données ChEMBL 35, en se concentrant sur le code "Topic_CheMBL_35_55".  Vous interrogez la base de données pour extraire des données de bioactivité (probablement les valeurs IC50, Ki, EC50) et les propriétés moléculaires. RDKit sera ensuite utilisé pour générer des descripteurs moléculaires, et des modèles d'apprentissage automatique seront entraînés pour prédire la bioactivité en fonction de ces descripteurs. En nous concentrant sur un ensemble de données limité à 100 lignes, nous créons essentiellement une preuve de concept. Cela nous permettra de tester le flux de travail, de corriger les erreurs et d'ajuster les paramètres avant de mettre à l'échelle l'analyse sur un ensemble de données plus important.</p>
+<p><strong>Étapes Clés d'Analyse:</strong></p>
+<ul>
+<li><strong>Extraction de données (SQL) :</strong> Récupérer les données pertinentes (structures moléculaires, données de bioactivité) de ChEMBL.</li>
+<li><strong>Prétraitement des données (Python) :</strong> Nettoyer et filtrer les données (par exemple, gérer les valeurs manquantes, standardiser les unités). Convertir les chaînes SMILES en molécules RDKit</li>
+</ul>
+        </body>
+        </html>
+        

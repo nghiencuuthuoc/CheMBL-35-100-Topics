@@ -1,0 +1,409 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_61</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: QSAR with Random Forest and ChEMBL descriptors</h1>
+<hr />
+<p>Okay, I understand. You're working with ChEMBL 35 data, using RDKit for analysis, and following an AIMLops template. You have a PostgreSQL database, and you'll be using Jupyter notebooks for your analysis. You've also encountered a couple of errors and want to limit the data to 100 rows for quicker processing. I will provide analysis, guidance, SQL and Python code examples.</p>
+<p>Here's a breakdown of the approach, code, and explanations in both English and Vietnamese:</p>
+<p><strong>1. Analysis and Model Explanation</strong></p>
+<p><strong>English:</strong></p>
+<p>The project aims to analyze ChEMBL 35 data for drug discovery. The initial steps involve querying the PostgreSQL database to extract relevant information, such as molecule structures (SMILES) and activity data (IC50, Ki, etc.).  This extracted data is then loaded into a Pandas DataFrame within a Jupyter notebook. We will then utilize RDKit to generate molecular descriptors from the SMILES strings.</p>
+<p>Possible analytical models include:</p>
+<ul>
+<li><strong>Exploratory Data Analysis (EDA):</strong> Visualize activity distributions, identify potential outliers, and explore relationships between different activity types.</li>
+<li><strong>Structure-Activity Relationship (SAR) modeling:</strong> Use machine learning models (e.g., Random Forest, Support Vector Machines) to predict activity based on molecular descriptors.</li>
+<li><strong>Clustering:</strong> Group molecules based on structural similarity or activity profiles.</li>
+<li><strong>Filtering and Prioritization:</strong> Identify promising compounds based on activity thresholds and desired properties.</li>
+</ul>
+<p>The example code focuses on extracting basic data and generating some simple molecular descriptors.  More complex modeling would require further feature engineering and model selection.</p>
+<p><strong>Vietnamese:</strong></p>
+<p>Dự án này nhằm mục đích phân tích dữ liệu ChEMBL 35 cho việc khám phá thuốc. Các bước ban đầu bao gồm truy vấn cơ sở dữ liệu PostgreSQL để trích xuất thông tin liên quan, chẳng hạn như cấu trúc phân tử (SMILES) và dữ liệu hoạt động (IC50, Ki, v.v.). Dữ liệu được trích xuất này sau đó được tải vào DataFrame Pandas trong một Jupyter notebook. Sau đó, chúng ta sẽ sử dụng RDKit để tạo ra các mô tả phân tử từ chuỗi SMILES.</p>
+<p>Các mô hình phân tích có thể bao gồm:</p>
+<ul>
+<li><strong>Phân tích dữ liệu thăm dò (EDA):</strong> Trực quan hóa phân phối hoạt động, xác định các giá trị ngoại lai tiềm năng và khám phá mối quan hệ giữa các loại hoạt động khác nhau.</li>
+<li><strong>Mô hình hóa mối quan hệ cấu trúc-hoạt động (SAR):</strong> Sử dụng các mô hình học máy (ví dụ: Random Forest, Support Vector Machines) để dự đoán hoạt động dựa trên các mô tả phân tử.</li>
+<li><strong>Phân cụm:</strong> Nhóm các phân tử dựa trên sự tương đồng về cấu trúc hoặc hồ sơ hoạt động.</li>
+<li><strong>Lọc và ưu tiên:</strong> Xác định các hợp chất đầy hứa hẹn dựa trên ngưỡng hoạt động và các thuộc tính mong muốn.</li>
+</ul>
+<p>Đoạn mã ví dụ tập trung vào việc trích xuất dữ liệu cơ bản và tạo ra một số mô tả phân tử đơn giản. Mô hình hóa phức tạp hơn sẽ yêu cầu kỹ thuật đặc trưng và lựa chọn mô hình hơn nữa.</p>
+<p><strong>2. SQL Code (Creating CSV File)</strong></p>
+<p><strong>English:</strong></p>
+<p>This SQL code retrieves activity data and corresponding SMILES strings for a specified target. It also addresses the error you encountered regarding the regular expression by casting the <code>standard_value</code> column to <code>TEXT</code> before applying the regex.  Critically, it also limits the results to 100 rows.  Remember to run this code in pgAdmin and save the output as a CSV file in your <code>/data</code> directory.</p>
+<p>```sql
+-- Save this as /data/chembl_35_activity_data.csv
+COPY (
+    SELECT
+        act.molregno,
+        act.standard_type,
+        act.standard_value,
+        act.standard_units,
+        md.canonical_smiles
+    FROM
+        activities act
+    JOIN
+        molecule_dictionary md ON act.molregno = md.molregno
+    WHERE
+        act.standard_type = 'IC50'  -- Example: You can change this to Ki, EC50, etc.
+        AND act.standard_relation = '='
+        AND act.standard_value IS NOT NULL
+        AND act.standard_units = 'nM'
+        AND CAST(act.standard_value AS TEXT) ~ '^[0-9.]+$' -- Corrected regex
+        AND act.target_id IN (SELECT target_id FROM target_dictionary WHERE pref_name = 'Epidermal Growth Factor Receptor') -- Example Target
+    LIMIT 100
+)
+TO '/tmp/chembl_35_activity_data.csv' WITH CSV HEADER;</p>
+<p>```</p>
+<p><strong>Important Notes for SQL Code:</strong></p>
+<ul>
+<li><strong><code>standard_type</code>:</strong> Modify the <code>WHERE act.standard_type = 'IC50'</code> clause to filter for your desired activity type (e.g., <code>'Ki'</code>, <code>'EC50'</code>).</li>
+<li><strong><code>target_id</code></strong>: Modify the <code>target_id</code> clause to select the data related to the target you want to analyze. The example uses <code>'Epidermal Growth Factor Receptor'</code>.  You can find appropriate <code>pref_name</code> values in the <code>target_dictionary</code> table.</li>
+<li><strong>File Path:</strong> Change <code>/tmp/chembl_35_activity_data.csv</code> to the correct path within your AIMLops folder structure.  For example, it might be <code>/app/data/chembl_35_activity_data.csv</code>.  <strong>IMPORTANT:</strong>  The PostgreSQL server user (usually <code>postgres</code>) needs write permissions to this directory.</li>
+<li><strong>Regex:</strong> The <code>CAST(act.standard_value AS TEXT) ~ '^[0-9.]+$'</code> part is crucial. It first casts the <code>standard_value</code> to a text data type before applying the regular expression to check if it contains only numbers and periods.</li>
+<li><strong><code>LIMIT 100</code>:</strong> This limits the result set to 100 rows.  Remove or adjust this as needed.</li>
+</ul>
+<p><strong>Vietnamese:</strong></p>
+<p>Đoạn mã SQL này truy xuất dữ liệu hoạt động và chuỗi SMILES tương ứng cho một mục tiêu cụ thể. Nó cũng giải quyết lỗi mà bạn gặp phải liên quan đến biểu thức chính quy bằng cách chuyển đổi cột <code>standard_value</code> thành <code>TEXT</code> trước khi áp dụng biểu thức chính quy. Quan trọng nhất, nó cũng giới hạn kết quả thành 100 hàng. Hãy nhớ chạy mã này trong pgAdmin và lưu đầu ra dưới dạng tệp CSV trong thư mục <code>/data</code> của bạn.</p>
+<p>```sql
+-- Lưu cái này thành /data/chembl_35_activity_data.csv
+COPY (
+    SELECT
+        act.molregno,
+        act.standard_type,
+        act.standard_value,
+        act.standard_units,
+        md.canonical_smiles
+    FROM
+        activities act
+    JOIN
+        molecule_dictionary md ON act.molregno = md.molregno
+    WHERE
+        act.standard_type = 'IC50'  -- Ví dụ: Bạn có thể thay đổi cái này thành Ki, EC50, v.v.
+        AND act.standard_relation = '='
+        AND act.standard_value IS NOT NULL
+        AND act.standard_units = 'nM'
+        AND CAST(act.standard_value AS TEXT) ~ '^[0-9.]+$' -- Regex đã sửa
+        AND act.target_id IN (SELECT target_id FROM target_dictionary WHERE pref_name = 'Epidermal Growth Factor Receptor') -- Ví dụ về mục tiêu
+    LIMIT 100
+)
+TO '/tmp/chembl_35_activity_data.csv' WITH CSV HEADER;</p>
+<p>```</p>
+<p><strong>Lưu ý quan trọng cho mã SQL:</strong></p>
+<ul>
+<li><strong><code>standard_type</code>:</strong> Sửa đổi mệnh đề <code>WHERE act.standard_type = 'IC50'</code> để lọc theo loại hoạt động mong muốn của bạn (ví dụ: <code>'Ki'</code>, <code>'EC50'</code>).</li>
+<li><strong><code>target_id</code></strong>: Sửa đổi mệnh đề <code>target_id</code> để chọn dữ liệu liên quan đến mục tiêu bạn muốn phân tích. Ví dụ sử dụng <code>'Epidermal Growth Factor Receptor'</code>. Bạn có thể tìm thấy các giá trị <code>pref_name</code> phù hợp trong bảng <code>target_dictionary</code>.</li>
+<li><strong>Đường dẫn tệp:</strong> Thay đổi <code>/tmp/chembl_35_activity_data.csv</code> thành đường dẫn chính xác trong cấu trúc thư mục AIMLops của bạn. Ví dụ: nó có thể là <code>/app/data/chembl_35_activity_data.csv</code>. <strong>QUAN TRỌNG:</strong> Người dùng máy chủ PostgreSQL (thường là <code>postgres</code>) cần có quyền ghi vào thư mục này.</li>
+<li><strong>Regex:</strong> Phần <code>CAST(act.standard_value AS TEXT) ~ '^[0-9.]+$'</code> là rất quan trọng. Nó đầu tiên chuyển đổi <code>standard_value</code> thành kiểu dữ liệu văn bản trước khi áp dụng biểu thức chính quy để kiểm tra xem nó chỉ chứa số và dấu chấm hay không.</li>
+<li><strong><code>LIMIT 100</code>:</strong> Điều này giới hạn tập kết quả thành 100 hàng. Xóa hoặc điều chỉnh cái này nếu cần.</li>
+</ul>
+<p><strong>3. Python Code (Jupyter Notebook: <code>Topic_CheMBL_35_61_1_data_loading_and_descriptor_generation.ipynb</code>)</strong></p>
+<p><strong>English:</strong></p>
+<p>This Python code reads the CSV file created by the SQL query, uses RDKit to generate some basic molecular descriptors, and performs a simple data visualization. It also includes a workaround for the <code>squared=False</code> error in older scikit-learn versions.</p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from rdkit.Chem import Lipinski
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
+import numpy as np</p>
+<h1>Define base path based on your AIMLops structure</h1>
+<p>base_path = "/app" # Adjust this to your actual base path</p>
+<h1>Construct the data file path</h1>
+<p>data_file = os.path.join(base_path, "data", "chembl_35_activity_data.csv")</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(data_file)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_file}.  Make sure you ran the SQL query and saved the CSV to the correct location.")
+    exit()</p>
+<p>print(f"Loaded {len(df)} rows of data.")
+print(df.head())</p>
+<h1>Create RDKit Mol objects</h1>
+<p>df['mol'] = df['canonical_smiles'].apply(lambda x: Chem.MolFromSmiles(x))
+df = df.dropna(subset=['mol']) # Remove rows where mol is None (invalid SMILES)</p>
+<h1>Calculate some descriptors</h1>
+<p>def calculate_descriptors(mol):
+    try:
+        mw = Descriptors.MolWt(mol)
+        logp = Descriptors.MolLogP(mol)
+        hbd = Lipinski.NumHDonors(mol)
+        hba = Lipinski.NumHAcceptors(mol)
+        return pd.Series([mw, logp, hbd, hba])
+    except:
+        return pd.Series([None, None, None, None]) #Handle potential errors in descriptor calculation</p>
+<p>df[['mol_wt', 'logp', 'hbd', 'hba']] = df['mol'].apply(calculate_descriptors)</p>
+<h1>Convert standard_value to numeric and handle errors</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value']) # Remove rows where standard_value is NaN</p>
+<h1>Data Visualization (Example)</h1>
+<p>plt.figure(figsize=(8, 6))
+plt.hist(df['standard_value'], bins=50)
+plt.xlabel('IC50 (nM)')
+plt.ylabel('Frequency')
+plt.title('Distribution of IC50 Values')
+plt.show()</p>
+<p>plt.figure(figsize=(8, 6))
+plt.scatter(df['mol_wt'], df['logp'])
+plt.xlabel('Molecular Weight')
+plt.ylabel('LogP')
+plt.title('Molecular Weight vs. LogP')
+plt.show()</p>
+<h1>Example: Simple Linear Regression (Demonstration - Requires further feature engineering)</h1>
+<p>from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression</p>
+<h1>Prepare data for the model</h1>
+<p>X = df[['mol_wt', 'logp', 'hbd', 'hba']].fillna(0) # Handle missing values (important!)
+y = df['standard_value']</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train the model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model (Handle the squared=False issue)</h1>
+<p>try:
+    mse = mean_squared_error(y_test, y_pred, squared=False) # Python 3.9+
+except TypeError:
+    mse = mean_squared_error(y_test, y_pred) # Older scikit-learn
+    print("Warning:  Using older scikit-learn version.  Consider upgrading for correct MSE calculation.")</p>
+<p>print(f"Mean Squared Error: {mse}")
+```</p>
+<p><strong>Explanation of Python Code:</strong></p>
+<ol>
+<li><strong>Import Libraries:</strong> Imports necessary libraries like <code>os</code>, <code>pandas</code>, <code>rdkit</code>, <code>matplotlib</code>, and <code>scikit-learn</code>.</li>
+<li><strong>Define Base Path:</strong> Sets the base path for your project, ensuring the code can find the data file.  <strong>Important:</strong> Modify this to your actual base path.</li>
+<li><strong>Load Data:</strong> Reads the CSV file into a Pandas DataFrame. Includes error handling if the file is not found.</li>
+<li><strong>Create RDKit Mol Objects:</strong> Converts SMILES strings to RDKit <code>Mol</code> objects, which are used for descriptor calculation.  Rows with invalid SMILES are removed.</li>
+<li><strong>Calculate Descriptors:</strong> Calculates molecular weight, LogP, number of hydrogen bond donors, and number of hydrogen bond acceptors using RDKit functions.</li>
+<li><strong>Data Cleaning:</strong> Converts the <code>standard_value</code> column to numeric, handling potential errors and removing rows with missing values.</li>
+<li><strong>Data Visualization:</strong> Creates a histogram of IC50 values and a scatter plot of molecular weight vs. LogP.</li>
+<li><strong>Simple Linear Regression (Example):</strong><ul>
+<li>Prepares the data for a linear regression model.</li>
+<li>Splits the data into training and testing sets.</li>
+<li>Trains a linear regression model.</li>
+<li>Makes predictions.</li>
+<li>Calculates the Mean Squared Error (MSE).  Includes a workaround for the <code>squared=False</code> parameter in older scikit-learn versions.  If you're using an older version, it will print a warning message.</li>
+</ul>
+</li>
+</ol>
+<p><strong>Vietnamese:</strong></p>
+<p>Đoạn mã Python này đọc tệp CSV được tạo bởi truy vấn SQL, sử dụng RDKit để tạo ra một số mô tả phân tử cơ bản và thực hiện trực quan hóa dữ liệu đơn giản. Nó cũng bao gồm một giải pháp cho lỗi <code>squared=False</code> trong các phiên bản scikit-learn cũ hơn.</p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from rdkit.Chem import Lipinski
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
+import numpy as np</p>
+<h1>Xác định đường dẫn gốc dựa trên cấu trúc AIMLops của bạn</h1>
+<p>base_path = "/app" # Điều chỉnh cái này theo đường dẫn gốc thực tế của bạn</p>
+<h1>Xây dựng đường dẫn tệp dữ liệu</h1>
+<p>data_file = os.path.join(base_path, "data", "chembl_35_activity_data.csv")</p>
+<h1>Tải dữ liệu</h1>
+<p>try:
+    df = pd.read_csv(data_file)
+except FileNotFoundError:
+    print(f"Lỗi: Không tìm thấy tệp tại {data_file}. Đảm bảo bạn đã chạy truy vấn SQL và lưu CSV vào đúng vị trí.")
+    exit()</p>
+<p>print(f"Đã tải {len(df)} hàng dữ liệu.")
+print(df.head())</p>
+<h1>Tạo đối tượng Mol RDKit</h1>
+<p>df['mol'] = df['canonical_smiles'].apply(lambda x: Chem.MolFromSmiles(x))
+df = df.dropna(subset=['mol']) # Xóa các hàng mà mol là None (SMILES không hợp lệ)</p>
+<h1>Tính toán một số mô tả</h1>
+<p>def calculate_descriptors(mol):
+    try:
+        mw = Descriptors.MolWt(mol)
+        logp = Descriptors.MolLogP(mol)
+        hbd = Lipinski.NumHDonors(mol)
+        hba = Lipinski.NumHAcceptors(mol)
+        return pd.Series([mw, logp, hbd, hba])
+    except:
+        return pd.Series([None, None, None, None]) # Xử lý các lỗi tiềm ẩn trong tính toán mô tả</p>
+<p>df[['mol_wt', 'logp', 'hbd', 'hba']] = df['mol'].apply(calculate_descriptors)</p>
+<h1>Chuyển đổi standard_value thành số và xử lý lỗi</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value']) # Xóa các hàng mà standard_value là NaN</p>
+<h1>Trực quan hóa dữ liệu (Ví dụ)</h1>
+<p>plt.figure(figsize=(8, 6))
+plt.hist(df['standard_value'], bins=50)
+plt.xlabel('IC50 (nM)')
+plt.ylabel('Tần số')
+plt.title('Phân phối các giá trị IC50')
+plt.show()</p>
+<p>plt.figure(figsize=(8, 6))
+plt.scatter(df['mol_wt'], df['logp'])
+plt.xlabel('Khối lượng phân tử')
+plt.ylabel('LogP')
+plt.title('Khối lượng phân tử so với LogP')
+plt.show()</p>
+<h1>Ví dụ: Hồi quy tuyến tính đơn giản (Minh họa - Yêu cầu kỹ thuật đặc trưng hơn nữa)</h1>
+<p>from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression</p>
+<h1>Chuẩn bị dữ liệu cho mô hình</h1>
+<p>X = df[['mol_wt', 'logp', 'hbd', 'hba']].fillna(0) # Xử lý các giá trị bị thiếu (quan trọng!)
+y = df['standard_value']</p>
+<h1>Chia dữ liệu thành tập huấn luyện và tập kiểm tra</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Huấn luyện mô hình</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Dự đoán</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Đánh giá mô hình (Xử lý vấn đề squared=False)</h1>
+<p>try:
+    mse = mean_squared_error(y_test, y_pred, squared=False) # Python 3.9+
+except TypeError:
+    mse = mean_squared_error(y_test, y_pred) # Scikit-learn cũ hơn
+    print("Cảnh báo: Đang sử dụng phiên bản scikit-learn cũ hơn. Cân nhắc nâng cấp để tính toán MSE chính xác.")</p>
+<p>print(f"Lỗi bình phương trung bình: {mse}")
+```</p>
+<p><strong>Giải thích mã Python:</strong></p>
+<ol>
+<li><strong>Nhập thư viện:</strong> Nhập các thư viện cần thiết như <code>os</code>, <code>pandas</code>, <code>rdkit</code>, <code>matplotlib</code> và <code>scikit-learn</code>.</li>
+<li><strong>Xác định đường dẫn gốc:</strong> Đặt đường dẫn gốc cho dự án của bạn, đảm bảo mã có thể tìm thấy tệp dữ liệu. <strong>Quan trọng:</strong> Sửa đổi cái này theo đường dẫn gốc thực tế của bạn.</li>
+<li><strong>Tải dữ liệu:</strong> Đọc tệp CSV vào DataFrame Pandas. Bao gồm xử lý lỗi nếu không tìm thấy tệp.</li>
+<li><strong>Tạo đối tượng Mol RDKit:</strong> Chuyển đổi chuỗi SMILES thành đối tượng <code>Mol</code> RDKit, được sử dụng để tính toán mô tả. Các hàng có SMILES không hợp lệ sẽ bị xóa.</li>
+<li><strong>Tính toán mô tả:</strong> Tính toán trọng lượng phân tử, LogP, số lượng người cho liên kết hydro và số lượng người nhận liên kết hydro bằng các hàm RDKit.</li>
+<li><strong>Làm sạch dữ liệu:</strong> Chuyển đổi cột <code>standard_value</code> thành số, xử lý các lỗi tiềm ẩn và xóa các hàng có giá trị bị thiếu.</li>
+<li><strong>Trực quan hóa dữ liệu:</strong> Tạo biểu đồ tần suất của các giá trị IC50 và biểu đồ phân tán của trọng lượng phân tử so với LogP.</li>
+<li><strong>Hồi quy tuyến tính đơn giản (Ví dụ):</strong><ul>
+<li>Chuẩn bị dữ liệu cho mô hình hồi quy tuyến tính.</li>
+<li>Chia dữ liệu thành tập huấn luyện và tập kiểm tra.</li>
+<li>Huấn luyện một mô hình hồi quy tuyến tính.</li>
+<li>Đưa ra dự đoán.</li>
+<li>Tính toán Lỗi bình phương trung bình (MSE). Bao gồm một giải pháp cho tham số <code>squared=False</code> trong các phiên bản scikit-learn cũ hơn. Nếu bạn đang sử dụng phiên bản cũ hơn, nó sẽ in ra một thông báo cảnh báo.</li>
+</ul>
+</li>
+</ol>
+<p><strong>4. Running the Code</strong></p>
+<ol>
+<li><strong>SQL:</strong> Execute the SQL query in pgAdmin and save the result as a CSV file in the <code>/data</code> folder of your AIMLops project structure (e.g., <code>/app/data/chembl_35_activity_data.csv</code>). Remember to adjust the SQL query to target the specific activity type and target of interest.  <strong>Double-check the file path!</strong></li>
+<li><strong>Python:</strong> Open the Jupyter notebook (<code>Topic_CheMBL_35_61_1_data_loading_and_descriptor_generation.ipynb</code>) and run the cells sequentially.  Make sure to adjust the <code>base_path</code> variable to reflect your project's directory structure.</li>
+<li>
+<p><strong>Dependencies:</strong> Ensure you have the necessary Python libraries installed: <code>pandas</code>, <code>rdkit</code>, <code>matplotlib</code>, and <code>scikit-learn</code>.  You can install them using <code>pip</code>:</p>
+<p><code>bash
+pip install pandas rdkit matplotlib scikit-learn</code></p>
+</li>
+</ol>
+<p><strong>5. Five Examples (Expanding on the Core Code)</strong></p>
+<p>Here are five example scenarios, with snippets of code that you can add to your Jupyter Notebook. These examples build upon the base code provided above.  <strong>Remember to execute the core code (data loading, descriptor generation) <em>before</em> running these examples.</strong></p>
+<p><strong>Example 1: Filtering by Molecular Weight</strong></p>
+<p>This example filters the DataFrame to only include molecules with a molecular weight between 200 and 500.</p>
+<p>```python</p>
+<h1>Filter by molecular weight</h1>
+<p>df_filtered_mw = df[(df['mol_wt'] &gt;= 200) &amp; (df['mol_wt'] &lt;= 500)]
+print(f"Number of molecules after filtering by molecular weight: {len(df_filtered_mw)}")
+print(df_filtered_mw.head())
+```</p>
+<p><strong>Example 2:  Analyzing Activity Distribution for a Specific Target</strong></p>
+<p>(Requires modifying the SQL query to select a specific target and activity type)
+This shows the distribution of activity (e.g. IC50) for that one target.</p>
+<p>```python
+import seaborn as sns</p>
+<h1>Plot distribution of IC50 values</h1>
+<p>plt.figure(figsize=(10,6))
+sns.histplot(df['standard_value'], kde=True)
+plt.title("IC50 Distribution for Selected Target")
+plt.xlabel("IC50 (nM)")
+plt.ylabel("Frequency")
+plt.show()
+```</p>
+<p><strong>Example 3: Calculating and Visualizing TPSA (Topological Polar Surface Area)</strong></p>
+<p>This calculates TPSA, a descriptor related to drug permeability, and visualizes it against LogP.</p>
+<p>```python
+from rdkit.Chem import rdMolDescriptors</p>
+<p>def calculate_tpsa(mol):
+    try:
+        tpsa = rdMolDescriptors.CalcTPSA(mol)
+        return tpsa
+    except:
+        return None</p>
+<p>df['tpsa'] = df['mol'].apply(calculate_tpsa)
+df = df.dropna(subset=['tpsa'])</p>
+<p>plt.figure(figsize=(8, 6))
+plt.scatter(df['logp'], df['tpsa'])
+plt.xlabel('LogP')
+plt.ylabel('TPSA')
+plt.title('LogP vs. TPSA')
+plt.show()
+```</p>
+<p><strong>Example 4:  Calculating Similarity to a Known Active Compound</strong></p>
+<p>This calculates the Tanimoto similarity between each molecule and a reference compound (using Morgan fingerprints).</p>
+<p>```python
+from rdkit import DataStructs
+from rdkit.Chem import AllChem</p>
+<h1>Define a reference SMILES (e.g., a known active compound)</h1>
+<p>reference_smiles = "CC(=O)Oc1ccccc1C(=O)O"  # Example: Aspirin
+reference_mol = Chem.MolFromSmiles(reference_smiles)
+reference_fp = AllChem.GetMorganFingerprintAsBitVect(reference_mol, 2, nBits=2048)</p>
+<p>def calculate_similarity(mol):
+    try:
+        fp = AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=2048)
+        similarity = DataStructs.TanimotoSimilarity(reference_fp, fp)
+        return similarity
+    except:
+        return None</p>
+<p>df['similarity'] = df['mol'].apply(calculate_similarity)
+df = df.dropna(subset=['similarity'])</p>
+<p>plt.figure(figsize=(8, 6))
+plt.hist(df['similarity'], bins=50)
+plt.xlabel('Tanimoto Similarity to Aspirin')
+plt.ylabel('Frequency')
+plt.title('Distribution of Similarity Scores')
+plt.show()
+```</p>
+<p><strong>Example 5:  Applying a Lipinski's Rule of Five Filter</strong></p>
+<p>This filters the DataFrame based on Lipinski's Rule of Five, a set of guidelines for drug-likeness.</p>
+<p>```python</p>
+<h1>Apply Lipinski's Rule of Five</h1>
+<p>df_lipinski = df[
+    (df['mol_wt'] &lt;= 500) &amp;
+    (df['logp'] &lt;= 5) &amp;
+    (df['hbd'] &lt;= 5) &amp;
+    (df['hba'] &lt;= 10)
+]</p>
+<p>print(f"Number of molecules after applying Lipinski's Rule of Five: {len(df_lipinski)}")
+print(df_lipinski.head())
+```</p>
+<p>Remember to adapt the code to your specific research question, target, and data. Good luck!  Let me know if you have more questions.</p>
+        </body>
+        </html>
+        

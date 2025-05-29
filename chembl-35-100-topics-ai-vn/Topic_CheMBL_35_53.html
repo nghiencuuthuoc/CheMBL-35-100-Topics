@@ -1,0 +1,658 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_53</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Phân tử kháng virus tương ứng với đích COVID-19</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 sử dụng RDKit. Với vai trò là chuyên gia nghiên cứu và phát triển dược học, tôi sẽ cung cấp cho bạn những phân tích, hướng dẫn và mã nguồn mẫu để bạn có thể tiến hành dự án một cách hiệu quả.</p>
+<p><strong>Phân tích tổng quan</strong></p>
+<p>Dự án của bạn tập trung vào việc khai thác dữ liệu từ cơ sở dữ liệu ChEMBL 35, một nguồn tài nguyên vô giá trong lĩnh vực phát triển thuốc. Việc kết hợp ChEMBL với RDKit, một bộ công cụ hóa tin học mạnh mẽ, cho phép bạn thực hiện các phân tích sâu sắc về cấu trúc phân tử, tính chất hóa lý và hoạt tính sinh học của các hợp chất.</p>
+<p><strong>Mục tiêu của dự án:</strong></p>
+<ul>
+<li><strong>Thu thập dữ liệu:</strong> Lấy dữ liệu liên quan từ cơ sở dữ liệu ChEMBL 35 bằng các truy vấn SQL.</li>
+<li><strong>Tiền xử lý dữ liệu:</strong> Làm sạch và chuẩn hóa dữ liệu, loại bỏ các giá trị ngoại lệ và xử lý các giá trị thiếu.</li>
+<li><strong>Tính toán các descriptor phân tử:</strong> Sử dụng RDKit để tính toán các descriptor phân tử, mô tả các đặc tính cấu trúc và hóa lý của các hợp chất.</li>
+<li><strong>Phân tích dữ liệu:</strong> Áp dụng các kỹ thuật thống kê và học máy để khám phá các mối quan hệ giữa cấu trúc phân tử, tính chất và hoạt tính sinh học.</li>
+<li><strong>Xây dựng mô hình:</strong> Xây dựng các mô hình dự đoán hoạt tính sinh học của các hợp chất dựa trên cấu trúc của chúng.</li>
+<li><strong>Trực quan hóa dữ liệu:</strong> Sử dụng các công cụ trực quan hóa để trình bày kết quả phân tích một cách rõ ràng và dễ hiểu.</li>
+</ul>
+<p><strong>1. Phân tích và mô hình phân tích</strong></p>
+<p>Chúng ta sẽ tập trung vào việc xây dựng một quy trình phân tích dữ liệu ChEMBL 35 để dự đoán hoạt tính sinh học của các hợp chất. Dưới đây là mô hình phân tích chi tiết:</p>
+<p><strong>Bước 1: Thu thập dữ liệu (Data Acquisition)</strong></p>
+<ul>
+<li><strong>Mục tiêu:</strong> Lấy dữ liệu từ cơ sở dữ liệu ChEMBL 35, bao gồm thông tin về cấu trúc phân tử (SMILES), hoạt tính sinh học (IC50, Ki, EC50, v.v.) và các thuộc tính liên quan khác.</li>
+<li><strong>Công cụ:</strong> SQL, psycopg2 (Python library for PostgreSQL).</li>
+<li><strong>Đầu ra:</strong> Một tập dữ liệu chứa thông tin về các hợp chất và hoạt tính sinh học của chúng.</li>
+</ul>
+<p><strong>Bước 2: Tiền xử lý dữ liệu (Data Preprocessing)</strong></p>
+<ul>
+<li><strong>Mục tiêu:</strong> Làm sạch và chuẩn hóa dữ liệu để đảm bảo chất lượng và tính nhất quán.</li>
+<li><strong>Công cụ:</strong> Pandas (Python library for data manipulation), RDKit.</li>
+<li><strong>Các bước:</strong><ul>
+<li>Loại bỏ các hợp chất trùng lặp.</li>
+<li>Chuẩn hóa chuỗi SMILES.</li>
+<li>Xử lý các giá trị hoạt tính sinh học (ví dụ: chuyển đổi IC50 sang pIC50).</li>
+<li>Loại bỏ các giá trị ngoại lệ hoặc không hợp lệ.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Bước 3: Tính toán descriptor phân tử (Molecular Descriptor Calculation)</strong></p>
+<ul>
+<li><strong>Mục tiêu:</strong> Tính toán các descriptor phân tử từ cấu trúc của các hợp chất.</li>
+<li><strong>Công cụ:</strong> RDKit.</li>
+<li><strong>Các descriptor:</strong><ul>
+<li>Các descriptor 2D: Molecular Weight, LogP, Topological Polar Surface Area (TPSA).</li>
+<li>Các descriptor dựa trên fragments: Murcko Fragments.</li>
+<li>Các descriptor khác: Số lượng vòng, số lượng nguyên tử, v.v.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Bước 4: Phân tích dữ liệu và xây dựng mô hình (Data Analysis and Model Building)</strong></p>
+<ul>
+<li><strong>Mục tiêu:</strong> Xây dựng các mô hình học máy để dự đoán hoạt tính sinh học của các hợp chất dựa trên các descriptor phân tử.</li>
+<li><strong>Công cụ:</strong> Scikit-learn (Python library for machine learning).</li>
+<li><strong>Các thuật toán:</strong><ul>
+<li>Hồi quy tuyến tính (Linear Regression).</li>
+<li>Máy vector hỗ trợ (Support Vector Machine - SVM).</li>
+<li>Rừng ngẫu nhiên (Random Forest).</li>
+<li>Mạng nơ-ron (Neural Networks).</li>
+</ul>
+</li>
+<li><strong>Đánh giá mô hình:</strong> Sử dụng các kỹ thuật đánh giá mô hình phù hợp (ví dụ: cross-validation, R-squared, RMSE) để đánh giá hiệu suất của các mô hình.</li>
+</ul>
+<p><strong>Bước 5: Trực quan hóa dữ liệu (Data Visualization)</strong></p>
+<ul>
+<li><strong>Mục tiêu:</strong> Trình bày kết quả phân tích một cách rõ ràng và dễ hiểu.</li>
+<li><strong>Công cụ:</strong> Matplotlib, Seaborn (Python libraries for data visualization).</li>
+<li><strong>Các loại biểu đồ:</strong><ul>
+<li>Biểu đồ phân tán (Scatter plots) để hiển thị mối quan hệ giữa các descriptor và hoạt tính sinh học.</li>
+<li>Biểu đồ hộp (Box plots) để so sánh phân phối của các descriptor giữa các nhóm hợp chất khác nhau.</li>
+<li>Biểu đồ quan trọng tính năng (Feature importance plots) để xác định các descriptor quan trọng nhất trong mô hình.</li>
+</ul>
+</li>
+</ul>
+<p><strong>2. Hướng dẫn song ngữ (Bilingual Instructions)</strong></p>
+<p>Dưới đây là hướng dẫn chi tiết bằng cả tiếng Anh và tiếng Việt cho từng bước trong quy trình phân tích:</p>
+<p><strong>Bước 1: Thu thập dữ liệu (Data Acquisition)</strong></p>
+<ul>
+<li><strong>English:</strong><ol>
+<li>Connect to the ChEMBL 35 database using <code>psycopg2</code>.</li>
+<li>Execute SQL queries to retrieve the necessary data (e.g., compound structures, activity data).</li>
+<li>Save the data to a CSV file.</li>
+</ol>
+</li>
+<li><strong>Tiếng Việt:</strong><ol>
+<li>Kết nối đến cơ sở dữ liệu ChEMBL 35 bằng <code>psycopg2</code>.</li>
+<li>Thực thi các truy vấn SQL để lấy dữ liệu cần thiết (ví dụ: cấu trúc hợp chất, dữ liệu hoạt tính).</li>
+<li>Lưu dữ liệu vào một file CSV.</li>
+</ol>
+</li>
+</ul>
+<p><strong>Bước 2: Tiền xử lý dữ liệu (Data Preprocessing)</strong></p>
+<ul>
+<li><strong>English:</strong><ol>
+<li>Load the CSV file into a Pandas DataFrame.</li>
+<li>Remove duplicate compounds.</li>
+<li>Standardize SMILES strings using RDKit.</li>
+<li>Convert activity values (e.g., IC50) to pIC50.</li>
+<li>Remove outliers or invalid values.</li>
+</ol>
+</li>
+<li><strong>Tiếng Việt:</strong><ol>
+<li>Tải file CSV vào một Pandas DataFrame.</li>
+<li>Loại bỏ các hợp chất trùng lặp.</li>
+<li>Chuẩn hóa chuỗi SMILES bằng RDKit.</li>
+<li>Chuyển đổi giá trị hoạt tính (ví dụ: IC50) sang pIC50.</li>
+<li>Loại bỏ các giá trị ngoại lệ hoặc không hợp lệ.</li>
+</ol>
+</li>
+</ul>
+<p><strong>Bước 3: Tính toán descriptor phân tử (Molecular Descriptor Calculation)</strong></p>
+<ul>
+<li><strong>English:</strong><ol>
+<li>Use RDKit to calculate molecular descriptors for each compound.</li>
+<li>Calculate 2D descriptors (e.g., Molecular Weight, LogP, TPSA).</li>
+<li>Calculate fragment-based descriptors (e.g., Murcko Fragments).</li>
+<li>Add the descriptors to the Pandas DataFrame.</li>
+</ol>
+</li>
+<li><strong>Tiếng Việt:</strong><ol>
+<li>Sử dụng RDKit để tính toán các descriptor phân tử cho mỗi hợp chất.</li>
+<li>Tính toán các descriptor 2D (ví dụ: Molecular Weight, LogP, TPSA).</li>
+<li>Tính toán các descriptor dựa trên fragments (ví dụ: Murcko Fragments).</li>
+<li>Thêm các descriptor vào Pandas DataFrame.</li>
+</ol>
+</li>
+</ul>
+<p><strong>Bước 4: Phân tích dữ liệu và xây dựng mô hình (Data Analysis and Model Building)</strong></p>
+<ul>
+<li><strong>English:</strong><ol>
+<li>Split the data into training and testing sets.</li>
+<li>Train a machine learning model (e.g., Linear Regression, SVM, Random Forest) using the training data.</li>
+<li>Evaluate the model's performance on the testing data.</li>
+</ol>
+</li>
+<li><strong>Tiếng Việt:</strong><ol>
+<li>Chia dữ liệu thành tập huấn luyện và tập kiểm tra.</li>
+<li>Huấn luyện một mô hình học máy (ví dụ: Linear Regression, SVM, Random Forest) sử dụng dữ liệu huấn luyện.</li>
+<li>Đánh giá hiệu suất của mô hình trên dữ liệu kiểm tra.</li>
+</ol>
+</li>
+</ul>
+<p><strong>Bước 5: Trực quan hóa dữ liệu (Data Visualization)</strong></p>
+<ul>
+<li><strong>English:</strong><ol>
+<li>Use Matplotlib and Seaborn to create visualizations of the data and model results.</li>
+<li>Create scatter plots, box plots, and feature importance plots.</li>
+</ol>
+</li>
+<li><strong>Tiếng Việt:</strong><ol>
+<li>Sử dụng Matplotlib và Seaborn để tạo các hình ảnh trực quan về dữ liệu và kết quả mô hình.</li>
+<li>Tạo biểu đồ phân tán, biểu đồ hộp và biểu đồ quan trọng tính năng.</li>
+</ol>
+</li>
+</ul>
+<p><strong>3. Code SQL và Python (SQL and Python Code)</strong></p>
+<p>Dưới đây là các ví dụ về code SQL và Python để thực hiện các bước trong quy trình phân tích. Tôi sẽ tập trung vào việc khắc phục các lỗi bạn đã đề cập.</p>
+<p><strong>a. SQL Code (Data Acquisition)</strong></p>
+<p>```sql
+-- English
+-- Select 100 compounds with activity data
+SELECT DISTINCT ON (molregno)
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type = 'IC50'  -- You can change this to other activity types
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9.]+$'  -- Corrected line
+ORDER BY molregno
+LIMIT 100;</p>
+<p>-- Vietnamese
+-- Chọn 100 hợp chất có dữ liệu hoạt tính
+SELECT DISTINCT ON (molregno)
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type = 'IC50'  -- Bạn có thể thay đổi thành loại hoạt tính khác
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9.]+$'  -- Dòng đã sửa
+ORDER BY molregno
+LIMIT 100;
+```</p>
+<p><strong>Giải thích lỗi và cách sửa:</strong></p>
+<ul>
+<li><strong>Lỗi:</strong> <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></li>
+<li><strong>Nguyên nhân:</strong> Toán tử <code>~</code> trong PostgreSQL được sử dụng để so sánh một chuỗi với một regular expression. Trong trường hợp này, <code>act.standard_value</code> có kiểu dữ liệu là <code>numeric</code>, không phải là <code>text</code>.</li>
+<li><strong>Cách sửa:</strong> Ép kiểu <code>act.standard_value</code> về <code>text</code> bằng cách sử dụng <code>act.standard_value::text</code>.</li>
+</ul>
+<p><strong>b. Python Code (Data Preprocessing and Descriptor Calculation)</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+import os</p>
+<p>base_path = "../data"  # Adjust as needed</p>
+<p>def calculate_descriptors(smiles):
+    """Calculates molecular descriptors using RDKit."""
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['Molecular Weight'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Chem.Crippen.MolLogP(mol)
+    descriptors['TPSA'] = Chem.rdMolDescriptors.CalcTPSA(mol)
+    return descriptors</p>
+<h1>Load data</h1>
+<p>data = pd.read_csv(os.path.join(base_path, "chembl_data.csv"))  # Replace with your CSV file</p>
+<h1>Handle missing SMILES</h1>
+<p>data = data.dropna(subset=['canonical_smiles'])</p>
+<h1>Calculate descriptors</h1>
+<p>data['descriptors'] = data['canonical_smiles'].apply(calculate_descriptors)
+data = data.dropna(subset=['descriptors'])
+data = data[data['descriptors'].notna()]</p>
+<h1>Convert descriptors to columns</h1>
+<p>data = pd.concat([data.drop(['descriptors'], axis=1), data['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Convert IC50 to pIC50</h1>
+<p>def ic50_to_pic50(ic50):
+    """Converts IC50 to pIC50."""
+    if pd.isna(ic50):
+        return np.nan
+    ic50 = float(ic50)
+    if ic50 &lt;= 0:
+        return np.nan
+    pIC50 = -np.log10(ic50 / 1e9)
+    return pIC50</p>
+<p>data['pIC50'] = data['standard_value'].apply(ic50_to_pic50)</p>
+<h1>Display the first few rows</h1>
+<p>print(data.head())</p>
+<h1>Vietnamese</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+import os</p>
+<p>base_path = "../data"  # Điều chỉnh nếu cần</p>
+<p>def tinh_toan_descriptor(smiles):
+    """Tính toán các descriptor phân tử sử dụng RDKit."""
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['Molecular Weight'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Chem.Crippen.MolLogP(mol)
+    descriptors['TPSA'] = Chem.rdMolDescriptors.CalcTPSA(mol)
+    return descriptors</p>
+<h1>Tải dữ liệu</h1>
+<p>data = pd.read_csv(os.path.join(base_path, "chembl_data.csv"))  # Thay thế bằng file CSV của bạn</p>
+<h1>Xử lý SMILES bị thiếu</h1>
+<p>data = data.dropna(subset=['canonical_smiles'])</p>
+<h1>Tính toán các descriptor</h1>
+<p>data['descriptors'] = data['canonical_smiles'].apply(tinh_toan_descriptor)
+data = data.dropna(subset=['descriptors'])
+data = data[data['descriptors'].notna()]</p>
+<h1>Chuyển descriptor thành các cột</h1>
+<p>data = pd.concat([data.drop(['descriptors'], axis=1), data['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Chuyển đổi IC50 sang pIC50</h1>
+<p>def ic50_sang_pic50(ic50):
+    """Chuyển đổi IC50 sang pIC50."""
+    if pd.isna(ic50):
+        return np.nan
+    ic50 = float(ic50)
+    if ic50 &lt;= 0:
+        return np.nan
+    pIC50 = -np.log10(ic50 / 1e9)
+    return pIC50</p>
+<p>data['pIC50'] = data['standard_value'].apply(ic50_sang_pic50)</p>
+<h1>Hiển thị một vài dòng đầu tiên</h1>
+<p>print(data.head())
+```</p>
+<p><strong>c. Python Code (Model Building)</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Select features and target</h1>
+<p>features = ['Molecular Weight', 'LogP', 'TPSA']  # Add more features as needed
+target = 'pIC50'</p>
+<h1>Handle missing values</h1>
+<p>data = data.dropna(subset=features + [target])</p>
+<h1>Scale features</h1>
+<p>scaler = StandardScaler()
+X = scaler.fit_transform(data[features])
+y = data[target]</p>
+<h1>Split data</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Evaluate model</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Vietnamese</h1>
+<p>from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Chọn các đặc trưng và mục tiêu</h1>
+<p>features = ['Molecular Weight', 'LogP', 'TPSA']  # Thêm các đặc trưng khác nếu cần
+target = 'pIC50'</p>
+<h1>Xử lý các giá trị bị thiếu</h1>
+<p>data = data.dropna(subset=features + [target])</p>
+<h1>Chuẩn hóa các đặc trưng</h1>
+<p>scaler = StandardScaler()
+X = scaler.fit_transform(data[features])
+y = data[target]</p>
+<h1>Chia dữ liệu</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Huấn luyện mô hình</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Đánh giá mô hình</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>Giải thích lỗi và cách sửa:</strong></p>
+<ul>
+<li><strong>Lỗi:</strong> <code>ValueError:</code>squared<code>is deprecated and will be removed in scikit-learn 1.4. Use</code>squared=False` if you want to calculate the root mean squared error.</li>
+<li><strong>Nguyên nhân:</strong> Phiên bản scikit-learn của bạn cũ và không hỗ trợ tham số <code>squared=False</code> trong hàm <code>mean_squared_error</code>.</li>
+<li><strong>Cách sửa:</strong> Nâng cấp scikit-learn lên phiên bản mới nhất bằng lệnh <code>pip install -U scikit-learn</code>. Nếu không thể nâng cấp, bạn có thể tính RMSE bằng cách lấy căn bậc hai của MSE: <code>rmse = mean_squared_error(y_test, y_pred, squared=False)</code>. Tuy nhiên, tôi khuyến khích bạn nâng cấp scikit-learn để tận dụng các tính năng mới nhất và sửa lỗi.</li>
+</ul>
+<p><strong>4. Ví dụ Code SQL và Python mẫu</strong></p>
+<p>Dưới đây là 5 ví dụ khác nhau về code SQL và Python để bạn tham khảo:</p>
+<p><strong>Ví dụ 1: Lọc các hợp chất dựa trên trọng lượng phân tử (Filtering compounds based on molecular weight)</strong></p>
+<ul>
+<li><strong>SQL:</strong></li>
+</ul>
+<p>```sql
+-- English
+SELECT
+    md.molregno,
+    cs.canonical_smiles
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+WHERE
+    md.mw_freebase BETWEEN 200 AND 400
+LIMIT 100;</p>
+<p>-- Vietnamese
+SELECT
+    md.molregno,
+    cs.canonical_smiles
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+WHERE
+    md.mw_freebase BETWEEN 200 AND 400
+LIMIT 100;
+```</p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<p>import pandas as pd
+from rdkit import Chem</p>
+<h1>Load data (replace with your actual loading method)</h1>
+<p>data = pd.read_csv("chembl_data.csv")
+data = data.dropna(subset=['canonical_smiles'])</p>
+<h1>Function to calculate molecular weight using RDKit</h1>
+<p>def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Chem.Descriptors.MolWt(mol)
+    return None</p>
+<h1>Apply the function to calculate molecular weight</h1>
+<p>data['MW'] = data['canonical_smiles'].apply(calculate_mw)</p>
+<h1>Filter compounds with MW between 200 and 400</h1>
+<p>filtered_data = data[(data['MW'] &gt;= 200) &amp; (data['MW'] &lt;= 400)]</p>
+<p>print(filtered_data.head())</p>
+<h1>Vietnamese</h1>
+<p>import pandas as pd
+from rdkit import Chem</p>
+<h1>Tải dữ liệu (thay thế bằng phương pháp tải dữ liệu thực tế của bạn)</h1>
+<p>data = pd.read_csv("chembl_data.csv")
+data = data.dropna(subset=['canonical_smiles'])</p>
+<h1>Hàm tính toán trọng lượng phân tử bằng RDKit</h1>
+<p>def tinh_trong_luong_phan_tu(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Chem.Descriptors.MolWt(mol)
+    return None</p>
+<h1>Áp dụng hàm để tính toán trọng lượng phân tử</h1>
+<p>data['MW'] = data['canonical_smiles'].apply(tinh_trong_luong_phan_tu)</p>
+<h1>Lọc các hợp chất có MW trong khoảng 200 và 400</h1>
+<p>filtered_data = data[(data['MW'] &gt;= 200) &amp; (data['MW'] &lt;= 400)]</p>
+<p>print(filtered_data.head())
+```</p>
+<p><strong>Ví dụ 2: Tính toán số lượng vòng (Calculating the number of rings)</strong></p>
+<ul>
+<li><strong>SQL:</strong> (Không thể thực hiện trực tiếp trong SQL, cần sử dụng Python)</li>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import rdMolDescriptors</p>
+<h1>Load data</h1>
+<p>data = pd.read_csv("chembl_data.csv")
+data = data.dropna(subset=['canonical_smiles'])</p>
+<h1>Function to calculate the number of rings</h1>
+<p>def calculate_num_rings(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return rdMolDescriptors.CalcNumRings(mol)
+    return None</p>
+<h1>Apply the function</h1>
+<p>data['NumRings'] = data['canonical_smiles'].apply(calculate_num_rings)</p>
+<p>print(data.head())</p>
+<h1>Vietnamese</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import rdMolDescriptors</p>
+<h1>Tải dữ liệu</h1>
+<p>data = pd.read_csv("chembl_data.csv")
+data = data.dropna(subset=['canonical_smiles'])</p>
+<h1>Hàm tính toán số lượng vòng</h1>
+<p>def tinh_so_luong_vong(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return rdMolDescriptors.CalcNumRings(mol)
+    return None</p>
+<h1>Áp dụng hàm</h1>
+<p>data['NumRings'] = data['canonical_smiles'].apply(tinh_so_luong_vong)</p>
+<p>print(data.head())
+```</p>
+<p><strong>Ví dụ 3: Phân tích hoạt tính sinh học (Analyzing activity data)</strong></p>
+<ul>
+<li><strong>SQL:</strong></li>
+</ul>
+<p>```sql
+-- English
+SELECT
+    act.standard_type,
+    AVG(act.standard_value) AS average_value,
+    COUNT(*) AS num_measurements
+FROM
+    activities act
+WHERE
+    act.standard_type IN ('IC50', 'Ki', 'EC50')
+    AND act.standard_value IS NOT NULL
+GROUP BY
+    act.standard_type;</p>
+<p>-- Vietnamese
+SELECT
+    act.standard_type,
+    AVG(act.standard_value) AS average_value,
+    COUNT(*) AS num_measurements
+FROM
+    activities act
+WHERE
+    act.standard_type IN ('IC50', 'Ki', 'EC50')
+    AND act.standard_value IS NOT NULL
+GROUP BY
+    act.standard_type;
+```</p>
+<ul>
+<li><strong>Python:</strong> (Có thể dùng để trực quan hóa kết quả)</li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<p>import pandas as pd
+import matplotlib.pyplot as plt</p>
+<h1>Load data (assuming you have activity data in a CSV)</h1>
+<p>data = pd.read_csv("chembl_data.csv")</p>
+<h1>Group by standard_type and calculate the mean standard_value</h1>
+<p>activity_summary = data.groupby('standard_type')['standard_value'].mean()</p>
+<h1>Plot the activity summary</h1>
+<p>activity_summary.plot(kind='bar')
+plt.title('Average Activity Values by Standard Type')
+plt.xlabel('Standard Type')
+plt.ylabel('Average Standard Value')
+plt.show()</p>
+<h1>Vietnamese</h1>
+<p>import pandas as pd
+import matplotlib.pyplot as plt</p>
+<h1>Tải dữ liệu (giả sử bạn có dữ liệu hoạt tính trong một file CSV)</h1>
+<p>data = pd.read_csv("chembl_data.csv")</p>
+<h1>Nhóm theo standard_type và tính giá trị trung bình của standard_value</h1>
+<p>activity_summary = data.groupby('standard_type')['standard_value'].mean()</p>
+<h1>Vẽ biểu đồ tóm tắt hoạt tính</h1>
+<p>activity_summary.plot(kind='bar')
+plt.title('Giá trị Hoạt tính Trung bình theo Loại Tiêu chuẩn')
+plt.xlabel('Loại Tiêu chuẩn')
+plt.ylabel('Giá trị Tiêu chuẩn Trung bình')
+plt.show()
+```</p>
+<p><strong>Ví dụ 4: Sử dụng Random Forest để dự đoán hoạt tính (Using Random Forest for activity prediction)</strong></p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score</p>
+<h1>Load data and calculate descriptors (as shown in previous examples)</h1>
+<h1>Assuming 'data' DataFrame is already prepared</h1>
+<h1>Prepare data</h1>
+<p>features = ['Molecular Weight', 'LogP', 'TPSA']  # Adjust based on your available descriptors
+target = 'pIC50'</p>
+<p>data = data.dropna(subset=features + [target])</p>
+<p>X = data[features]
+y = data[target]</p>
+<h1>Split data</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train Random Forest model</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)</p>
+<h1>Evaluate model</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Vietnamese</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score</p>
+<h1>Tải dữ liệu và tính toán descriptor (như trong các ví dụ trước)</h1>
+<h1>Giả sử DataFrame 'data' đã được chuẩn bị</h1>
+<h1>Chuẩn bị dữ liệu</h1>
+<p>features = ['Molecular Weight', 'LogP', 'TPSA']  # Điều chỉnh dựa trên các descriptor có sẵn
+target = 'pIC50'</p>
+<p>data = data.dropna(subset=features + [target])</p>
+<p>X = data[features]
+y = data[target]</p>
+<h1>Chia dữ liệu</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Huấn luyện mô hình Random Forest</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)</p>
+<h1>Đánh giá mô hình</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>Ví dụ 5: Tính toán Murcko Fragments (Calculating Murcko Fragments)</strong></p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import MurckoFragment</p>
+<h1>Load data</h1>
+<p>data = pd.read_csv("chembl_data.csv")
+data = data.dropna(subset=['canonical_smiles'])</p>
+<h1>Function to calculate Murcko Fragment</h1>
+<p>def calculate_murcko(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        core = MurckoFragment.GetMurckoFragment(mol)
+        return Chem.MolToSmiles(core)
+    return None</p>
+<h1>Apply the function</h1>
+<p>data['MurckoFragment'] = data['canonical_smiles'].apply(calculate_murcko)</p>
+<p>print(data.head())</p>
+<h1>Vietnamese</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import MurckoFragment</p>
+<h1>Tải dữ liệu</h1>
+<p>data = pd.read_csv("chembl_data.csv")
+data = data.dropna(subset=['canonical_smiles'])</p>
+<h1>Hàm tính toán Murcko Fragment</h1>
+<p>def tinh_murcko(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        core = MurckoFragment.GetMurckoFragment(mol)
+        return Chem.MolToSmiles(core)
+    return None</p>
+<h1>Áp dụng hàm</h1>
+<p>data['MurckoFragment'] = data['canonical_smiles'].apply(tinh_murcko)</p>
+<p>print(data.head())
+```</p>
+<p><strong>Lưu ý quan trọng:</strong></p>
+<ul>
+<li>Đảm bảo bạn đã cài đặt tất cả các thư viện cần thiết (RDKit, Pandas, Scikit-learn, Matplotlib, Seaborn). Bạn có thể sử dụng <code>pip install rdkit pandas scikit-learn matplotlib seaborn</code> để cài đặt chúng.</li>
+<li>Điều chỉnh đường dẫn file và tên cột cho phù hợp với dữ liệu của bạn.</li>
+<li>Các ví dụ trên chỉ là điểm khởi đầu. Bạn có thể tùy chỉnh và mở rộng chúng để phù hợp với nhu cầu cụ thể của dự án.</li>
+</ul>
+<p>Tôi hy vọng những hướng dẫn và ví dụ này sẽ giúp bạn tiến hành dự án phân tích dữ liệu ChEMBL 35 một cách hiệu quả. Nếu bạn có bất kỳ câu hỏi nào khác, đừng ngần ngại hỏi! Chúc bạn thành công!</p>
+        </body>
+        </html>
+        

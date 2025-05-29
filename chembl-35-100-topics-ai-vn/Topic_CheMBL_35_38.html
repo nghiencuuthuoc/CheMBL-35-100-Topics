@@ -1,0 +1,446 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_38</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Trực quan hóa họ protein từ ChEMBL</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 sử dụng RDKit. Với vai trò là một chuyên gia R&amp;D dược học, tôi hiểu rõ tầm quan trọng của việc khai thác thông tin từ cơ sở dữ liệu lớn như ChEMBL để thúc đẩy quá trình phát triển thuốc.</p>
+<p>Dựa trên thông tin bạn cung cấp, tôi sẽ giúp bạn xây dựng quy trình phân tích, khắc phục lỗi và cung cấp các ví dụ code mẫu theo chuẩn AIMLOps.</p>
+<p><strong>1. Phân tích Mô hình (Analysis of the Model):</strong></p>
+<p>Mục tiêu của bạn là phân tích dữ liệu ChEMBL 35 để phục vụ nghiên cứu và phát triển thuốc. Dưới đây là một số mô hình phân tích phổ biến bạn có thể áp dụng:</p>
+<ul>
+<li><strong>Phân tích SAR (Structure-Activity Relationship):</strong> Nghiên cứu mối quan hệ giữa cấu trúc hóa học của các phân tử và hoạt tính sinh học của chúng. Điều này giúp xác định các nhóm thế (functional groups) quan trọng cho hoạt tính.</li>
+<li><strong>Phân tích QSAR (Quantitative Structure-Activity Relationship):</strong> Xây dựng các mô hình toán học để dự đoán hoạt tính sinh học dựa trên các thuộc tính hóa học tính toán được (ví dụ: trọng lượng phân tử, logP, số lượng liên kết hydro).</li>
+<li><strong>Phân tích đa dạng hóa học (Chemical Diversity Analysis):</strong> Đánh giá sự đa dạng của các phân tử trong một tập hợp dữ liệu, giúp chọn ra các phân tử đại diện cho các vùng không gian hóa học khác nhau.</li>
+<li><strong>Phân tích sàng lọc ảo (Virtual Screening):</strong> Sử dụng các mô hình QSAR hoặc docking để sàng lọc một lượng lớn các phân tử và xác định các ứng cử viên tiềm năng cho thử nghiệm sinh học.</li>
+<li><strong>Phân tích liên kết hóa học (Chemical Linkage Analysis):</strong> Nghiên cứu các liên kết hóa học có trong các phân tử có hoạt tính, để tìm ra các mẫu cấu trúc chung (common structural patterns) liên quan đến hoạt tính.</li>
+</ul>
+<p><strong>2. Hướng dẫn Song ngữ (Bilingual Guidance):</strong></p>
+<p>Tôi sẽ cung cấp hướng dẫn bằng cả tiếng Anh và tiếng Việt để bạn dễ dàng theo dõi và thực hiện.</p>
+<p><strong>3. Code SQL và Python (SQL and Python Code):</strong></p>
+<p>Tôi sẽ cung cấp các đoạn code SQL để truy vấn dữ liệu từ cơ sở dữ liệu ChEMBL 35 và các đoạn code Python sử dụng RDKit để xử lý và phân tích dữ liệu.</p>
+<p><strong>4. Ví dụ Code (Code Examples):</strong></p>
+<p>Tôi sẽ cung cấp 5 ví dụ code SQL và Python mẫu để bạn bắt đầu.</p>
+<p><strong>Khắc phục lỗi (Error Handling):</strong></p>
+<ul>
+<li>
+<p><strong>Lỗi SQL (SQL Error):</strong> "ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9.]+$'"</p>
+<ul>
+<li><strong>Giải thích (Explanation):</strong> Lỗi này xảy ra do bạn đang cố gắng sử dụng toán tử <code>~</code> (regex match) trên một cột kiểu số (<code>numeric</code>). Toán tử này chỉ dùng cho kiểu dữ liệu văn bản (<code>text</code>).</li>
+<li><strong>Khắc phục (Solution):</strong> Bạn cần chuyển đổi cột <code>standard_value</code> sang kiểu văn bản trước khi sử dụng toán tử <code>~</code>.</li>
+<li><strong>English:</strong> This error occurs because you are trying to use the <code>~</code> (regex match) operator on a numeric column. This operator is only for text data types. You need to convert the <code>standard_value</code> column to text before using the <code>~</code> operator.</li>
+</ul>
+</li>
+<li>
+<p><strong>Lỗi Python (Python Error):</strong> "phiên bản scikit-learn cũ không hỗ trợ tham số squared=False trong hàm mean_squared_error"</p>
+<ul>
+<li><strong>Giải thích (Explanation):</strong> Phiên bản scikit-learn bạn đang sử dụng quá cũ và không hỗ trợ tham số <code>squared=False</code> trong hàm <code>mean_squared_error</code>.</li>
+<li><strong>Khắc phục (Solution):</strong> Nâng cấp phiên bản scikit-learn của bạn lên phiên bản mới nhất bằng lệnh <code>pip install --upgrade scikit-learn</code>. Nếu không thể nâng cấp, bạn có thể tính căn bậc hai của MSE (Mean Squared Error) để có được RMSE (Root Mean Squared Error).</li>
+<li><strong>English:</strong> The version of scikit-learn you are using is too old and does not support the <code>squared=False</code> parameter in the <code>mean_squared_error</code> function. Upgrade your scikit-learn version to the latest version using <code>pip install --upgrade scikit-learn</code>. If you cannot upgrade, you can calculate the square root of MSE to get RMSE.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Ví dụ Code (Code Examples):</strong></p>
+<p>Dưới đây là 5 ví dụ code SQL và Python mẫu, tập trung vào phân tích SAR và QSAR:</p>
+<p><strong>Ví dụ 1: Lấy dữ liệu hoạt tính và cấu trúc (Fetching Activity and Structure Data)</strong></p>
+<ul>
+<li><strong>SQL:</strong></li>
+</ul>
+<p><code>sql
+-- Lấy 100 dòng dữ liệu hoạt tính kháng một target cụ thể (ví dụ: CHEMBL240)
+SELECT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.assay_id IN (SELECT assay_id FROM assays WHERE target_chembl_id = 'CHEMBL240')
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND cs.canonical_smiles IS NOT NULL
+LIMIT 100;</code></p>
+<ul>
+<li><strong>English:</strong></li>
+</ul>
+<p><code>sql
+-- Fetch 100 rows of activity data against a specific target (e.g., CHEMBL240)
+SELECT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.assay_id IN (SELECT assay_id FROM assays WHERE target_chembl_id = 'CHEMBL240')
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND cs.canonical_smiles IS NOT NULL
+LIMIT 100;</code></p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors</p>
+<p>base_path = "." # Thay đổi nếu cần</p>
+<h1>Đường dẫn đến file CSV chứa dữ liệu lấy từ SQL</h1>
+<p>csv_file_path = os.path.join(base_path, "data", "chembl_activity_data.csv")</p>
+<h1>Đọc dữ liệu từ file CSV</h1>
+<p>df = pd.read_csv(csv_file_path)</p>
+<h1>Hàm tính toán các thuộc tính hóa học sử dụng RDKit</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        descriptors = {desc_name: desc_func(mol) for desc_name, desc_func in Descriptors.descList}
+        return descriptors
+    else:
+        return None</p>
+<h1>Áp dụng hàm tính toán thuộc tính cho cột 'canonical_smiles'</h1>
+<p>df['descriptors'] = df['canonical_smiles'].apply(calculate_descriptors)</p>
+<h1>In ra một vài dòng đầu của DataFrame</h1>
+<p>print(df.head())
+```</p>
+<ul>
+<li><strong>English:</strong></li>
+</ul>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors</p>
+<p>base_path = "." # Change if needed</p>
+<h1>Path to the CSV file containing data fetched from SQL</h1>
+<p>csv_file_path = os.path.join(base_path, "data", "chembl_activity_data.csv")</p>
+<h1>Read data from CSV file</h1>
+<p>df = pd.read_csv(csv_file_path)</p>
+<h1>Function to calculate chemical descriptors using RDKit</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        descriptors = {desc_name: desc_func(mol) for desc_name, desc_func in Descriptors.descList}
+        return descriptors
+    else:
+        return None</p>
+<h1>Apply the descriptor calculation function to the 'canonical_smiles' column</h1>
+<p>df['descriptors'] = df['canonical_smiles'].apply(calculate_descriptors)</p>
+<h1>Print the first few rows of the DataFrame</h1>
+<p>print(df.head())
+```</p>
+<p><strong>Ví dụ 2: Phân tích SAR đơn giản (Simple SAR Analysis)</strong></p>
+<ul>
+<li><strong>SQL:</strong> (Không cần thiết cho ví dụ này, dữ liệu đã có từ ví dụ 1)</li>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Draw
+import os</p>
+<p>base_path = "." # Thay đổi nếu cần
+csv_file_path = os.path.join(base_path, "data", "chembl_activity_data.csv")
+df = pd.read_csv(csv_file_path)</p>
+<h1>Chuyển đổi cột standard_value thành số</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')</p>
+<h1>Lọc các phân tử có hoạt tính cao (IC50 &lt; 100 nM)</h1>
+<p>active_molecules = df[df['standard_value'] &lt; 100]</p>
+<h1>In ra số lượng phân tử có hoạt tính cao</h1>
+<p>print(f"Number of active molecules: {len(active_molecules)}")</p>
+<h1>Vẽ một vài phân tử có hoạt tính cao</h1>
+<p>molecules = [Chem.MolFromSmiles(smiles) for smiles in active_molecules['canonical_smiles'].head(4)]
+img = Draw.MolsToGridImage(molecules, molsPerRow=4, subImgSize=(200,200))
+img.save(os.path.join(base_path, "data", "active_molecules.png"))
+```</p>
+<ul>
+<li><strong>English:</strong></li>
+</ul>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Draw
+import os</p>
+<p>base_path = "." # Change if needed
+csv_file_path = os.path.join(base_path, "data", "chembl_activity_data.csv")
+df = pd.read_csv(csv_file_path)</p>
+<h1>Convert the standard_value column to numeric</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')</p>
+<h1>Filter for highly active molecules (IC50 &lt; 100 nM)</h1>
+<p>active_molecules = df[df['standard_value'] &lt; 100]</p>
+<h1>Print the number of active molecules</h1>
+<p>print(f"Number of active molecules: {len(active_molecules)}")</p>
+<h1>Draw a few highly active molecules</h1>
+<p>molecules = [Chem.MolFromSmiles(smiles) for smiles in active_molecules['canonical_smiles'].head(4)]
+img = Draw.MolsToGridImage(molecules, molsPerRow=4, subImgSize=(200,200))
+img.save(os.path.join(base_path, "data", "active_molecules.png"))
+```</p>
+<p><strong>Ví dụ 3: Tính toán LogP và TPSA (Calculating LogP and TPSA)</strong></p>
+<ul>
+<li><strong>SQL:</strong> (Không cần thiết cho ví dụ này, dữ liệu đã có từ ví dụ 1)</li>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from rdkit.Chem import Crippen
+from rdkit.Chem import rdMolDescriptors
+import os</p>
+<p>base_path = "." # Thay đổi nếu cần
+csv_file_path = os.path.join(base_path, "data", "chembl_activity_data.csv")
+df = pd.read_csv(csv_file_path)</p>
+<h1>Hàm tính toán LogP và TPSA</h1>
+<p>def calculate_logp_tpsa(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        logp = Crippen.MolLogP(mol)
+        tpsa = rdMolDescriptors.CalcTPSA(mol)
+        return logp, tpsa
+    else:
+        return None, None</p>
+<h1>Áp dụng hàm tính toán LogP và TPSA</h1>
+<p>df[['logp', 'tpsa']] = df['canonical_smiles'].apply(lambda x: pd.Series(calculate_logp_tpsa(x)))</p>
+<h1>In ra một vài dòng đầu của DataFrame</h1>
+<p>print(df[['canonical_smiles', 'logp', 'tpsa']].head())
+```</p>
+<ul>
+<li><strong>English:</strong></li>
+</ul>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from rdkit.Chem import Crippen
+from rdkit.Chem import rdMolDescriptors
+import os</p>
+<p>base_path = "." # Change if needed
+csv_file_path = os.path.join(base_path, "data", "chembl_activity_data.csv")
+df = pd.read_csv(csv_file_path)</p>
+<h1>Function to calculate LogP and TPSA</h1>
+<p>def calculate_logp_tpsa(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        logp = Crippen.MolLogP(mol)
+        tpsa = rdMolDescriptors.CalcTPSA(mol)
+        return logp, tpsa
+    else:
+        return None, None</p>
+<h1>Apply the LogP and TPSA calculation function</h1>
+<p>df[['logp', 'tpsa']] = df['canonical_smiles'].apply(lambda x: pd.Series(calculate_logp_tpsa(x)))</p>
+<h1>Print the first few rows of the DataFrame</h1>
+<p>print(df[['canonical_smiles', 'logp', 'tpsa']].head())
+```</p>
+<p><strong>Ví dụ 4: Xây dựng mô hình QSAR đơn giản (Building a Simple QSAR Model)</strong></p>
+<ul>
+<li><strong>SQL:</strong> (Không cần thiết cho ví dụ này, dữ liệu đã có từ ví dụ 1 và 3)</li>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+import numpy as np
+import os</p>
+<p>base_path = "." # Thay đổi nếu cần
+csv_file_path = os.path.join(base_path, "data", "chembl_activity_data.csv")
+df = pd.read_csv(csv_file_path)</p>
+<h1>Tính toán LogP và TPSA (nếu chưa có)</h1>
+<p>def calculate_logp_tpsa(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        logp = Crippen.MolLogP(mol)
+        tpsa = rdMolDescriptors.CalcTPSA(mol)
+        return logp, tpsa
+    else:
+        return None, None</p>
+<p>df[['logp', 'tpsa']] = df['canonical_smiles'].apply(lambda x: pd.Series(calculate_logp_tpsa(x)))</p>
+<h1>Chuyển đổi IC50 thành pIC50</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] * 1e-9)  # Chuyển đổi nM thành M</p>
+<h1>Chọn các thuộc tính (features) và biến mục tiêu (target)</h1>
+<p>X = df[['logp', 'tpsa']].fillna(0)  # Điền giá trị NaN bằng 0
+y = df['pIC50'].fillna(0)</p>
+<h1>Chia dữ liệu thành tập huấn luyện và tập kiểm tra</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Xây dựng mô hình hồi quy tuyến tính</h1>
+<p>model = LinearRegression()</p>
+<h1>Huấn luyện mô hình</h1>
+<p>model.fit(X_train, y_train)</p>
+<h1>Dự đoán trên tập kiểm tra</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Đánh giá mô hình</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+print(f"Root Mean Squared Error: {rmse}")
+```</p>
+<ul>
+<li><strong>English:</strong></li>
+</ul>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+import numpy as np
+import os</p>
+<p>base_path = "." # Change if needed
+csv_file_path = os.path.join(base_path, "data", "chembl_activity_data.csv")
+df = pd.read_csv(csv_file_path)</p>
+<h1>Calculate LogP and TPSA (if not already calculated)</h1>
+<p>def calculate_logp_tpsa(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        logp = Crippen.MolLogP(mol)
+        tpsa = rdMolDescriptors.CalcTPSA(mol)
+        return logp, tpsa
+    else:
+        return None, None</p>
+<p>df[['logp', 'tpsa']] = df['canonical_smiles'].apply(lambda x: pd.Series(calculate_logp_tpsa(x)))</p>
+<h1>Convert IC50 to pIC50</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] * 1e-9)  # Convert nM to M</p>
+<h1>Select features and target variable</h1>
+<p>X = df[['logp', 'tpsa']].fillna(0)  # Fill NaN values with 0
+y = df['pIC50'].fillna(0)</p>
+<h1>Split data into training and test sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Build a linear regression model</h1>
+<p>model = LinearRegression()</p>
+<h1>Train the model</h1>
+<p>model.fit(X_train, y_train)</p>
+<h1>Predict on the test set</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+print(f"Root Mean Squared Error: {rmse}")
+```</p>
+<p><strong>Ví dụ 5: Phân tích cấu trúc con (Substructure Analysis)</strong></p>
+<ul>
+<li><strong>SQL:</strong> (Không cần thiết cho ví dụ này, dữ liệu đã có từ ví dụ 1)</li>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from rdkit.Chem import Draw
+from rdkit.Chem.Draw import IPythonConsole
+import os</p>
+<p>base_path = "." # Thay đổi nếu cần
+csv_file_path = os.path.join(base_path, "data", "chembl_activity_data.csv")
+df = pd.read_csv(csv_file_path)</p>
+<h1>Định nghĩa cấu trúc con (substructure) quan tâm (ví dụ: vòng benzen)</h1>
+<p>substructure = Chem.MolFromSmiles('c1ccccc1')</p>
+<h1>Hàm kiểm tra xem một phân tử có chứa cấu trúc con hay không</h1>
+<p>def has_substructure(smiles, substructure):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return mol.HasSubstructMatch(substructure)
+    else:
+        return False</p>
+<h1>Tạo cột mới để chỉ ra sự hiện diện của cấu trúc con</h1>
+<p>df['has_benzene'] = df['canonical_smiles'].apply(lambda x: has_substructure(x, substructure))</p>
+<h1>Lọc các phân tử có chứa vòng benzen</h1>
+<p>benzene_molecules = df[df['has_benzene'] == True]</p>
+<h1>In ra số lượng phân tử có chứa vòng benzen</h1>
+<p>print(f"Number of molecules with benzene ring: {len(benzene_molecules)}")</p>
+<h1>Vẽ một vài phân tử có chứa vòng benzen</h1>
+<p>molecules = [Chem.MolFromSmiles(smiles) for smiles in benzene_molecules['canonical_smiles'].head(4)]
+img = Draw.MolsToGridImage(molecules, molsPerRow=4, subImgSize=(200,200))
+img.save(os.path.join(base_path, "data", "benzene_molecules.png"))
+```</p>
+<ul>
+<li><strong>English:</strong></li>
+</ul>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from rdkit.Chem import Draw
+from rdkit.Chem.Draw import IPythonConsole
+import os</p>
+<p>base_path = "." # Change if needed
+csv_file_path = os.path.join(base_path, "data", "chembl_activity_data.csv")
+df = pd.read_csv(csv_file_path)</p>
+<h1>Define the substructure of interest (e.g., benzene ring)</h1>
+<p>substructure = Chem.MolFromSmiles('c1ccccc1')</p>
+<h1>Function to check if a molecule contains the substructure</h1>
+<p>def has_substructure(smiles, substructure):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return mol.HasSubstructMatch(substructure)
+    else:
+        return False</p>
+<h1>Create a new column to indicate the presence of the substructure</h1>
+<p>df['has_benzene'] = df['canonical_smiles'].apply(lambda x: has_substructure(x, substructure))</p>
+<h1>Filter for molecules containing the benzene ring</h1>
+<p>benzene_molecules = df[df['has_benzene'] == True]</p>
+<h1>Print the number of molecules containing the benzene ring</h1>
+<p>print(f"Number of molecules with benzene ring: {len(benzene_molecules)}")</p>
+<h1>Draw a few molecules containing the benzene ring</h1>
+<p>molecules = [Chem.MolFromSmiles(smiles) for smiles in benzene_molecules['canonical_smiles'].head(4)]
+img = Draw.MolsToGridImage(molecules, molsPerRow=4, subImgSize=(200,200))
+img.save(os.path.join(base_path, "data", "benzene_molecules.png"))
+```</p>
+<p><strong>Lưu ý quan trọng:</strong></p>
+<ul>
+<li><strong>Đường dẫn:</strong> Hãy chắc chắn rằng bạn đã thay đổi <code>base_path</code> để phù hợp với cấu trúc thư mục của bạn.</li>
+<li><strong>Cài đặt thư viện:</strong> Đảm bảo bạn đã cài đặt tất cả các thư viện cần thiết (pandas, rdkit, scikit-learn).</li>
+<li><strong>Dữ liệu:</strong> Các ví dụ này giả định rằng bạn đã tải dữ liệu từ ChEMBL và lưu nó vào file CSV. Bạn có thể cần điều chỉnh code để phù hợp với định dạng dữ liệu của bạn.</li>
+<li><strong>Phân tích sâu hơn:</strong> Đây chỉ là những ví dụ cơ bản. Bạn có thể mở rộng chúng bằng cách sử dụng các thuộc tính hóa học khác, các mô hình máy học phức tạp hơn và các kỹ thuật phân tích dữ liệu khác.</li>
+</ul>
+<p>Hãy cho tôi biết nếu bạn có bất kỳ câu hỏi nào hoặc cần hỗ trợ thêm. Chúc bạn thành công với dự án của mình!</p>
+        </body>
+        </html>
+        

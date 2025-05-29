@@ -1,0 +1,519 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_11</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Predicting LogP and TPSA of ChEMBL compounds</h1>
+<hr />
+<p>Okay, I understand. You're working with ChEMBL 35 data, using RDKit, and following an AIMLops-inspired directory structure. You're running into issues with your SQL query (regex operator incompatibility) and scikit-learn version. You need assistance in structuring your code within the AIMLops framework, generating SQL and Python code snippets, and addressing the errors you're encountering. And you want to limit the data to 100 rows for faster prototyping.</p>
+<p>Here's a breakdown, analysis, code examples, and solutions, formatted for your use case, and presented in both English and Vietnamese.</p>
+<p><strong>1. Analysis of the Analysis Model:</strong></p>
+<p>Your analysis model likely involves extracting bioactivity data from the ChEMBL database, filtering it based on specific criteria (e.g., activity type, standard value), and then using this data in Python with RDKit for tasks such as:</p>
+<ul>
+<li><strong>Structure-Activity Relationship (SAR) Modeling:</strong> Building models to predict activity based on molecular features.</li>
+<li><strong>Virtual Screening:</strong>  Identifying potential drug candidates by screening a library of compounds against a target.</li>
+<li><strong>Lead Optimization:</strong>  Improving the properties of existing drug candidates.</li>
+<li><strong>Data Exploration and Visualization:</strong> Understanding trends in the data through plots and statistical analysis.</li>
+</ul>
+<p>The SQL code serves to extract and prepare the data.  The Python code uses RDKit for molecular manipulation and potentially scikit-learn for machine learning models.</p>
+<p><strong>Vietnamese Translation:</strong></p>
+<p><em>Mô hình phân tích của bạn có khả năng liên quan đến việc trích xuất dữ liệu hoạt tính sinh học từ cơ sở dữ liệu ChEMBL, lọc dữ liệu dựa trên các tiêu chí cụ thể (ví dụ: loại hoạt động, giá trị tiêu chuẩn), sau đó sử dụng dữ liệu này trong Python với RDKit cho các tác vụ như:</em></p>
+<ul>
+<li><em>Mô hình hóa mối quan hệ cấu trúc-hoạt tính (SAR): Xây dựng mô hình để dự đoán hoạt động dựa trên các đặc điểm phân tử.</em></li>
+<li><em>Sàng lọc ảo: Xác định các ứng cử viên thuốc tiềm năng bằng cách sàng lọc một thư viện các hợp chất đối với một mục tiêu.</em></li>
+<li><em>Tối ưu hóa dẫn đầu: Cải thiện các thuộc tính của các ứng cử viên thuốc hiện có.</em></li>
+<li><em>Khám phá và trực quan hóa dữ liệu: Hiểu các xu hướng trong dữ liệu thông qua các biểu đồ và phân tích thống kê.</em></li>
+</ul>
+<p><em>Mã SQL phục vụ để trích xuất và chuẩn bị dữ liệu. Mã Python sử dụng RDKit để thao tác phân tử và có khả năng sử dụng scikit-learn cho các mô hình học máy.</em></p>
+<p><strong>2. AIMLops Directory Structure and Code Integration</strong></p>
+<p>Assuming a simplified AIMLops-inspired structure, it might look like this:</p>
+<p><code>Topic_CheMBL_35_11/
+├── data/
+│   └── chembl_activity_data.csv
+├── notebooks/
+│   └── Topic_CheMBL_35_11_1_data_extraction_and_cleaning.ipynb
+│   └── Topic_CheMBL_35_11_2_sar_analysis.ipynb
+├── src/
+│   └── utils.py  # Optional:  Reusable functions
+└── README.md</code></p>
+<ul>
+<li><strong><code>data/</code></strong>:  Stores your extracted data (e.g., <code>chembl_activity_data.csv</code>).</li>
+<li><strong><code>notebooks/</code></strong>: Contains your Jupyter notebooks.</li>
+<li><strong><code>src/</code></strong>: (Optional) Holds Python modules with reusable functions.</li>
+</ul>
+<p><strong>Vietnamese Translation:</strong></p>
+<p><em>Giả sử một cấu trúc lấy cảm hứng từ AIMLops đơn giản, nó có thể trông như thế này:</em></p>
+<p><code>Topic_CheMBL_35_11/
+├── data/
+│   └── chembl_activity_data.csv
+├── notebooks/
+│   └── Topic_CheMBL_35_11_1_data_extraction_and_cleaning.ipynb
+│   └── Topic_CheMBL_35_11_2_phan_tich_sar.ipynb
+├── src/
+│   └── utils.py  # Tùy chọn: Các hàm có thể tái sử dụng
+└── README.md</code></p>
+<ul>
+<li><em><code>data/</code></em>: Lưu trữ dữ liệu đã trích xuất của bạn (ví dụ: <code>chembl_activity_data.csv</code>).</li>
+<li><em><code>notebooks/</code></em>: Chứa các sổ tay Jupyter của bạn.</li>
+<li><em><code>src/</code></em>: (Tùy chọn) Chứa các mô-đun Python với các hàm có thể tái sử dụng.</li>
+</ul>
+<p><strong>3. SQL Code (Addressing Regex Issue and Limiting to 100 Rows)</strong></p>
+<p>The error "ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9.]+$'" indicates that the <code>~</code> operator (PostgreSQL's regular expression match) is not compatible with the <code>numeric</code> data type in the <code>standard_value</code> column.  We need to cast the column to text <em>before</em> applying the regex. Also, the <code>LIMIT 100</code> clause will restrict the output to 100 rows.</p>
+<p><code>sql
+-- File: data/chembl_activity_data.sql
+SELECT
+    act.activity_id,
+    cmp.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    mol.molfile
+FROM activities act
+JOIN assays ass ON act.assay_id = ass.assay_id
+JOIN target_dictionary td ON ass.tid = td.tid
+JOIN molecule_dictionary md ON act.molregno = md.molregno
+JOIN compound_structures cmp ON md.molregno = cmp.molregno
+LEFT JOIN mols mol ON md.molregno = mol.molregno
+WHERE td.target_type = 'SINGLE PROTEIN'
+  AND ass.assay_type = 'B'
+  AND act.standard_type = 'IC50'
+  AND act.standard_units = 'nM'
+  AND act.standard_value IS NOT NULL
+  AND act.standard_value::TEXT ~ '^[0-9.]+$' -- Cast to TEXT before regex
+LIMIT 100;</code></p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><code>act.standard_value::TEXT ~ '^[0-9.]+$'</code> : This line explicitly casts the <code>standard_value</code> column to the <code>TEXT</code> data type before applying the regular expression.  <code>^[0-9.]+$</code> ensures that the value consists only of digits and periods.</li>
+<li><code>LIMIT 100</code>: Restricts the number of rows returned to 100.</li>
+</ul>
+<p><strong>How to run:</strong></p>
+<ol>
+<li>Open pgAdmin and connect to your <code>chembl_35</code> database.</li>
+<li>Open a new query window.</li>
+<li>Paste the SQL code above into the query window.</li>
+<li>Execute the query.</li>
+<li><strong>Important:</strong> In pgAdmin, use the "Copy with Headers" option after running the query to copy the result to your clipboard. Then, save this clipboard content as a CSV file named <code>chembl_activity_data.csv</code> inside your <code>data/</code> directory.  Alternatively, explore pgAdmin's export functionality for more robust CSV creation.</li>
+</ol>
+<p><strong>Vietnamese Translation:</strong></p>
+<ul>
+<li><em><code>act.standard_value::TEXT ~ '^[0-9.]+$'</code> : Dòng này chuyển đổi rõ ràng cột <code>standard_value</code> thành kiểu dữ liệu <code>TEXT</code> trước khi áp dụng biểu thức chính quy. <code>^[0-9.]+$</code> đảm bảo rằng giá trị chỉ bao gồm các chữ số và dấu chấm.</em></li>
+<li><code>LIMIT 100</code>: Hạn chế số lượng hàng trả về là 100.</li>
+</ul>
+<p><strong>Hướng dẫn chạy:</strong></p>
+<ol>
+<li>Mở pgAdmin và kết nối với cơ sở dữ liệu <code>chembl_35</code> của bạn.</li>
+<li>Mở một cửa sổ truy vấn mới.</li>
+<li>Dán mã SQL ở trên vào cửa sổ truy vấn.</li>
+<li>Thực thi truy vấn.</li>
+<li><strong>Quan trọng:</strong> Trong pgAdmin, sử dụng tùy chọn "Sao chép với tiêu đề" sau khi chạy truy vấn để sao chép kết quả vào clipboard của bạn. Sau đó, lưu nội dung clipboard này dưới dạng tệp CSV có tên <code>chembl_activity_data.csv</code> bên trong thư mục <code>data/</code> của bạn. Ngoài ra, hãy khám phá chức năng xuất của pgAdmin để tạo CSV mạnh mẽ hơn.</li>
+</ol>
+<p><strong>4. Python Code (Example Notebooks)</strong></p>
+<p>Here are two example notebooks to demonstrate how to read the data, use RDKit, and perform some basic analysis.</p>
+<p><strong>Notebook 1: <code>notebooks/Topic_CheMBL_35_11_1_data_extraction_and_cleaning.ipynb</code></strong></p>
+<p>```python</p>
+<h1>---</h1>
+<h1>jupyter:</h1>
+<h1>jupytext:</h1>
+<h1>text_representation:</h1>
+<h1>extension: .py</h1>
+<h1>format_name: percent</h1>
+<h1>format_version: '1.3'</h1>
+<h1>jupytext_version: 1.14.5</h1>
+<h1>kernelspec:</h1>
+<h1>display_name: Python 3 (ipykernel)</h1>
+<h1>language: python</h1>
+<h1>name: python3</h1>
+<h1>---</h1>
+<h1>%% [markdown]</h1>
+<h1># Topic_CheMBL_35_11_1: Data Extraction and Cleaning</h1>
+<h1>%%</h1>
+<p>import pandas as pd
+import os
+from rdkit import Chem</p>
+<h1>Define the base path</h1>
+<p>base_path = os.path.dirname(os.getcwd())
+data_path = os.path.join(base_path, 'data', 'chembl_activity_data.csv')</p>
+<h1>%%</h1>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}. Make sure the CSV file exists.")
+    exit()</p>
+<h1>%%</h1>
+<h1>Display the first few rows</h1>
+<p>print(df.head())</p>
+<h1>%%</h1>
+<h1>Check for missing values</h1>
+<p>print("\nMissing Values:")
+print(df.isnull().sum())</p>
+<h1>%%</h1>
+<h1>Basic data cleaning: Drop rows with missing 'molfile'</h1>
+<p>df = df.dropna(subset=['molfile'])</p>
+<h1>%%</h1>
+<h1>Convert molfile to RDKit Mol object</h1>
+<p>def molfile_to_mol(molfile):
+    try:
+        mol = Chem.MolFromMolBlock(molfile)
+        if mol is None:
+            return None
+        return mol
+    except:
+        return None</p>
+<p>df['mol'] = df['molfile'].apply(molfile_to_mol)</p>
+<h1>Drop rows where the conversion to Mol object failed</h1>
+<p>df = df.dropna(subset=['mol'])</p>
+<h1>Display the cleaned data</h1>
+<p>print("\nCleaned Data:")
+print(df.head())</p>
+<h1>%%</h1>
+<h1>Basic data cleaning: keep the IC50 data type.</h1>
+<p>df = df[df['standard_type'] == 'IC50']</p>
+<h1>%%</h1>
+<h1>Save the cleaned data (optional)</h1>
+<p>cleaned_data_path = os.path.join(base_path, 'data', 'chembl_activity_data_cleaned.csv')
+df.to_csv(cleaned_data_path, index=False)
+print(f"\nCleaned data saved to {cleaned_data_path}")
+```</p>
+<p><strong>Notebook 2: <code>notebooks/Topic_CheMBL_35_11_2_sar_analysis.ipynb</code></strong></p>
+<p>```python</p>
+<h1>---</h1>
+<h1>jupyter:</h1>
+<h1>jupytext:</h1>
+<h1>text_representation:</h1>
+<h1>extension: .py</h1>
+<h1>format_name: percent</h1>
+<h1>format_version: '1.3'</h1>
+<h1>jupytext_version: 1.14.5</h1>
+<h1>kernelspec:</h1>
+<h1>display_name: Python 3 (ipykernel)</h1>
+<h1>language: python</h1>
+<h1>name: python3</h1>
+<h1>---</h1>
+<h1>%% [markdown]</h1>
+<h1># Topic_CheMBL_35_11_2: SAR Analysis</h1>
+<h1>%%</h1>
+<p>import pandas as pd
+import os
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt</p>
+<h1>Define the base path</h1>
+<p>base_path = os.path.dirname(os.getcwd())
+cleaned_data_path = os.path.join(base_path, 'data', 'chembl_activity_data_cleaned.csv')</p>
+<h1>%%</h1>
+<h1>Load the cleaned data</h1>
+<p>try:
+    df = pd.read_csv(cleaned_data_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {cleaned_data_path}.  Make sure you run the first notebook first.")
+    exit()</p>
+<h1>Convert molfile to RDKit Mol object</h1>
+<p>def molfile_to_mol(molfile):
+    try:
+        mol = Chem.MolFromMolBlock(molfile)
+        if mol is None:
+            return None
+        return mol
+    except:
+        return None</p>
+<p>df['mol'] = df['molfile'].apply(molfile_to_mol)</p>
+<h1>Drop rows where the conversion to Mol object failed</h1>
+<p>df = df.dropna(subset=['mol'])</p>
+<h1>%%</h1>
+<h1>Calculate molecular weight</h1>
+<p>def calculate_mw(mol):
+    return Descriptors.MolWt(mol)</p>
+<p>df['mol_weight'] = df['mol'].apply(calculate_mw)</p>
+<h1>%%</h1>
+<h1>Prepare data for modeling</h1>
+<p>X = df[['mol_weight']]  # Feature: Molecular Weight
+y = -np.log10(df['standard_value'])  # Target: pIC50 (transformed IC50)</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>%%</h1>
+<h1>Train a linear regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>%%</h1>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>%%</h1>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>%%</h1>
+<h1>Plot predictions vs. actual values</h1>
+<p>plt.scatter(y_test, y_pred)
+plt.xlabel("Actual pIC50")
+plt.ylabel("Predicted pIC50")
+plt.title("Actual vs. Predicted pIC50")
+plt.show()
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong><code>os.path.join(base_path, ...)</code></strong>:  This ensures your code works regardless of where the notebook is run, as long as the directory structure is maintained.</li>
+<li><strong>RDKit <code>Chem.MolFromMolBlock(molfile)</code></strong>: This converts the <code>molfile</code> string (representing the molecular structure) into an RDKit <code>Mol</code> object, which can then be used for calculations.</li>
+<li><strong><code>Descriptors.MolWt(mol)</code></strong>: This calculates the molecular weight of the molecule.</li>
+<li><strong><code>-np.log10(df['standard_value'])</code></strong>:  This transforms the IC50 value to pIC50 (a logarithmic scale), which is often a better representation for SAR modeling.</li>
+<li><strong><code>train_test_split</code></strong>, <strong><code>LinearRegression</code></strong>, <strong><code>mean_squared_error</code></strong>, <strong><code>r2_score</code></strong>: These are scikit-learn functions for splitting data, training a linear regression model, and evaluating its performance.  The <code>squared=False</code> parameter is <em>not</em> needed for <code>mean_squared_error</code> in current versions of scikit-learn.</li>
+</ul>
+<p><strong>Vietnamese Translation:</strong></p>
+<ul>
+<li><em><code>os.path.join(base_path, ...)</code></em>: Điều này đảm bảo mã của bạn hoạt động bất kể sổ tay được chạy ở đâu, miễn là cấu trúc thư mục được duy trì.</li>
+<li><em>RDKit <code>Chem.MolFromMolBlock(molfile)</code></em>: Điều này chuyển đổi chuỗi <code>molfile</code> (đại diện cho cấu trúc phân tử) thành đối tượng <code>Mol</code> của RDKit, sau đó có thể được sử dụng cho các phép tính.</li>
+<li><em><code>Descriptors.MolWt(mol)</code></em>: Điều này tính toán trọng lượng phân tử của phân tử.</li>
+<li><em><code>-np.log10(df['standard_value'])</code></em>: Điều này chuyển đổi giá trị IC50 thành pIC50 (thang logarit), thường là một biểu diễn tốt hơn cho mô hình hóa SAR.</li>
+<li><em><code>train_test_split</code></em>, <em><code>LinearRegression</code></em>, <em><code>mean_squared_error</code></em>, <em><code>r2_score</code></em>: Đây là các hàm scikit-learn để chia dữ liệu, huấn luyện mô hình hồi quy tuyến tính và đánh giá hiệu suất của nó. Tham số <code>squared=False</code> <em>không</em> cần thiết cho <code>mean_squared_error</code> trong các phiên bản scikit-learn hiện tại.</li>
+</ul>
+<p><strong>5. Addressing Errors</strong></p>
+<ul>
+<li><strong><code>ERROR: operator does not exist: numeric ~ unknown</code></strong>:  Add <code>::TEXT</code> to cast the numeric column to text before applying the regex (as shown in the SQL code above).</li>
+<li><strong><code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong>:  Remove the <code>squared=False</code> parameter from the <code>mean_squared_error</code> function.  The default behavior is to return the mean squared error.  If you <em>need</em> the root mean squared error, calculate it manually: <code>rmse = np.sqrt(mean_squared_error(y_test, y_pred))</code></li>
+</ul>
+<p><strong>Vietnamese Translation:</strong></p>
+<ul>
+<li><em><code>ERROR: operator does not exist: numeric ~ unknown</code></em>: Thêm <code>::TEXT</code> để chuyển đổi cột số thành văn bản trước khi áp dụng regex (như được hiển thị trong mã SQL ở trên).</li>
+<li><em><code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></em>: Xóa tham số <code>squared=False</code> khỏi hàm <code>mean_squared_error</code>. Hành vi mặc định là trả về lỗi bình phương trung bình. Nếu bạn <em>cần</em> căn bậc hai của lỗi bình phương trung bình, hãy tính nó thủ công: <code>rmse = np.sqrt(mean_squared_error(y_test, y_pred))</code></li>
+</ul>
+<p><strong>6. Five Code Examples (Extending the Analysis)</strong></p>
+<p>Here are five additional code examples to extend your analysis, focusing on different aspects of the data and RDKit:</p>
+<p><strong>Example 1: Calculating LogP</strong></p>
+<p>```python</p>
+<h1>In notebooks/Topic_CheMBL_35_11_2_sar_analysis.ipynb (or a new notebook)</h1>
+<p>from rdkit.Chem import AllChem
+from rdkit.Chem import Crippen</p>
+<p>def calculate_logp(mol):
+    return Crippen.MolLogP(mol)</p>
+<p>df['logp'] = df['mol'].apply(calculate_logp)
+print(df[['chembl_id', 'logp']].head())
+```</p>
+<p><strong>Example 2: Calculating TPSA (Topological Polar Surface Area)</strong></p>
+<p>```python</p>
+<h1>In notebooks/Topic_CheMBL_35_11_2_sar_analysis.ipynb (or a new notebook)</h1>
+<p>from rdkit.Chem import Descriptors3D</p>
+<p>def calculate_tpsa(mol):
+    return Descriptors3D.TPSA(mol)</p>
+<p>df['tpsa'] = df['mol'].apply(calculate_tpsa)
+print(df[['chembl_id', 'tpsa']].head())
+```</p>
+<p><strong>Example 3: Creating a Histogram of Molecular Weights</strong></p>
+<p>```python</p>
+<h1>In notebooks/Topic_CheMBL_35_11_2_sar_analysis.ipynb (or a new notebook)</h1>
+<p>import matplotlib.pyplot as plt</p>
+<p>plt.hist(df['mol_weight'], bins=20)
+plt.xlabel("Molecular Weight")
+plt.ylabel("Frequency")
+plt.title("Distribution of Molecular Weights")
+plt.show()
+```</p>
+<p><strong>Example 4: Calculating Morgan Fingerprints (ECFP4) and PCA (for visualization)</strong></p>
+<p>```python</p>
+<h1>In notebooks/Topic_CheMBL_35_11_2_sar_analysis.ipynb (or a new notebook)</h1>
+<p>from rdkit.Chem import AllChem
+from sklearn.decomposition import PCA</p>
+<p>def calculate_ecfp4(mol):
+    return AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=1024)</p>
+<p>df['ecfp4'] = df['mol'].apply(calculate_ecfp4)</p>
+<h1>Convert fingerprints to a matrix</h1>
+<p>X = np.array([list(fp) for fp in df['ecfp4']])</p>
+<h1>Perform PCA for dimensionality reduction</h1>
+<p>pca = PCA(n_components=2)
+pca.fit(X)
+X_pca = pca.transform(X)</p>
+<h1>Plot the PCA results</h1>
+<p>plt.scatter(X_pca[:, 0], X_pca[:, 1])
+plt.xlabel("PCA Component 1")
+plt.ylabel("PCA Component 2")
+plt.title("PCA of ECFP4 Fingerprints")
+plt.show()
+```</p>
+<p><strong>Example 5: Building a slightly more complex model (using multiple features). Requires the cleaned data from the first notebook.</strong></p>
+<p>```python</p>
+<h1>In notebooks/Topic_CheMBL_35_11_2_sar_analysis.ipynb (or a new notebook)</h1>
+<p>from rdkit.Chem import AllChem
+from rdkit.Chem import Crippen
+from rdkit.Chem import Descriptors3D
+import numpy as np
+import pandas as pd
+import os
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
+from rdkit import Chem</p>
+<h1>Define the base path</h1>
+<p>base_path = os.path.dirname(os.getcwd())
+cleaned_data_path = os.path.join(base_path, 'data', 'chembl_activity_data_cleaned.csv')</p>
+<h1>Load the cleaned data</h1>
+<p>try:
+    df = pd.read_csv(cleaned_data_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {cleaned_data_path}.  Make sure you run the first notebook first.")
+    exit()</p>
+<h1>Convert molfile to RDKit Mol object</h1>
+<p>def molfile_to_mol(molfile):
+    try:
+        mol = Chem.MolFromMolBlock(molfile)
+        if mol is None:
+            return None
+        return mol
+    except:
+        return None</p>
+<p>df['mol'] = df['molfile'].apply(molfile_to_mol)</p>
+<h1>Drop rows where the conversion to Mol object failed</h1>
+<p>df = df.dropna(subset=['mol'])</p>
+<h1>Ensure we calculate the features after handling missing MOL objects.</h1>
+<p>def calculate_mw(mol):
+    return Descriptors.MolWt(mol)</p>
+<p>def calculate_logp(mol):
+    return Crippen.MolLogP(mol)</p>
+<p>def calculate_tpsa(mol):
+    return Descriptors3D.TPSA(mol)</p>
+<p>df['mol_weight'] = df['mol'].apply(calculate_mw)
+df['logp'] = df['mol'].apply(calculate_logp)
+df['tpsa'] = df['mol'].apply(calculate_tpsa)</p>
+<h1>Prepare data for modeling.  Handle any newly introduced NaNs from descriptor calculation</h1>
+<p>df = df.dropna(subset=['mol_weight', 'logp', 'tpsa'])</p>
+<p>X = df[['mol_weight', 'logp', 'tpsa']]  # Features: Molecular Weight, LogP, TPSA
+y = -np.log10(df['standard_value'])  # Target: pIC50 (transformed IC50)</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a linear regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Plot predictions vs. actual values</h1>
+<p>plt.scatter(y_test, y_pred)
+plt.xlabel("Actual pIC50")
+plt.ylabel("Predicted pIC50")
+plt.title("Actual vs. Predicted pIC50")
+plt.show()
+```</p>
+<p><strong>Vietnamese Translation (for Example 5 - the most complex one):</strong></p>
+<p>```python</p>
+<h1>Trong notebooks/Topic_CheMBL_35_11_2_phan_tich_sar.ipynb (hoặc một sổ tay mới)</h1>
+<p>from rdkit.Chem import AllChem
+from rdkit.Chem import Crippen
+from rdkit.Chem import Descriptors3D
+import numpy as np
+import pandas as pd
+import os
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
+from rdkit import Chem</p>
+<h1>Xác định đường dẫn cơ sở</h1>
+<p>base_path = os.path.dirname(os.getcwd())
+cleaned_data_path = os.path.join(base_path, 'data', 'chembl_activity_data_cleaned.csv')</p>
+<h1>Tải dữ liệu đã làm sạch</h1>
+<p>try:
+    df = pd.read_csv(cleaned_data_path)
+except FileNotFoundError:
+    print(f"Lỗi: Không tìm thấy tệp tại {cleaned_data_path}.  Đảm bảo bạn đã chạy sổ tay đầu tiên trước.")
+    exit()</p>
+<h1>Chuyển đổi molfile thành đối tượng Mol của RDKit</h1>
+<p>def molfile_to_mol(molfile):
+    try:
+        mol = Chem.MolFromMolBlock(molfile)
+        if mol is None:
+            return None
+        return mol
+    except:
+        return None</p>
+<p>df['mol'] = df['molfile'].apply(molfile_to_mol)</p>
+<h1>Loại bỏ các hàng mà việc chuyển đổi sang đối tượng Mol không thành công</h1>
+<p>df = df.dropna(subset=['mol'])</p>
+<h1>Đảm bảo chúng ta tính toán các đặc trưng sau khi xử lý các đối tượng MOL bị thiếu.</h1>
+<p>def calculate_mw(mol):
+    return Descriptors.MolWt(mol)</p>
+<p>def calculate_logp(mol):
+    return Crippen.MolLogP(mol)</p>
+<p>def calculate_tpsa(mol):
+    return Descriptors3D.TPSA(mol)</p>
+<p>df['mol_weight'] = df['mol'].apply(calculate_mw)
+df['logp'] = df['mol'].apply(calculate_logp)
+df['tpsa'] = df['mol'].apply(calculate_tpsa)</p>
+<h1>Chuẩn bị dữ liệu để mô hình hóa. Xử lý bất kỳ NaN mới nào được đưa vào từ việc tính toán descriptor</h1>
+<p>df = df.dropna(subset=['mol_weight', 'logp', 'tpsa'])</p>
+<p>X = df[['mol_weight', 'logp', 'tpsa']]  # Các đặc trưng: Trọng lượng phân tử, LogP, TPSA
+y = -np.log10(df['standard_value'])  # Mục tiêu: pIC50 (IC50 đã chuyển đổi)</p>
+<h1>Chia dữ liệu thành tập huấn luyện và tập kiểm tra</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Huấn luyện một mô hình hồi quy tuyến tính</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Dự đoán</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Đánh giá mô hình</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Lỗi bình phương trung bình: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Vẽ đồ thị dự đoán so với các giá trị thực tế</h1>
+<p>plt.scatter(y_test, y_pred)
+plt.xlabel("pIC50 thực tế")
+plt.ylabel("pIC50 dự đoán")
+plt.title("pIC50 thực tế so với dự đoán")
+plt.show()
+```</p>
+<p><strong>Key Improvements and Considerations:</strong></p>
+<ul>
+<li><strong>Error Handling:</strong>  The Python code includes <code>try...except</code> blocks for file loading and molecule conversion to gracefully handle potential errors.</li>
+<li><strong>Data Cleaning:</strong>  The code explicitly handles missing values (<code>NaNs</code>) by dropping rows with missing data.  This is <em>crucial</em> for many RDKit calculations and scikit-learn models.</li>
+<li><strong>Feature Engineering:</strong> The examples demonstrate calculating molecular weight, LogP, TPSA, and ECFP4 fingerprints, which are commonly used features in SAR models.</li>
+<li><strong>Model Evaluation:</strong>  The code calculates the Mean Squared Error (MSE) and R-squared (R²) to evaluate the performance of the linear regression model.</li>
+<li><strong>Visualization:</strong>  The examples include plots to visualize the distribution of molecular weights and the results of the PCA analysis.</li>
+<li><strong>Flexibility:</strong>  The code is designed to be modular and easily adaptable to different datasets and analysis tasks.  You can add more features, try different machine learning models, and customize the visualizations.</li>
+<li><strong>Directory Structure:</strong> The code adheres to the AIMLops-inspired directory structure, making it easier to manage and deploy your project.</li>
+<li><strong>Upgrading scikit-learn:</strong> It's strongly recommended to update to a recent version of scikit-learn to avoid compatibility issues.  You can do this using <code>pip install --upgrade scikit-learn</code>.</li>
+<li><strong>Data Exploration:</strong>  Before building complex models, always explore your data thoroughly.  Look for outliers, missing values, and potential biases.</li>
+</ul>
+<p>This comprehensive response provides a solid foundation for your ChEMBL 35 data analysis project. Remember to adapt the code and analysis to your specific research questions and goals. Good luck!</p>
+        </body>
+        </html>
+        

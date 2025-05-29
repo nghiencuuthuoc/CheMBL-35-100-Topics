@@ -1,0 +1,409 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_50</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Xu hướng phê duyệt theo nhóm target</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được tham gia vào dự án thú vị này với vai trò chuyên gia R&amp;D dược học. Dựa trên thông tin bạn cung cấp, chúng ta sẽ tập trung vào chủ đề "Topic_CheMBL_35_50" và xây dựng quy trình phân tích dữ liệu từ Chembl 35 kết hợp RDKit, tuân thủ theo template AIMLOps của bạn.</p>
+<p><strong>1. Phân tích mô hình (Analysis Model)</strong></p>
+<p>Mục tiêu của chủ đề "Topic_CheMBL_35_50" có thể là khám phá mối quan hệ giữa cấu trúc hóa học của các hợp chất (từ Chembl 35) và hoạt tính sinh học của chúng (IC50, Ki, v.v.). Chúng ta sẽ sử dụng RDKit để tạo các descriptor (đặc trưng) cho cấu trúc phân tử, sau đó sử dụng các mô hình học máy để dự đoán hoạt tính.</p>
+<p><strong>Các bước chính:</strong></p>
+<ol>
+<li><strong>Data Extraction (Trích xuất dữ liệu):</strong> Sử dụng SQL để trích xuất thông tin từ database Chembl 35, bao gồm cấu trúc phân tử (ví dụ: SMILES) và dữ liệu hoạt tính (ví dụ: IC50).</li>
+<li><strong>Data Preprocessing (Tiền xử lý dữ liệu):</strong><ul>
+<li>Chuyển đổi SMILES thành đối tượng phân tử RDKit.</li>
+<li>Tính toán các descriptor phân tử (ví dụ: MW, logP, HBA, HBD, TPSA).</li>
+<li>Xử lý các giá trị hoạt tính (ví dụ: chuyển đổi IC50 sang pIC50).</li>
+<li>Loại bỏ các giá trị ngoại lệ hoặc thiếu.</li>
+</ul>
+</li>
+<li><strong>Feature Selection/Engineering (Chọn lọc/Xây dựng đặc trưng):</strong> Chọn các descriptor phù hợp nhất cho mô hình hoặc tạo các đặc trưng mới từ các descriptor hiện có.</li>
+<li><strong>Model Building (Xây dựng mô hình):</strong> Sử dụng các thuật toán học máy (ví dụ: Linear Regression, Random Forest, Support Vector Machines) để xây dựng mô hình dự đoán hoạt tính dựa trên các descriptor phân tử.</li>
+<li><strong>Model Evaluation (Đánh giá mô hình):</strong> Đánh giá hiệu suất của mô hình bằng cách sử dụng các metric phù hợp (ví dụ: R-squared, RMSE, MAE).</li>
+<li><strong>Model Interpretation (Giải thích mô hình):</strong> Tìm hiểu các descriptor nào có ảnh hưởng lớn nhất đến hoạt tính.</li>
+</ol>
+<p><strong>2. Hướng dẫn song ngữ (Bilingual Guide)</strong></p>
+<p><strong>2.1. Data Extraction (Trích xuất dữ liệu)</strong></p>
+<p><strong>English:</strong></p>
+<p>We will use SQL to extract data from the Chembl 35 database. Here's an example query to retrieve compound structures (SMILES) and activity data (IC50) for a specific target:</p>
+<p><code>sql
+-- SQL query to extract data from Chembl
+SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.pref_name = 'Target Name'  -- Replace with your target of interest
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0 -- Exclude invalid values
+LIMIT 100;</code></p>
+<p><strong>Tiếng Việt:</strong></p>
+<p>Chúng ta sẽ sử dụng SQL để trích xuất dữ liệu từ cơ sở dữ liệu Chembl 35. Dưới đây là một truy vấn mẫu để lấy cấu trúc hợp chất (SMILES) và dữ liệu hoạt tính (IC50) cho một mục tiêu cụ thể:</p>
+<p><code>sql
+-- Truy vấn SQL để trích xuất dữ liệu từ Chembl
+SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.pref_name = 'Tên mục tiêu'  -- Thay thế bằng mục tiêu bạn quan tâm
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0 -- Loại trừ các giá trị không hợp lệ
+LIMIT 100;</code></p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><code>molecule_dictionary</code>: Contains general information about molecules.</li>
+<li><code>compound_structures</code>: Contains the structure of the compounds (SMILES).</li>
+<li><code>activities</code>: Contains activity data (IC50, Ki, etc.).</li>
+<li><code>target_dictionary</code>: Contains information about the targets (proteins).</li>
+<li><code>LIMIT 100</code>: giới hạn 100 dòng dữ liệu</li>
+</ul>
+<p><strong>2.2. Data Preprocessing and Feature Calculation (Tiền xử lý dữ liệu và tính toán đặc trưng)</strong></p>
+<p><strong>English:</strong></p>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+import os</p>
+<h1>Define base path</h1>
+<p>base_path = "../data"  # Adjust this path according to your AIMLOps template</p>
+<h1>Load data from CSV file</h1>
+<p>file_path = os.path.join(base_path, "chembl_data.csv")  # Replace with your actual CSV file name
+df = pd.read_csv(file_path)</p>
+<h1>Function to calculate molecular descriptors</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {desc[0]: desc<a href="mol">1</a> for desc in Descriptors.descList}
+    return descriptors</p>
+<h1>Apply the function to each SMILES string</h1>
+<p>df['descriptors'] = df['canonical_smiles'].apply(calculate_descriptors)</p>
+<h1>Convert descriptors to columns</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Handle missing values</h1>
+<p>df = df.dropna()</p>
+<h1>Convert IC50 to pIC50</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] * 1e-9)  # Convert nM to M and then to pIC50</p>
+<h1>Display the first few rows of the processed data</h1>
+<p>print(df.head())
+```</p>
+<p><strong>Tiếng Việt:</strong></p>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+import os</p>
+<h1>Định nghĩa đường dẫn cơ sở</h1>
+<p>base_path = "../data"  # Điều chỉnh đường dẫn này theo template AIMLOps của bạn</p>
+<h1>Tải dữ liệu từ file CSV</h1>
+<p>file_path = os.path.join(base_path, "chembl_data.csv")  # Thay thế bằng tên file CSV thực tế của bạn
+df = pd.read_csv(file_path)</p>
+<h1>Hàm tính toán các descriptor phân tử</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {desc[0]: desc<a href="mol">1</a> for desc in Descriptors.descList}
+    return descriptors</p>
+<h1>Áp dụng hàm cho mỗi chuỗi SMILES</h1>
+<p>df['descriptors'] = df['canonical_smiles'].apply(calculate_descriptors)</p>
+<h1>Chuyển đổi descriptor thành các cột</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Xử lý các giá trị thiếu</h1>
+<p>df = df.dropna()</p>
+<h1>Chuyển đổi IC50 thành pIC50</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] * 1e-9)  # Chuyển đổi nM sang M và sau đó sang pIC50</p>
+<h1>Hiển thị một vài hàng đầu tiên của dữ liệu đã xử lý</h1>
+<p>print(df.head())
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li>The code reads the CSV file (obtained from the SQL query) into a Pandas DataFrame.</li>
+<li>It uses RDKit to convert SMILES strings into molecular objects and calculates a set of molecular descriptors.</li>
+<li>It handles missing values and converts IC50 values to pIC50 values.</li>
+</ul>
+<p><strong>2.3. Model Building and Evaluation (Xây dựng và đánh giá mô hình)</strong></p>
+<p><strong>English:</strong></p>
+<p>```python
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Prepare the data</h1>
+<p>X = df.drop(['molregno', 'canonical_smiles', 'standard_type', 'standard_value', 'standard_units', 'pIC50'], axis=1)  # Drop non-descriptor columns
+y = df['pIC50']</p>
+<h1>Scale the features</h1>
+<p>scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)</p>
+<h1>Split the data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)</p>
+<h1>Train the model (Linear Regression)</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>r2 = r2_score(y_test, y_pred)
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))</p>
+<p>print(f"R-squared: {r2}")
+print(f"RMSE: {rmse}")
+```</p>
+<p><strong>Tiếng Việt:</strong></p>
+<p>```python
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import Ridge
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Chuẩn bị dữ liệu</h1>
+<p>X = df.drop(['molregno', 'canonical_smiles', 'standard_type', 'standard_value', 'standard_units', 'pIC50'], axis=1)  # Loại bỏ các cột không phải descriptor
+y = df['pIC50']</p>
+<h1>Scale các đặc trưng</h1>
+<p>scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)</p>
+<h1>Chia dữ liệu thành tập huấn luyện và tập kiểm tra</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)</p>
+<h1>Huấn luyện mô hình (Ridge Regression)</h1>
+<p>model = Ridge(alpha=1.0)  # You can adjust the alpha parameter
+model.fit(X_train, y_train)</p>
+<h1>Dự đoán</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Đánh giá mô hình</h1>
+<p>r2 = r2_score(y_test, y_pred)
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))</p>
+<p>print(f"R-squared: {r2}")
+print(f"RMSE: {rmse}")
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li>The code prepares the data by separating features (descriptors) from the target variable (pIC50).</li>
+<li>It splits the data into training and testing sets.</li>
+<li>It trains a Linear Regression model on the training data.</li>
+<li>It makes predictions on the testing data and evaluates the model's performance using R-squared and RMSE.</li>
+</ul>
+<p><strong>3. Sửa lỗi (Error Handling)</strong></p>
+<p><strong>a. <code>ERROR: operator does not exist: numeric ~ unknown LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p><strong>English:</strong></p>
+<p>This error occurs because the <code>~</code> operator is used for regular expression matching, but the <code>standard_value</code> column is likely of numeric type. To fix this, you can cast the <code>standard_value</code> to text before using the <code>~</code> operator or use a different approach to filter numeric values.</p>
+<p><strong>Fixed SQL Query:</strong></p>
+<p><code>sql
+SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.pref_name = 'Your Target Name'
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0  -- Corrected line: Directly compare as numeric
+LIMIT 100;</code></p>
+<p><strong>Tiếng Việt:</strong></p>
+<p>Lỗi này xảy ra vì toán tử <code>~</code> được sử dụng để so khớp biểu thức chính quy, nhưng cột <code>standard_value</code> có khả năng là kiểu số. Để khắc phục điều này, bạn có thể chuyển đổi <code>standard_value</code> thành văn bản trước khi sử dụng toán tử <code>~</code> hoặc sử dụng một cách tiếp cận khác để lọc các giá trị số.</p>
+<p><strong>Truy vấn SQL đã sửa:</strong></p>
+<p><code>sql
+SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.pref_name = 'Tên mục tiêu của bạn'
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0  -- Dòng đã sửa: So sánh trực tiếp dưới dạng số
+LIMIT 100;</code></p>
+<p><strong>b. <code>sklearn</code> version is too old</strong></p>
+<p><strong>English:</strong></p>
+<p>If you encounter an error related to <code>squared=False</code> in <code>mean_squared_error</code>, it means your <code>scikit-learn</code> version is outdated. You should update it using pip:</p>
+<p><code>bash
+pip install --upgrade scikit-learn</code></p>
+<p>If upgrading is not feasible, you can calculate RMSE manually:</p>
+<p><code>python
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)</code></p>
+<p><strong>Tiếng Việt:</strong></p>
+<p>Nếu bạn gặp lỗi liên quan đến <code>squared=False</code> trong <code>mean_squared_error</code>, điều đó có nghĩa là phiên bản <code>scikit-learn</code> của bạn đã lỗi thời. Bạn nên cập nhật nó bằng pip:</p>
+<p><code>bash
+pip install --upgrade scikit-learn</code></p>
+<p>Nếu việc nâng cấp không khả thi, bạn có thể tính RMSE thủ công:</p>
+<p><code>python
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)</code></p>
+<p><strong>4. Ví dụ code (Code Examples)</strong></p>
+<p><strong>4.1. SQL (Data Extraction)</strong></p>
+<p><strong>Example 1: Select compounds targeting a specific protein and their IC50 values.</strong></p>
+<p><code>sql
+SELECT md.molregno, cs.canonical_smiles, act.standard_value
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+JOIN activities act ON md.molregno = act.molregno
+JOIN target_dictionary td ON act.tid = td.tid
+WHERE td.pref_name = 'CHEMBL205' AND act.standard_type = 'IC50' AND act.standard_units = 'nM'
+LIMIT 100;</code></p>
+<p><strong>Example 2: Select compounds with Ki values for a particular target.</strong></p>
+<p><code>sql
+SELECT md.molregno, cs.canonical_smiles, act.standard_value
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+JOIN activities act ON md.molregno = act.molregno
+JOIN target_dictionary td ON act.tid = td.tid
+WHERE td.pref_name = 'CHEMBL205' AND act.standard_type = 'Ki' AND act.standard_units = 'nM'
+LIMIT 100;</code></p>
+<p><strong>Example 3: Filter compounds based on molecular weight (requires a function or table with MW data).</strong>
+This example assumes you have a table with molecular weights.</p>
+<p><code>sql
+-- This is a hypothetical example. Replace 'mw_table' with your actual table.
+SELECT md.molregno, cs.canonical_smiles, act.standard_value
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+JOIN activities act ON md.molregno = act.molregno
+JOIN target_dictionary td ON act.tid = td.tid
+JOIN mw_table mw ON md.molregno = mw.molregno -- Hypothetical table
+WHERE td.pref_name = 'CHEMBL205' AND act.standard_type = 'IC50' AND act.standard_units = 'nM' AND mw.mw &lt; 500
+LIMIT 100;</code></p>
+<p><strong>Example 4: Select compounds and their activities within a specific range.</strong></p>
+<p><code>sql
+SELECT md.molregno, cs.canonical_smiles, act.standard_value
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+JOIN activities act ON md.molregno = act.molregno
+JOIN target_dictionary td ON act.tid = td.tid
+WHERE td.pref_name = 'CHEMBL205' AND act.standard_type = 'IC50' AND act.standard_units = 'nM' AND act.standard_value BETWEEN 10 AND 100
+LIMIT 100;</code></p>
+<p><strong>Example 5: Retrieve compounds and their activities for multiple targets.</strong></p>
+<p><code>sql
+SELECT md.molregno, cs.canonical_smiles, act.standard_value
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+JOIN activities act ON md.molregno = act.molregno
+JOIN target_dictionary td ON act.tid = td.tid
+WHERE td.pref_name IN ('CHEMBL205', 'CHEMBL206', 'CHEMBL207') AND act.standard_type = 'IC50' AND act.standard_units = 'nM'
+LIMIT 100;</code></p>
+<p><strong>4.2. Python (Data Preprocessing and Modeling)</strong></p>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np
+import os</p>
+<h1>Example 1:  Calculate LogP and Molecular Weight and Handle Errors</h1>
+<p>def calculate_logp_mw(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is not None:
+            logp = Descriptors.MolLogP(mol)
+            mw = Descriptors.MolWt(mol)
+            return logp, mw
+        else:
+            return None, None
+    except:
+        return None, None</p>
+<h1>Example 2:  Feature Scaling (StandardScaler)</h1>
+<p>from sklearn.preprocessing import StandardScaler</p>
+<p>def scale_features(df, columns_to_scale):
+    scaler = StandardScaler()
+    df[columns_to_scale] = scaler.fit_transform(df[columns_to_scale])
+    return df</p>
+<h1>Example 3:  Train-Test Split with a Fixed Random State</h1>
+<p>def split_data(X, y, test_size=0.2, random_state=42):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+    return X_train, X_test, y_train, y_test</p>
+<h1>Example 4:  Train and Evaluate a Linear Regression Model</h1>
+<p>def train_evaluate_model(X_train, X_test, y_train, y_test):
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    r2 = r2_score(y_test, y_pred)
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+    return r2, rmse, model</p>
+<h1>Example 5: Save Model</h1>
+<p>import joblib
+def save_model(model, filepath):
+    joblib.dump(model, filepath)
+```</p>
+<p>This comprehensive guide should give you a solid foundation for analyzing Chembl 35 data. Let me know if you have any specific questions or need further assistance!</p>
+        </body>
+        </html>
+        

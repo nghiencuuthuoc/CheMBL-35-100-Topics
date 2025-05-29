@@ -1,0 +1,598 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_60</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: ChEMBL → Real-world evidence mapping</h1>
+<hr />
+<p>Okay, I understand. You're working with ChEMBL 35 data in PostgreSQL, using RDKit for analysis, and following an AIMLops-inspired folder structure. You're encountering errors related to SQL syntax and scikit-learn version compatibility, and you need guidance on how to structure your project and code, limited to 100 rows of data for demonstration.</p>
+<p>Let's break this down step-by-step, providing code examples in both SQL and Python, and addressing the errors you're facing.  I will provide the analysis and solutions in both English and Vietnamese.</p>
+<p><strong>1. Project Setup and Folder Structure</strong></p>
+<p>Following the AIMLops principle, let's assume a simplified project structure like this:</p>
+<p><code>project_root/
+├── data/           # Stores CSV files extracted from the database
+├── notebooks/       # Jupyter notebooks with your analysis code
+├── src/            # (Optional) Python modules for reusable code
+├── models/        #  (Optional) Saved model files
+├── README.md</code></p>
+<p>This structure helps in organizing your data, code, and models.</p>
+<p><strong>2. Addressing the SQL Error: <code>ERROR: operator does not exist: numeric ~ unknown</code></strong></p>
+<p>This error occurs because the <code>~</code> operator in PostgreSQL is used for regular expression matching on <em>text</em> data, not <em>numeric</em> data. You are trying to use it on <code>act.standard_value</code>, which is likely a numeric column.  The correct approach is to either cast the numeric column to text or, more preferably, use a numerical comparison (e.g., <code>&gt;=</code>, <code>&lt;=</code>).  However, your intent is to filter for values that look like valid numbers. A better approach to filter invalid data is to use <code>standard_value IS NOT NULL</code></p>
+<p><strong>3. SQL Code (to be run in pgAdmin)</strong></p>
+<p>This SQL query will extract 100 rows from the ChEMBL database, focusing on activities and molecules. This will generate a CSV file named <code>Topic_CheMBL_35_60.csv</code> in your <code>data/</code> folder.</p>
+<p><code>sql
+-- SQL Code (Topic_CheMBL_35_60.sql)
+-- Retrieve data and save as Topic_CheMBL_35_60.csv
+COPY (
+  SELECT
+    act.activity_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.assay_id,
+    mol.molregno,
+    mol.smiles
+  FROM activities act
+  JOIN assays ass ON act.assay_id = ass.assay_id
+  JOIN target_dictionary td ON ass.tid = td.tid
+  JOIN molecule_dictionary mol ON act.molregno = mol.molregno
+  WHERE act.standard_type = 'IC50'  -- Example: Filter for IC50 values
+  AND act.standard_relation = '='    -- Example: Filter for exact values
+  AND act.standard_value IS NOT NULL
+  AND act.standard_units = 'nM' -- Filter for values in nM
+  LIMIT 100
+)
+TO '/tmp/Topic_CheMBL_35_60.csv'  -- Adjust path to your server's /tmp directory.  Important for permissions!
+WITH CSV HEADER DELIMITER ',';</code></p>
+<p><strong>Important notes about the SQL code:</strong></p>
+<ul>
+<li><strong>Path:</strong> Change <code>/tmp/Topic_CheMBL_35_60.csv</code> to a directory where PostgreSQL has write permissions on the server.  <code>/tmp</code> is often a good choice for testing.  If you don't have permissions, you'll need to grant them or choose a different location.</li>
+<li><strong>Error Handling:</strong> This SQL code assumes a smooth execution.  In a real-world scenario, you'd add error handling (e.g., <code>TRY...CATCH</code> blocks) and logging.</li>
+<li><strong>Filtering:</strong>  Adjust the <code>WHERE</code> clause to select the specific data you need. The provided example filters for <code>IC50</code> values, exact relations (=), only valid standard values (NOT NULL) and for values in <code>nM</code>. You can adjust this based on your research question.</li>
+<li><strong><code>LIMIT</code> Clause:</strong> The <code>LIMIT 100</code> clause restricts the output to 100 rows. Remove or adjust this if needed.</li>
+</ul>
+<p><strong>Running the SQL:</strong></p>
+<ol>
+<li>Open pgAdmin.</li>
+<li>Connect to your database (ip: 192.168.206.136, user: rd, pass: rd, database: chembl_35).</li>
+<li>Open a new query window.</li>
+<li>Paste the SQL code into the query window.</li>
+<li>Execute the query.</li>
+<li>The CSV file <code>Topic_CheMBL_35_60.csv</code> will be created on the <em>server</em> at the location you specified (e.g., <code>/tmp</code>). You'll need to copy it to your local <code>data/</code> folder.  A common way to do this is using <code>scp</code> from your local machine:</li>
+</ol>
+<p><code>bash
+scp rd@192.168.206.136:/tmp/Topic_CheMBL_35_60.csv data/</code></p>
+<p><strong>4. Python Code (Jupyter Notebook)</strong></p>
+<p>Now, let's create a Jupyter Notebook (<code>notebooks/Topic_CheMBL_35_60_1_Data_Loading.ipynb</code>) to load and inspect the data.</p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_60_1_Data_Loading.ipynb</h1>
+<p>import pandas as pd
+import os
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Define the base path to your project</h1>
+<p>base_path = os.getcwd() # Gets the current working directory
+data_path = os.path.join(base_path, "data")
+csv_file = os.path.join(data_path, "Topic_CheMBL_35_60.csv")</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(csv_file)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: File not found at {csv_file}.  Make sure you've copied the file from the server.")
+    df = None  # Or raise the exception if you want to stop execution</p>
+<p>if df is not None:
+    print(df.head())
+    print(df.info())</p>
+<pre><code># Data Cleaning
+# Handle missing values (example: fill with the mean)
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')  # Convert to numeric, coerce errors to NaN
+df['standard_value'].fillna(df['standard_value'].mean(), inplace=True) # Fill missing values with mean
+
+# Remove rows with missing SMILES
+df = df.dropna(subset=['smiles'])
+print("Data cleaning completed.")
+
+# Feature Engineering with RDKit
+def calculate_molecular_weight(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return None
+
+df['molecular_weight'] = df['smiles'].apply(calculate_molecular_weight)
+df = df.dropna(subset=['molecular_weight']) # Remove rows where molecular weight calculation failed
+print("Feature engineering completed.")
+
+print(df.head())
+</code></pre>
+<p>```</p>
+<p><strong>Explanation of the Python Code:</strong></p>
+<ol>
+<li><strong>Imports:</strong> Imports necessary libraries (pandas, os, RDKit, scikit-learn).</li>
+<li><strong>Path Handling:</strong> Uses <code>os.path.join</code> to construct file paths robustly.</li>
+<li><strong>Data Loading:</strong> Loads the CSV file into a pandas DataFrame.  Includes a <code>try...except</code> block to handle the <code>FileNotFoundError</code>.</li>
+<li><strong>Data Cleaning:</strong><ul>
+<li><strong>Missing Values:</strong> Converts 'standard_value' to numeric and fills missing values with the mean.</li>
+<li><strong>SMILES Handling:</strong> Removes rows with missing SMILES strings to prevent errors in RDKit.</li>
+</ul>
+</li>
+<li><strong>Feature Engineering (RDKit):</strong><ul>
+<li><strong>Molecular Weight:</strong> Calculates the molecular weight using RDKit and adds it as a new column.</li>
+<li><strong>Error Handling:</strong> The <code>calculate_molecular_weight</code> function includes a check to handle invalid SMILES strings.  The code also removes rows where the molecular weight calculation failed.</li>
+</ul>
+</li>
+<li><strong>Prints:</strong>  Prints the first few rows and info to verify the data loading and processing.</li>
+</ol>
+<p><strong>Example 2: Further Analysis and Modeling (Topic_CheMBL_35_60_2_Modeling.ipynb)</strong></p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_60_2_Modeling.ipynb</h1>
+<p>import pandas as pd
+import os
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Define the base path to your project</h1>
+<p>base_path = os.getcwd() # Gets the current working directory
+data_path = os.path.join(base_path, "data")
+csv_file = os.path.join(data_path, "Topic_CheMBL_35_60.csv")</p>
+<h1>Load the data (same as before, but wrapped in a function)</h1>
+<p>def load_and_preprocess_data(csv_file):
+    try:
+        df = pd.read_csv(csv_file)
+        print("Data loaded successfully.")
+    except FileNotFoundError:
+        print(f"Error: File not found at {csv_file}.  Make sure you've copied the file from the server.")
+        return None</p>
+<pre><code># Data Cleaning
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df['standard_value'].fillna(df['standard_value'].mean(), inplace=True)
+df = df.dropna(subset=['smiles'])
+
+# Feature Engineering with RDKit
+def calculate_molecular_weight(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return None
+
+df['molecular_weight'] = df['smiles'].apply(calculate_molecular_weight)
+df = df.dropna(subset=['molecular_weight'])
+print("Data loading and preprocessing completed.")
+return df
+</code></pre>
+<p>df = load_and_preprocess_data(csv_file)</p>
+<p>if df is not None:
+    # Prepare data for modeling
+    X = df[['molecular_weight']] # Features
+    y = df['standard_value']      # Target variable</p>
+<pre><code># Data Scaling
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+# Train a linear regression model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Evaluate the model
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+
+# Visualization (Scatter plot of actual vs. predicted values)
+plt.figure(figsize=(8, 6))
+plt.scatter(y_test, y_pred)
+plt.xlabel("Actual Values")
+plt.ylabel("Predicted Values")
+plt.title("Actual vs. Predicted Values")
+plt.show()
+</code></pre>
+<p>```</p>
+<p><strong>Explanation:</strong></p>
+<ol>
+<li><strong>Modularization:</strong>  The data loading and preprocessing steps are now encapsulated in a function <code>load_and_preprocess_data</code>. This promotes code reusability.</li>
+<li><strong>Feature Selection:</strong>  The code selects <code>molecular_weight</code> as the feature (X) and <code>standard_value</code> as the target variable (y).</li>
+<li><strong>Data Scaling:</strong> Uses <code>StandardScaler</code> to scale the features. This is important for linear regression and other models that are sensitive to feature scaling.</li>
+<li><strong>Train/Test Split:</strong> Splits the data into training and testing sets using <code>train_test_split</code>.</li>
+<li><strong>Model Training:</strong> Trains a linear regression model using <code>LinearRegression</code>.</li>
+<li><strong>Model Evaluation:</strong><ul>
+<li>Calculates the Mean Squared Error (MSE) and R-squared (R2) to evaluate the model's performance.</li>
+<li>Prints the evaluation metrics.</li>
+</ul>
+</li>
+<li><strong>Visualization:</strong> Creates a scatter plot of actual vs. predicted values to visualize the model's performance.</li>
+</ol>
+<p><strong>Addressing the <code>squared=False</code> Error</strong></p>
+<p>The error  "old scikit-learn version does not support parameters squared=False in the mean_squared_error function" indicates you are likely using an older version of scikit-learn.  The <code>squared=False</code> parameter was introduced in a later version to allow you to get the Root Mean Squared Error (RMSE) directly.</p>
+<p><strong>Solution:</strong></p>
+<p>The simplest solution is to upgrade your scikit-learn version:</p>
+<p><code>bash
+pip install --upgrade scikit-learn</code></p>
+<p>If upgrading is not an option (e.g., due to environment constraints), you can calculate the RMSE manually:</p>
+<p>```python
+from math import sqrt</p>
+<p>mse = mean_squared_error(y_test, y_pred)
+rmse = sqrt(mse)  # Calculate RMSE manually
+print(f"Root Mean Squared Error: {rmse}")
+```</p>
+<p><strong>5. Example Usage and Next Steps</strong></p>
+<p>You now have a basic framework for analyzing ChEMBL data using RDKit and scikit-learn. Here are some ideas for expanding this:</p>
+<p><strong>Example 3:  Adding More Features</strong></p>
+<p>Expand the feature engineering to include other molecular descriptors from RDKit (e.g., LogP, number of hydrogen bond donors/acceptors).</p>
+<p>```python
+def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        mw = Descriptors.MolWt(mol)
+        logp = Chem.Crippen.MolLogP(mol)
+        hbd = Descriptors.NumHDonors(mol)
+        hba = Descriptors.NumHAcceptors(mol)
+        return mw, logp, hbd, hba
+    else:
+        return None, None, None, None</p>
+<p>df[['molecular_weight', 'logp', 'hbd', 'hba']] = df['smiles'].apply(lambda x: pd.Series(calculate_descriptors(x)))
+df = df.dropna() # Remove rows with NaN values after descriptor calculation
+```</p>
+<p><strong>Example 4:  Trying Different Models</strong></p>
+<p>Experiment with different machine learning models, such as Random Forest Regressor or Support Vector Regressor.</p>
+<p>```python
+from sklearn.ensemble import RandomForestRegressor</p>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42) # Example: Random Forest
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+print(f"Random Forest - Mean Squared Error: {mse}")
+print(f"Random Forest - R-squared: {r2}")
+```</p>
+<p><strong>Example 5:  Hyperparameter Tuning</strong></p>
+<p>Use techniques like GridSearchCV or RandomizedSearchCV to optimize the hyperparameters of your chosen model.</p>
+<p>```python
+from sklearn.model_selection import GridSearchCV</p>
+<p>param_grid = {
+    'n_estimators': [50, 100, 200],
+    'max_depth': [None, 5, 10],
+    'min_samples_split': [2, 5, 10]
+}</p>
+<p>grid_search = GridSearchCV(RandomForestRegressor(random_state=42), param_grid, cv=3, scoring='neg_mean_squared_error')
+grid_search.fit(X_train, y_train)
+best_model = grid_search.best_estimator_
+y_pred = best_model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+print(f"Tuned Random Forest - Mean Squared Error: {mse}")
+print(f"Tuned Random Forest - R-squared: {r2}")
+```</p>
+<p><strong>Further Steps:</strong></p>
+<ul>
+<li><strong>Data Exploration:</strong> Spend more time exploring the data to understand its distributions and relationships.</li>
+<li><strong>Feature Selection:</strong> Use more sophisticated feature selection techniques to identify the most relevant features.</li>
+<li><strong>Model Validation:</strong>  Use cross-validation to get a more robust estimate of your model's performance.</li>
+<li><strong>Deployment:</strong>  Consider how you might deploy your model to make predictions on new compounds.</li>
+</ul>
+<p><strong>Vietnamese Translation:</strong></p>
+<p><strong>1. Phân tích và Hướng dẫn</strong></p>
+<p>Chào bạn, tôi hiểu rằng bạn đang làm việc với dữ liệu ChEMBL 35 trong PostgreSQL, sử dụng RDKit để phân tích, và tuân theo cấu trúc thư mục kiểu AIMLops. Bạn đang gặp lỗi liên quan đến cú pháp SQL và khả năng tương thích phiên bản của scikit-learn, và bạn cần hướng dẫn về cách cấu trúc dự án và mã của mình, giới hạn ở 100 hàng dữ liệu để minh họa.</p>
+<p>Chúng ta sẽ phân tích từng bước, cung cấp các ví dụ mã bằng cả SQL và Python, và giải quyết các lỗi bạn đang gặp phải.</p>
+<p><strong>2. Thiết lập Dự án và Cấu trúc Thư mục</strong></p>
+<p>Theo nguyên tắc AIMLops, hãy giả định một cấu trúc dự án đơn giản như sau:</p>
+<p><code>project_root/
+├── data/           # Lưu trữ các tệp CSV được trích xuất từ cơ sở dữ liệu
+├── notebooks/       # Sổ tay Jupyter với mã phân tích của bạn
+├── src/            # (Tùy chọn) Các mô-đun Python cho mã có thể tái sử dụng
+├── models/        #  (Tùy chọn) Các tệp mô hình đã lưu
+├── README.md</code></p>
+<p>Cấu trúc này giúp tổ chức dữ liệu, mã và mô hình của bạn.</p>
+<p><strong>3. Giải quyết Lỗi SQL: <code>ERROR: operator does not exist: numeric ~ unknown</code></strong></p>
+<p>Lỗi này xảy ra vì toán tử <code>~</code> trong PostgreSQL được sử dụng để so khớp biểu thức chính quy trên dữ liệu <em>văn bản</em>, không phải dữ liệu <em>số</em>. Bạn đang cố gắng sử dụng nó trên <code>act.standard_value</code>, có khả năng là một cột số. Cách tiếp cận chính xác là chuyển đổi cột số thành văn bản hoặc, tốt hơn là, sử dụng so sánh số (ví dụ: <code>&gt;=</code>, <code>&lt;=</code>). Tuy nhiên, mục đích của bạn là lọc các giá trị trông giống như số hợp lệ. Một cách tiếp cận tốt hơn để lọc dữ liệu không hợp lệ là sử dụng <code>standard_value IS NOT NULL</code></p>
+<p><strong>4. Mã SQL (chạy trong pgAdmin)</strong></p>
+<p>Truy vấn SQL này sẽ trích xuất 100 hàng từ cơ sở dữ liệu ChEMBL, tập trung vào các hoạt động và phân tử. Thao tác này sẽ tạo ra một tệp CSV có tên <code>Topic_CheMBL_35_60.csv</code> trong thư mục <code>data/</code> của bạn.</p>
+<p><code>sql
+-- Mã SQL (Topic_CheMBL_35_60.sql)
+-- Truy xuất dữ liệu và lưu dưới dạng Topic_CheMBL_35_60.csv
+COPY (
+  SELECT
+    act.activity_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.assay_id,
+    mol.molregno,
+    mol.smiles
+  FROM activities act
+  JOIN assays ass ON act.assay_id = ass.assay_id
+  JOIN target_dictionary td ON ass.tid = td.tid
+  JOIN molecule_dictionary mol ON act.molregno = mol.molregno
+  WHERE act.standard_type = 'IC50'  -- Ví dụ: Lọc cho các giá trị IC50
+  AND act.standard_relation = '='    -- Ví dụ: Lọc cho các giá trị chính xác
+  AND act.standard_value IS NOT NULL
+  AND act.standard_units = 'nM' -- Lọc cho các giá trị tính bằng nM
+  LIMIT 100
+)
+TO '/tmp/Topic_CheMBL_35_60.csv'  -- Điều chỉnh đường dẫn đến thư mục /tmp của máy chủ của bạn. Quan trọng đối với quyền!
+WITH CSV HEADER DELIMITER ',';</code></p>
+<p><strong>Lưu ý quan trọng về mã SQL:</strong></p>
+<ul>
+<li><strong>Đường dẫn:</strong> Thay đổi <code>/tmp/Topic_CheMBL_35_60.csv</code> thành một thư mục mà PostgreSQL có quyền ghi trên máy chủ. <code>/tmp</code> thường là một lựa chọn tốt để thử nghiệm. Nếu bạn không có quyền, bạn sẽ cần cấp chúng hoặc chọn một vị trí khác.</li>
+<li><strong>Xử lý Lỗi:</strong> Mã SQL này giả định một quá trình thực thi suôn sẻ. Trong một tình huống thực tế, bạn sẽ thêm xử lý lỗi (ví dụ: khối <code>TRY...CATCH</code>) và ghi nhật ký.</li>
+<li><strong>Lọc:</strong> Điều chỉnh mệnh đề <code>WHERE</code> để chọn dữ liệu cụ thể bạn cần. Ví dụ được cung cấp lọc cho các giá trị <code>IC50</code>, quan hệ chính xác (=), chỉ các giá trị tiêu chuẩn hợp lệ (NOT NULL) và cho các giá trị tính bằng <code>nM</code>. Bạn có thể điều chỉnh điều này dựa trên câu hỏi nghiên cứu của bạn.</li>
+<li><strong>Mệnh đề <code>LIMIT</code>:</strong> Mệnh đề <code>LIMIT 100</code> giới hạn đầu ra thành 100 hàng. Xóa hoặc điều chỉnh điều này nếu cần.</li>
+</ul>
+<p><strong>Chạy SQL:</strong></p>
+<ol>
+<li>Mở pgAdmin.</li>
+<li>Kết nối với cơ sở dữ liệu của bạn (ip: 192.168.206.136, user: rd, pass: rd, database: chembl_35).</li>
+<li>Mở một cửa sổ truy vấn mới.</li>
+<li>Dán mã SQL vào cửa sổ truy vấn.</li>
+<li>Thực thi truy vấn.</li>
+<li>Tệp CSV <code>Topic_CheMBL_35_60.csv</code> sẽ được tạo trên <em>máy chủ</em> tại vị trí bạn đã chỉ định (ví dụ: <code>/tmp</code>). Bạn sẽ cần sao chép nó vào thư mục <code>data/</code> cục bộ của bạn. Một cách phổ biến để thực hiện việc này là sử dụng <code>scp</code> từ máy cục bộ của bạn:</li>
+</ol>
+<p><code>bash
+scp rd@192.168.206.136:/tmp/Topic_CheMBL_35_60.csv data/</code></p>
+<p><strong>5. Mã Python (Sổ tay Jupyter)</strong></p>
+<p>Bây giờ, hãy tạo một Sổ tay Jupyter (<code>notebooks/Topic_CheMBL_35_60_1_Data_Loading.ipynb</code>) để tải và kiểm tra dữ liệu.</p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_60_1_Data_Loading.ipynb</h1>
+<p>import pandas as pd
+import os
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Xác định đường dẫn cơ sở đến dự án của bạn</h1>
+<p>base_path = os.getcwd()  # Lấy thư mục làm việc hiện tại
+data_path = os.path.join(base_path, "data")
+csv_file = os.path.join(data_path, "Topic_CheMBL_35_60.csv")</p>
+<h1>Tải dữ liệu</h1>
+<p>try:
+    df = pd.read_csv(csv_file)
+    print("Dữ liệu đã được tải thành công.")
+except FileNotFoundError:
+    print(f"Lỗi: Không tìm thấy tệp tại {csv_file}. Đảm bảo bạn đã sao chép tệp từ máy chủ.")
+    df = None  # Hoặc đưa ra ngoại lệ nếu bạn muốn dừng thực thi</p>
+<p>if df is not None:
+    print(df.head())
+    print(df.info())</p>
+<pre><code># Làm sạch dữ liệu
+# Xử lý các giá trị bị thiếu (ví dụ: điền vào bằng giá trị trung bình)
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')  # Chuyển đổi sang số, ép các lỗi thành NaN
+df['standard_value'].fillna(df['standard_value'].mean(), inplace=True)  # Điền các giá trị bị thiếu bằng giá trị trung bình
+
+# Xóa các hàng có SMILES bị thiếu
+df = df.dropna(subset=['smiles'])
+print("Đã hoàn thành làm sạch dữ liệu.")
+
+# Kỹ thuật đặc trưng với RDKit
+def calculate_molecular_weight(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return None
+
+df['molecular_weight'] = df['smiles'].apply(calculate_molecular_weight)
+df = df.dropna(subset=['molecular_weight'])  # Xóa các hàng mà tính toán trọng lượng phân tử không thành công
+print("Đã hoàn thành kỹ thuật đặc trưng.")
+
+print(df.head())
+</code></pre>
+<p>```</p>
+<p><strong>Giải thích về Mã Python:</strong></p>
+<ol>
+<li><strong>Nhập:</strong> Nhập các thư viện cần thiết (pandas, os, RDKit, scikit-learn).</li>
+<li><strong>Xử lý Đường dẫn:</strong> Sử dụng <code>os.path.join</code> để xây dựng các đường dẫn tệp một cách mạnh mẽ.</li>
+<li><strong>Tải Dữ liệu:</strong> Tải tệp CSV vào một DataFrame pandas. Bao gồm một khối <code>try...except</code> để xử lý <code>FileNotFoundError</code>.</li>
+<li><strong>Làm sạch Dữ liệu:</strong><ul>
+<li><strong>Giá trị Bị thiếu:</strong> Chuyển đổi 'standard_value' thành số và điền các giá trị bị thiếu bằng giá trị trung bình.</li>
+<li><strong>Xử lý SMILES:</strong> Xóa các hàng có chuỗi SMILES bị thiếu để ngăn chặn lỗi trong RDKit.</li>
+</ul>
+</li>
+<li><strong>Kỹ thuật Đặc trưng (RDKit):</strong><ul>
+<li><strong>Trọng lượng Phân tử:</strong> Tính trọng lượng phân tử bằng RDKit và thêm nó làm một cột mới.</li>
+<li><strong>Xử lý Lỗi:</strong> Hàm <code>calculate_molecular_weight</code> bao gồm một kiểm tra để xử lý các chuỗi SMILES không hợp lệ. Mã này cũng xóa các hàng mà tính toán trọng lượng phân tử không thành công.</li>
+</ul>
+</li>
+<li><strong>In:</strong> In một vài hàng đầu tiên và thông tin để xác minh việc tải và xử lý dữ liệu.</li>
+</ol>
+<p><strong>Ví dụ 2: Phân tích và Mô hình hóa Thêm (Topic_CheMBL_35_60_2_Modeling.ipynb)</strong></p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_60_2_Modeling.ipynb</h1>
+<p>import pandas as pd
+import os
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Xác định đường dẫn cơ sở đến dự án của bạn</h1>
+<p>base_path = os.getcwd()  # Lấy thư mục làm việc hiện tại
+data_path = os.path.join(base_path, "data")
+csv_file = os.path.join(data_path, "Topic_CheMBL_35_60.csv")</p>
+<h1>Tải dữ liệu (giống như trước đây, nhưng được gói trong một hàm)</h1>
+<p>def load_and_preprocess_data(csv_file):
+    try:
+        df = pd.read_csv(csv_file)
+        print("Dữ liệu đã được tải thành công.")
+    except FileNotFoundError:
+        print(f"Lỗi: Không tìm thấy tệp tại {csv_file}. Đảm bảo bạn đã sao chép tệp từ máy chủ.")
+        return None</p>
+<pre><code># Làm sạch dữ liệu
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df['standard_value'].fillna(df['standard_value'].mean(), inplace=True)
+df = df.dropna(subset=['smiles'])
+
+# Kỹ thuật đặc trưng với RDKit
+def calculate_molecular_weight(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return None
+
+df['molecular_weight'] = df['smiles'].apply(calculate_molecular_weight)
+df = df.dropna(subset=['molecular_weight'])
+print("Đã hoàn thành tải và tiền xử lý dữ liệu.")
+return df
+</code></pre>
+<p>df = load_and_preprocess_data(csv_file)</p>
+<p>if df is not None:
+    # Chuẩn bị dữ liệu cho mô hình hóa
+    X = df[['molecular_weight']]  # Các đặc trưng
+    y = df['standard_value']       # Biến mục tiêu</p>
+<pre><code># Chia tỷ lệ Dữ liệu
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Chia dữ liệu thành các tập huấn luyện và kiểm tra
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+# Huấn luyện một mô hình hồi quy tuyến tính
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Đưa ra dự đoán
+y_pred = model.predict(X_test)
+
+# Đánh giá mô hình
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f"Lỗi Bình phương Trung bình: {mse}")
+print(f"R-squared: {r2}")
+
+# Trực quan hóa (Biểu đồ phân tán của các giá trị thực tế so với giá trị dự đoán)
+plt.figure(figsize=(8, 6))
+plt.scatter(y_test, y_pred)
+plt.xlabel("Giá trị Thực tế")
+plt.ylabel("Giá trị Dự đoán")
+plt.title("Giá trị Thực tế so với Giá trị Dự đoán")
+plt.show()
+</code></pre>
+<p>```</p>
+<p><strong>Giải thích:</strong></p>
+<ol>
+<li><strong>Mô-đun hóa:</strong> Các bước tải và tiền xử lý dữ liệu giờ đây được đóng gói trong một hàm <code>load_and_preprocess_data</code>. Điều này thúc đẩy khả năng tái sử dụng mã.</li>
+<li><strong>Chọn Đặc trưng:</strong> Mã chọn <code>molecular_weight</code> làm đặc trưng (X) và <code>standard_value</code> làm biến mục tiêu (y).</li>
+<li><strong>Chia tỷ lệ Dữ liệu:</strong> Sử dụng <code>StandardScaler</code> để chia tỷ lệ các đặc trưng. Điều này quan trọng đối với hồi quy tuyến tính và các mô hình khác nhạy cảm với việc chia tỷ lệ đặc trưng.</li>
+<li><strong>Chia Tập Huấn luyện/Kiểm tra:</strong> Chia dữ liệu thành các tập huấn luyện và kiểm tra bằng cách sử dụng <code>train_test_split</code>.</li>
+<li><strong>Huấn luyện Mô hình:</strong> Huấn luyện một mô hình hồi quy tuyến tính bằng cách sử dụng <code>LinearRegression</code>.</li>
+<li><strong>Đánh giá Mô hình:</strong><ul>
+<li>Tính toán Lỗi Bình phương Trung bình (MSE) và R-squared (R2) để đánh giá hiệu suất của mô hình.</li>
+<li>In các số liệu đánh giá.</li>
+</ul>
+</li>
+<li><strong>Trực quan hóa:</strong> Tạo một biểu đồ phân tán của các giá trị thực tế so với các giá trị dự đoán để trực quan hóa hiệu suất của mô hình.</li>
+</ol>
+<p><strong>Giải quyết Lỗi <code>squared=False</code></strong></p>
+<p>Lỗi "phiên bản scikit-learn cũ không hỗ trợ tham số squared=False trong hàm mean_squared_error" chỉ ra rằng bạn có thể đang sử dụng một phiên bản scikit-learn cũ hơn. Tham số <code>squared=False</code> đã được giới thiệu trong một phiên bản sau này để cho phép bạn nhận trực tiếp Lỗi Bình phương Trung bình Gốc (RMSE).</p>
+<p><strong>Giải pháp:</strong></p>
+<p>Giải pháp đơn giản nhất là nâng cấp phiên bản scikit-learn của bạn:</p>
+<p><code>bash
+pip install --upgrade scikit-learn</code></p>
+<p>Nếu việc nâng cấp không phải là một tùy chọn (ví dụ: do các ràng buộc về môi trường), bạn có thể tính RMSE thủ công:</p>
+<p>```python
+from math import sqrt</p>
+<p>mse = mean_squared_error(y_test, y_pred)
+rmse = sqrt(mse)  # Tính RMSE thủ công
+print(f"Lỗi Bình phương Trung bình Gốc: {rmse}")
+```</p>
+<p><strong>6. Ví dụ Sử dụng và Các Bước Tiếp theo</strong></p>
+<p>Bạn hiện có một khuôn khổ cơ bản để phân tích dữ liệu ChEMBL bằng RDKit và scikit-learn. Dưới đây là một số ý tưởng để mở rộng điều này:</p>
+<p><strong>Ví dụ 3: Thêm Nhiều Đặc trưng Hơn</strong></p>
+<p>Mở rộng kỹ thuật đặc trưng để bao gồm các bộ mô tả phân tử khác từ RDKit (ví dụ: LogP, số lượng người cho/nhận liên kết hydro).</p>
+<p>```python
+def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        mw = Descriptors.MolWt(mol)
+        logp = Chem.Crippen.MolLogP(mol)
+        hbd = Descriptors.NumHDonors(mol)
+        hba = Descriptors.NumHAcceptors(mol)
+        return mw, logp, hbd, hba
+    else:
+        return None, None, None, None</p>
+<p>df[['molecular_weight', 'logp', 'hbd', 'hba']] = df['smiles'].apply(lambda x: pd.Series(calculate_descriptors(x)))
+df = df.dropna()  # Xóa các hàng có giá trị NaN sau khi tính toán bộ mô tả
+```</p>
+<p><strong>Ví dụ 4: Thử Các Mô hình Khác Nhau</strong></p>
+<p>Thử nghiệm với các mô hình máy học khác nhau, chẳng hạn như Random Forest Regressor hoặc Support Vector Regressor.</p>
+<p>```python
+from sklearn.ensemble import RandomForestRegressor</p>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)  # Ví dụ: Random Forest
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+print(f"Random Forest - Lỗi Bình phương Trung bình: {mse}")
+print(f"Random Forest - R-squared: {r2}")
+```</p>
+<p><strong>Ví dụ 5: Điều chỉnh Siêu tham số</strong></p>
+<p>Sử dụng các kỹ thuật như GridSearchCV hoặc RandomizedSearchCV để tối ưu hóa các siêu tham số của mô hình bạn đã chọn.</p>
+<p>```python
+from sklearn.model_selection import</p>
+        </body>
+        </html>
+        

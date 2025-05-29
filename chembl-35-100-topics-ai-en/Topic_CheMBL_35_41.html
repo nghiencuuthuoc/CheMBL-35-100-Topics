@@ -1,0 +1,466 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_41</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Linking ChEMBL drugs to clinical phases</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project using RDKit, following an AIMLops template, and encountering some errors. Let's break down the analysis, provide code (SQL and Python), and address the errors you're seeing.</p>
+<p><strong>1. Analysis Model:</strong></p>
+<p>Your project focuses on Chembl 35 data, likely aiming to extract insights relevant to drug discovery and development. The specific topic "Topic_CheMBL_35_41" suggests you're investigating a particular area within the vast Chembl dataset.</p>
+<p>The analysis involves these steps:</p>
+<ul>
+<li><strong>Data Extraction (SQL):</strong> Retrieve relevant data from the Chembl 35 database using SQL queries.  This will involve selecting specific tables (e.g., activities, molecules, targets) and filtering them based on your research question. You want to limit the initial dataset to 100 rows for faster prototyping.</li>
+<li><strong>Data Processing (Python/RDKit):</strong> Load the extracted data into a Pandas DataFrame using Python. Then, use RDKit to process the molecule data. This may include:<ul>
+<li><strong>SMILES Parsing:</strong> Converting SMILES strings to RDKit molecule objects.</li>
+<li><strong>Molecular Property Calculation:</strong> Calculating descriptors like molecular weight, logP, number of hydrogen bond donors/acceptors, etc.</li>
+<li><strong>Fingerprint Generation:</strong> Generating molecular fingerprints (e.g., Morgan fingerprints) for similarity searches and machine learning models.</li>
+</ul>
+</li>
+<li><strong>Data Analysis &amp; Modeling (Python/Scikit-learn):</strong>  Perform statistical analysis and/or build predictive models using scikit-learn.  This could involve:<ul>
+<li><strong>Regression:</strong> Predicting activity values (e.g., IC50) based on molecular descriptors.</li>
+<li><strong>Classification:</strong> Classifying molecules as active or inactive based on a threshold.</li>
+<li><strong>Clustering:</strong> Grouping molecules based on their properties.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Addressing Errors:</strong></p>
+<ul>
+<li>
+<p><strong>Error a: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p>This error occurs in your SQL query. The <code>~</code> operator represents regular expression matching in PostgreSQL. However, it seems the <code>act.standard_value</code> column is a numeric type (e.g., integer or float), not a text type. You cannot directly use regular expressions on numeric columns.</p>
+<p><strong>Solution:</strong>  Convert the <code>standard_value</code> column to text before applying the regular expression. Use <code>CAST(act.standard_value AS TEXT)</code> or <code>act.standard_value::TEXT</code>.</p>
+</li>
+<li>
+<p><strong>Error b: <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<p>This error indicates you are using an older version of scikit-learn (likely pre-0.20). The <code>squared=False</code> parameter was introduced in scikit-learn 0.20 to return the Root Mean Squared Error (RMSE) directly from <code>mean_squared_error</code>.</p>
+<p><strong>Solution:</strong></p>
+<ol>
+<li><strong>Update scikit-learn:</strong> The best solution is to update scikit-learn to the latest version (or at least 0.20 or later) using <code>pip install -U scikit-learn</code>.</li>
+<li>
+<p><strong>Calculate RMSE manually:</strong> If updating is not possible, calculate the RMSE manually by taking the square root of the mean squared error:</p>
+<p>```python
+from sklearn.metrics import mean_squared_error
+import numpy as np</p>
+<p>mse = mean_squared_error(y_true, y_pred)
+rmse = np.sqrt(mse)
+print(f"RMSE: {rmse}")
+```</p>
+</li>
+</ol>
+</li>
+</ul>
+<p><strong>2. SQL and Python Code:</strong></p>
+<p>Here's the SQL and Python code, incorporating the fixes and considering your project structure. I'll assume your "Topic_CheMBL_35_41" relates to a specific target or a specific range of activity values. I'll provide a generic example; adapt the <code>WHERE</code> clause to match your actual topic.</p>
+<p><strong>SQL (data/Topic_CheMBL_35_41.sql):</strong></p>
+<p>```sql
+-- Topic_CheMBL_35_41.sql
+-- Extracts activity data for a specific target (e.g., CHEMBL205) and filters for standard_type 'IC50'.
+-- Limits to 100 rows.  Adjust the WHERE clause to fit your specific "Topic_CheMBL_35_41".</p>
+<p>SELECT
+    act.activity_id,
+    act.molregno,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    md.chembl_id,
+    md.canonical_smiles
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    --AND act.standard_value BETWEEN 10 AND 1000 -- Example: Filter for IC50 values between 10 and 1000 nM
+    --AND md.chembl_id = 'CHEMBL205' -- Example: Filter for molecules targeting CHEMBL205 (a specific target)
+    AND act.standard_value IS NOT NULL
+ORDER BY act.standard_value ASC
+LIMIT 100;</p>
+<p>-- Save the output as Topic_CheMBL_35_41.csv using pgAdmin
+```</p>
+<p><strong>Important:</strong>  Run this SQL query in pgAdmin.  Then, use pgAdmin's export functionality to save the results as a CSV file named <code>Topic_CheMBL_35_41.csv</code> in the <code>../data/</code> directory.</p>
+<p><strong>Python (notebooks/Topic_CheMBL_35_41_1_Data_Loading_and_Processing.ipynb):</strong></p>
+<p>```python</p>
+<h1>notebooks/Topic_CheMBL_35_41_1_Data_Loading_and_Processing.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np  # Import numpy</p>
+<h1>Define paths according to AIMLops template</h1>
+<p>base_path = os.path.dirname(os.getcwd())  # Go up one level to the project root
+data_path = os.path.join(base_path, 'data')
+csv_file = os.path.join(data_path, 'Topic_CheMBL_35_41.csv')
+print(f"Data path: {csv_file}")</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(csv_file)
+    print(f"Data loaded successfully. Shape: {df.shape}")
+except FileNotFoundError:
+    print(f"Error: File not found at {csv_file}.  Make sure you ran the SQL and exported the CSV.")
+    exit()</p>
+<h1>Basic Data Cleaning and RDKit Processing</h1>
+<p>df = df.dropna(subset=['canonical_smiles']) # Drop rows with missing SMILES
+df = df[df['canonical_smiles'] != ''] # Drop rows with empty SMILES strings</p>
+<h1>Create RDKit molecule objects</h1>
+<p>df['molecule'] = df['canonical_smiles'].apply(lambda x: Chem.MolFromSmiles(x))
+df = df.dropna(subset=['molecule']) # Remove rows where RDKit failed to parse SMILES</p>
+<p>print(f"Number of valid molecules: {len(df)}")</p>
+<h1>Example: Calculate Molecular Weight</h1>
+<p>df['mol_weight'] = df['molecule'].apply(lambda x: Descriptors.MolWt(x))</p>
+<h1>Example: Function to calculate LogP (Octanol-water partition coefficient)</h1>
+<p>def calculate_logp(mol):
+    try:
+        return Descriptors.MolLogP(mol)
+    except:
+        return None</p>
+<p>df['logp'] = df['molecule'].apply(calculate_logp)</p>
+<h1>Clean the dataframe after all operations</h1>
+<p>df = df.dropna(subset=['logp'])</p>
+<p>print(df[['chembl_id', 'canonical_smiles', 'mol_weight', 'logp']].head())
+```</p>
+<p><strong>Python (notebooks/Topic_CheMBL_35_41_2_Analysis_and_Modeling.ipynb):</strong></p>
+<p>```python</p>
+<h1>notebooks/Topic_CheMBL_35_41_2_Analysis_and_Modeling.ipynb</h1>
+<p>import os
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
+import numpy as np</p>
+<h1>Define paths</h1>
+<p>base_path = os.path.dirname(os.getcwd())
+data_path = os.path.join(base_path, 'data')
+csv_file = os.path.join(data_path, 'Topic_CheMBL_35_41.csv')</p>
+<h1>Load the data</h1>
+<p>df = pd.read_csv(csv_file)</p>
+<h1>Data Cleaning and Preprocessing (same as previous notebook, but make sure these steps are consistent)</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])
+df = df[df['canonical_smiles'] != '']
+df['molecule'] = df['canonical_smiles'].apply(lambda x: Chem.MolFromSmiles(x))
+df = df.dropna(subset=['molecule'])
+df['mol_weight'] = df['molecule'].apply(lambda x: Descriptors.MolWt(x))
+df['logp'] = df['molecule'].apply(calculate_logp) #Make sure to define or import calculate_logp function in this notebook as well
+df = df.dropna(subset=['logp'])</p>
+<h1>Prepare data for modeling (example: predicting standard_value from mol_weight and logp)</h1>
+<p>X = df[['mol_weight', 'logp']]
+y = df['standard_value']</p>
+<h1>Handle potential infinite values in X by replacing them with a large number</h1>
+<p>X = X.replace([np.inf, -np.inf], np.nan)  # Replace inf with NaN
+X = X.fillna(X.max())  # Fill NaN with the maximum value in the column</p>
+<h1>Scale the features</h1>
+<p>scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)</p>
+<h1>Train a linear regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)  # Calculate RMSE manually (compatible with older scikit-learn)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error (MSE): {mse}")
+print(f"Root Mean Squared Error (RMSE): {rmse}")
+print(f"R-squared (R2): {r2}")
+```</p>
+<p><strong>3. Five Examples of Adapted Code (Varying the Analysis):</strong></p>
+<p>Here are five examples of how you can adapt the above code to explore different aspects of the Chembl data.  Remember to modify the SQL queries and Python code accordingly.</p>
+<ol>
+<li>
+<p><strong>Target-Specific Activity Prediction:</strong>  Focus on a single protein target (e.g., CHEMBL205 for the beta-2 adrenergic receptor) and try to predict the IC50 values.</p>
+<ul>
+<li><strong>SQL:</strong>  Add <code>AND md.chembl_id = 'CHEMBL205'</code> to the <code>WHERE</code> clause.</li>
+<li><strong>Python:</strong>  Use molecular descriptors and machine learning to predict IC50.  Consider feature selection techniques to identify the most relevant descriptors.</li>
+</ul>
+</li>
+<li>
+<p><strong>Activity Cliff Analysis:</strong>  Identify pairs of molecules with very similar structures but significantly different activities ("activity cliffs").</p>
+<ul>
+<li><strong>SQL:</strong> Retrieve SMILES and activity values.</li>
+<li><strong>Python:</strong> Calculate molecular similarity (e.g., using Tanimoto coefficient on Morgan fingerprints).  Identify molecule pairs with high similarity and large activity differences.</li>
+</ul>
+</li>
+<li>
+<p><strong>SAR (Structure-Activity Relationship) Exploration:</strong>  Investigate how changes in molecular structure affect activity.</p>
+<ul>
+<li><strong>SQL:</strong> Retrieve SMILES, activity values, and potentially substructure information (if available in Chembl).</li>
+<li><strong>Python:</strong>  Visualize the relationship between specific structural features (e.g., the presence of a particular substituent) and activity.  Consider using matched molecular pair analysis (MMPA).</li>
+</ul>
+</li>
+<li>
+<p><strong>LogP and Activity Relationship:</strong> Examine the correlation between lipophilicity (LogP) and activity.</p>
+<ul>
+<li><strong>SQL:</strong> Retrieve SMILES and activity values.</li>
+<li><strong>Python:</strong> Calculate LogP using RDKit. Create scatter plots of LogP vs. activity.  Calculate the Pearson correlation coefficient.</li>
+</ul>
+</li>
+<li>
+<p><strong>Molecular Weight and Activity Relationship:</strong>  Investigate the relationship between molecular weight and activity.  This is often a constraint in drug design.</p>
+<ul>
+<li><strong>SQL:</strong> Retrieve SMILES and activity values.</li>
+<li><strong>Python:</strong> Calculate molecular weight using RDKit. Create scatter plots of molecular weight vs. activity.  Calculate the Pearson correlation coefficient.  Filter data for molecules with a specific molecular weight range.</li>
+</ul>
+</li>
+</ol>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>Error Handling:</strong> Add more comprehensive error handling to your Python code to gracefully handle potential issues (e.g., invalid SMILES strings, missing data).</li>
+<li><strong>Data Validation:</strong> Validate the data you extract from Chembl.  Check for inconsistencies or errors.</li>
+<li><strong>Feature Engineering:</strong> Experiment with different molecular descriptors and feature engineering techniques to improve the performance of your models.</li>
+<li><strong>Model Evaluation:</strong> Use appropriate metrics to evaluate the performance of your machine learning models (e.g., RMSE, R2 score, AUC).</li>
+<li><strong>Documentation:</strong> Document your code clearly, explaining the purpose of each step and the rationale behind your choices.</li>
+<li><strong>Virtual Environments:</strong>  Use virtual environments (e.g., <code>venv</code> or <code>conda</code>) to manage your project dependencies and avoid conflicts with other Python projects.</li>
+</ul>
+<p>By following these steps, addressing the errors, and adapting the examples, you should be able to effectively analyze the Chembl 35 data and extract valuable insights for drug research and development.  Good luck!</p>
+<p><strong>Traducción al español:</strong></p>
+<p>Ok, entiendo. Estás trabajando en un proyecto de análisis de datos de Chembl 35 usando RDKit, siguiendo una plantilla AIMLops, y te encuentras con algunos errores. Vamos a desglosar el análisis, proporcionar código (SQL y Python), y abordar los errores que estás viendo.</p>
+<p><strong>1. Modelo de Análisis:</strong></p>
+<p>Tu proyecto se centra en los datos de Chembl 35, probablemente con el objetivo de extraer información relevante para el descubrimiento y desarrollo de fármacos. El tema específico "Topic_CheMBL_35_41" sugiere que estás investigando un área particular dentro del vasto conjunto de datos de Chembl.</p>
+<p>El análisis implica estos pasos:</p>
+<ul>
+<li><strong>Extracción de Datos (SQL):</strong> Recuperar datos relevantes de la base de datos de Chembl 35 usando consultas SQL. Esto implicará seleccionar tablas específicas (por ejemplo, actividades, moléculas, objetivos) y filtrarlas en función de tu pregunta de investigación. Quieres limitar el conjunto de datos inicial a 100 filas para una creación de prototipos más rápida.</li>
+<li><strong>Procesamiento de Datos (Python/RDKit):</strong> Cargar los datos extraídos en un DataFrame de Pandas usando Python. Luego, usar RDKit para procesar los datos de las moléculas. Esto podría incluir:<ul>
+<li><strong>Análisis de SMILES:</strong> Convertir cadenas SMILES en objetos moleculares de RDKit.</li>
+<li><strong>Cálculo de Propiedades Moleculares:</strong> Calcular descriptores como el peso molecular, logP, número de donantes/aceptores de enlaces de hidrógeno, etc.</li>
+<li><strong>Generación de Huellas Digitales:</strong> Generar huellas digitales moleculares (por ejemplo, huellas digitales de Morgan) para búsquedas de similitud y modelos de aprendizaje automático.</li>
+</ul>
+</li>
+<li><strong>Análisis de Datos y Modelado (Python/Scikit-learn):</strong> Realizar análisis estadísticos y/o construir modelos predictivos usando scikit-learn. Esto podría implicar:<ul>
+<li><strong>Regresión:</strong> Predecir valores de actividad (por ejemplo, IC50) basados en descriptores moleculares.</li>
+<li><strong>Clasificación:</strong> Clasificar moléculas como activas o inactivas basándose en un umbral.</li>
+<li><strong>Agrupamiento:</strong> Agrupar moléculas basándose en sus propiedades.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Abordando los Errores:</strong></p>
+<ul>
+<li>
+<p><strong>Error a: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p>Este error ocurre en tu consulta SQL. El operador <code>~</code> representa la coincidencia de expresiones regulares en PostgreSQL. Sin embargo, parece que la columna <code>act.standard_value</code> es un tipo numérico (por ejemplo, entero o flotante), no un tipo de texto. No puedes usar directamente expresiones regulares en columnas numéricas.</p>
+<p><strong>Solución:</strong> Convierte la columna <code>standard_value</code> a texto antes de aplicar la expresión regular. Usa <code>CAST(act.standard_value AS TEXT)</code> o <code>act.standard_value::TEXT</code>.</p>
+</li>
+<li>
+<p><strong>Error b: <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<p>Este error indica que estás usando una versión antigua de scikit-learn (probablemente anterior a 0.20). El parámetro <code>squared=False</code> se introdujo en scikit-learn 0.20 para devolver el Error Cuadrático Medio Raíz (RMSE) directamente desde <code>mean_squared_error</code>.</p>
+<p><strong>Solución:</strong></p>
+<ol>
+<li><strong>Actualizar scikit-learn:</strong> La mejor solución es actualizar scikit-learn a la última versión (o al menos 0.20 o posterior) usando <code>pip install -U scikit-learn</code>.</li>
+<li>
+<p><strong>Calcular RMSE manualmente:</strong> Si la actualización no es posible, calcula el RMSE manualmente tomando la raíz cuadrada del error cuadrático medio:</p>
+<p>```python
+from sklearn.metrics import mean_squared_error
+import numpy as np</p>
+<p>mse = mean_squared_error(y_true, y_pred)
+rmse = np.sqrt(mse)
+print(f"RMSE: {rmse}")
+```</p>
+</li>
+</ol>
+</li>
+</ul>
+<p><strong>2. Código SQL y Python:</strong></p>
+<p>Aquí está el código SQL y Python, incorporando las correcciones y considerando la estructura de tu proyecto. Asumiré que tu "Topic_CheMBL_35_41" se relaciona con un objetivo específico o un rango específico de valores de actividad. Proporcionaré un ejemplo genérico; adapta la cláusula <code>WHERE</code> para que coincida con tu tema real.</p>
+<p><strong>SQL (data/Topic_CheMBL_35_41.sql):</strong></p>
+<p>```sql
+-- Topic_CheMBL_35_41.sql
+-- Extrae datos de actividad para un objetivo específico (ej., CHEMBL205) y filtra por standard_type 'IC50'.
+-- Limita a 100 filas. Ajusta la cláusula WHERE para que se ajuste a tu "Topic_CheMBL_35_41" específico.</p>
+<p>SELECT
+    act.activity_id,
+    act.molregno,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    md.chembl_id,
+    md.canonical_smiles
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    --AND act.standard_value BETWEEN 10 AND 1000 -- Ejemplo: Filtrar por valores de IC50 entre 10 y 1000 nM
+    --AND md.chembl_id = 'CHEMBL205' -- Ejemplo: Filtrar por moléculas dirigidas a CHEMBL205 (un objetivo específico)
+    AND act.standard_value IS NOT NULL
+ORDER BY act.standard_value ASC
+LIMIT 100;</p>
+<p>-- Guarda la salida como Topic_CheMBL_35_41.csv usando pgAdmin
+```</p>
+<p><strong>Importante:</strong> Ejecuta esta consulta SQL en pgAdmin. Luego, usa la funcionalidad de exportación de pgAdmin para guardar los resultados como un archivo CSV llamado <code>Topic_CheMBL_35_41.csv</code> en el directorio <code>../data/</code>.</p>
+<p><strong>Python (notebooks/Topic_CheMBL_35_41_1_Data_Loading_and_Processing.ipynb):</strong></p>
+<p>```python</p>
+<h1>notebooks/Topic_CheMBL_35_41_1_Data_Loading_and_Processing.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np  # Import numpy</p>
+<h1>Define rutas de acuerdo con la plantilla AIMLops</h1>
+<p>base_path = os.path.dirname(os.getcwd())  # Sube un nivel al directorio raíz del proyecto
+data_path = os.path.join(base_path, 'data')
+csv_file = os.path.join(data_path, 'Topic_CheMBL_35_41.csv')
+print(f"Data path: {csv_file}")</p>
+<h1>Cargar los datos</h1>
+<p>try:
+    df = pd.read_csv(csv_file)
+    print(f"Data loaded successfully. Shape: {df.shape}")
+except FileNotFoundError:
+    print(f"Error: File not found at {csv_file}.  Asegúrate de haber ejecutado el SQL y exportado el CSV.")
+    exit()</p>
+<h1>Limpieza básica de datos y procesamiento con RDKit</h1>
+<p>df = df.dropna(subset=['canonical_smiles']) # Eliminar filas con SMILES faltantes
+df = df[df['canonical_smiles'] != ''] # Eliminar filas con cadenas SMILES vacías</p>
+<h1>Crear objetos moleculares de RDKit</h1>
+<p>df['molecule'] = df['canonical_smiles'].apply(lambda x: Chem.MolFromSmiles(x))
+df = df.dropna(subset=['molecule']) # Eliminar filas donde RDKit no pudo analizar SMILES</p>
+<p>print(f"Number of valid molecules: {len(df)}")</p>
+<h1>Ejemplo: Calcular el Peso Molecular</h1>
+<p>df['mol_weight'] = df['molecule'].apply(lambda x: Descriptors.MolWt(x))</p>
+<h1>Ejemplo: Función para calcular LogP (Coeficiente de partición Octanol-agua)</h1>
+<p>def calculate_logp(mol):
+    try:
+        return Descriptors.MolLogP(mol)
+    except:
+        return None</p>
+<p>df['logp'] = df['molecule'].apply(calculate_logp)</p>
+<h1>Limpiar el dataframe después de todas las operaciones</h1>
+<p>df = df.dropna(subset=['logp'])</p>
+<p>print(df[['chembl_id', 'canonical_smiles', 'mol_weight', 'logp']].head())
+```</p>
+<p><strong>Python (notebooks/Topic_CheMBL_35_41_2_Analysis_and_Modeling.ipynb):</strong></p>
+<p>```python</p>
+<h1>notebooks/Topic_CheMBL_35_41_2_Analysis_and_Modeling.ipynb</h1>
+<p>import os
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
+import numpy as np</p>
+<h1>Definir rutas</h1>
+<p>base_path = os.path.dirname(os.getcwd())
+data_path = os.path.join(base_path, 'data')
+csv_file = os.path.join(data_path, 'Topic_CheMBL_35_41.csv')</p>
+<h1>Cargar los datos</h1>
+<p>df = pd.read_csv(csv_file)</p>
+<h1>Limpieza y preprocesamiento de datos (igual que el notebook anterior, pero asegúrate de que estos pasos sean consistentes)</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])
+df = df[df['canonical_smiles'] != '']
+df['molecule'] = df['canonical_smiles'].apply(lambda x: Chem.MolFromSmiles(x))
+df = df.dropna(subset=['molecule'])
+df['mol_weight'] = df['molecule'].apply(lambda x: Descriptors.MolWt(x))
+df['logp'] = df['molecule'].apply(calculate_logp) #Asegúrate de definir o importar la función calculate_logp también en este notebook
+df = df.dropna(subset=['logp'])</p>
+<h1>Preparar los datos para el modelado (ejemplo: predecir standard_value a partir de mol_weight y logp)</h1>
+<p>X = df[['mol_weight', 'logp']]
+y = df['standard_value']</p>
+<h1>Manejar posibles valores infinitos en X reemplazándolos con un número grande</h1>
+<p>X = X.replace([np.inf, -np.inf], np.nan)  # Reemplazar inf con NaN
+X = X.fillna(X.max())  # Llenar NaN con el valor máximo en la columna</p>
+<h1>Escalar las características</h1>
+<p>scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)</p>
+<h1>Dividir los datos en conjuntos de entrenamiento y prueba</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)</p>
+<h1>Entrenar un modelo de regresión lineal</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Hacer predicciones</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluar el modelo</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)  # Calcular RMSE manualmente (compatible con scikit-learn antiguo)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error (MSE): {mse}")
+print(f"Root Mean Squared Error (RMSE): {rmse}")
+print(f"R-squared (R2): {r2}")
+```</p>
+<p><strong>3. Cinco Ejemplos de Código Adaptado (Variando el Análisis):</strong></p>
+<p>Aquí hay cinco ejemplos de cómo puedes adaptar el código anterior para explorar diferentes aspectos de los datos de Chembl. Recuerda modificar las consultas SQL y el código Python en consecuencia.</p>
+<ol>
+<li>
+<p><strong>Predicción de Actividad Específica del Objetivo:</strong> Centrarse en un solo objetivo proteico (por ejemplo, CHEMBL205 para el receptor adrenérgico beta-2) e intentar predecir los valores de IC50.</p>
+<ul>
+<li><strong>SQL:</strong> Agregar <code>AND md.chembl_id = 'CHEMBL205'</code> a la cláusula <code>WHERE</code>.</li>
+<li><strong>Python:</strong> Usar descriptores moleculares y aprendizaje automático para predecir IC50. Considerar técnicas de selección de características para identificar los descriptores más relevantes.</li>
+</ul>
+</li>
+<li>
+<p><strong>Análisis de Acantilados de Actividad:</strong> Identificar pares de moléculas con estructuras muy similares pero actividades significativamente diferentes ("acantilados de actividad").</p>
+<ul>
+<li><strong>SQL:</strong> Recuperar SMILES y valores de actividad.</li>
+<li><strong>Python:</strong> Calcular la similitud molecular (por ejemplo, usando el coeficiente de Tanimoto en las huellas digitales de Morgan). Identificar pares de moléculas con alta similitud y grandes diferencias de actividad.</li>
+</ul>
+</li>
+<li>
+<p><strong>Exploración SAR (Relación Estructura-Actividad):</strong> Investigar cómo los cambios en la estructura molecular afectan la actividad.</p>
+<ul>
+<li><strong>SQL:</strong> Recuperar SMILES, valores de actividad y, potencialmente, información de subestructura (si está disponible en Chembl).</li>
+<li><strong>Python:</strong> Visualizar la relación entre características estructurales específicas (por ejemplo, la presencia de un sustituyente particular) y la actividad. Considerar el uso del análisis de pares moleculares emparejados (MMPA).</li>
+</ul>
+</li>
+<li>
+<p><strong>Relación LogP y Actividad:</strong> Examinar la correlación entre la lipofilicidad (LogP) y la actividad.</p>
+<ul>
+<li><strong>SQL:</strong> Recuperar SMILES y valores de actividad.</li>
+<li><strong>Python:</strong> Calcular LogP usando RDKit. Crear diagramas de dispersión de LogP vs. actividad. Calcular el coeficiente de correlación de Pearson.</li>
+</ul>
+</li>
+<li>
+<p><strong>Relación Peso Molecular y Actividad:</strong> Investigar la relación entre el peso molecular y la actividad. Esto suele ser una limitación en el diseño de fármacos.</p>
+<ul>
+<li><strong>SQL:</strong> Recuperar SMILES y valores de actividad.</li>
+<li><strong>Python:</strong> Calcular el peso molecular usando RDKit. Crear diagramas de dispersión del peso molecular vs. actividad. Calcular el coeficiente de correlación de Pearson. Filtrar datos para moléculas con un rango de peso molecular específico.</li>
+</ul>
+</li>
+</ol>
+<p><strong>Consideraciones Importantes:</strong></p>
+<ul>
+<li><strong>Manejo de Errores:</strong> Agregar un manejo de errores más completo a tu código Python para manejar con elegancia posibles problemas (por ejemplo, cadenas SMILES inválidas, datos faltantes).</li>
+<li><strong>Validación de Datos:</strong> Validar los datos que extraes de Chembl. Verificar si hay inconsistencias o errores.</li>
+<li><strong>Ingeniería de Características:</strong> Experimentar con diferentes descriptores moleculares y técnicas de ingeniería de características para mejorar el rendimiento de tus modelos.</li>
+<li><strong>Evaluación del Modelo:</strong> Usar métricas apropiadas para evaluar el rendimiento de tus modelos de aprendizaje automático (por ejemplo, RMSE, puntuación R2, AUC).</li>
+<li><strong>Documentación:</strong> Documentar tu código claramente, explicando el propósito de cada paso y la justificación detrás de tus decisiones.</li>
+<li><strong>Entornos Virtuales:</strong> Usar entornos virtuales (por ejemplo, <code>venv</code> o <code>conda</code>) para administrar las dependencias de tu proyecto y evitar conflictos con otros proyectos de Python.</li>
+</ul>
+<p>Siguiendo estos pasos, abordando los errores y adaptando los ejemplos, deberías ser capaz de analizar eficazmente los datos de Chembl 35 y extraer información valiosa para la investigación y el desarrollo de fármacos. ¡Buena suerte!</p>
+        </body>
+        </html>
+        

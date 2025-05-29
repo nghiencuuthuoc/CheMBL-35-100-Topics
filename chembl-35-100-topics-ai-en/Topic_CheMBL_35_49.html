@@ -1,0 +1,270 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_49</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: FDA-approved ChEMBL drugs analysis</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project using RDKit, following an AIMLops-style structure, and encountering some errors. You want to extract 100 rows of data, and need guidance with SQL and Python code. Let's get started.</p>
+<p><strong>1. Analysis of the Analysis Model:</strong></p>
+<p>This project likely aims to explore the ChEMBL database for drug discovery purposes.  A common workflow would involve:</p>
+<ul>
+<li><strong>Data Extraction:</strong>  Fetching relevant data from the ChEMBL database using SQL queries.  This would include information about compounds (structures, properties) and bioactivities (e.g., IC50 values against specific targets).</li>
+<li><strong>Data Cleaning &amp; Transformation:</strong> Processing the extracted data to handle missing values, convert units, standardize compound representations (e.g., using SMILES), and filter out irrelevant entries.</li>
+<li><strong>Feature Engineering:</strong> Calculating molecular descriptors using RDKit (e.g., molecular weight, logP, number of hydrogen bond donors/acceptors) that can be used as features for machine learning models.</li>
+<li><strong>Modeling (Potentially):</strong>  Building predictive models to relate compound structure to bioactivity. This could involve tasks like QSAR (Quantitative Structure-Activity Relationship) modeling or virtual screening.</li>
+</ul>
+<p>Your current setup suggests you're focusing on data extraction and initial cleaning/transformation. The error messages indicate issues with your SQL query and the scikit-learn version you're using.</p>
+<p><strong>2. SQL Code:</strong></p>
+<p>Here's a SQL query tailored to your needs, addressing the <code>numeric ~ unknown</code> error and limiting the result to 100 rows. The core of the error stems from using the regular expression operator <code>~</code> on a numeric column (<code>standard_value</code>). We'll cast the <code>standard_value</code> to TEXT before applying the regex.</p>
+<p>```sql
+-- File: ../data/Topic_CheMBL_35_49.sql</p>
+<p>SELECT
+    act.activity_id,
+    act.standard_value,
+    act.standard_units,
+    act.standard_type,
+    cmp.canonical_smiles,
+    tgt.target_chembl_id
+FROM
+    activities act
+JOIN
+    component_sequences cs ON act.component_id = cs.component_id
+JOIN
+    compound_structures cmp ON act.molregno = cmp.molregno
+JOIN
+    target_dictionary tgt ON act.tid = tgt.tid
+WHERE
+    act.standard_type = 'IC50'  -- Filter for IC50 values
+    AND act.standard_units = 'nM' -- Filter for nM units
+    AND act.standard_value IS NOT NULL  -- Exclude null values
+    AND act.standard_value::TEXT ~ '^[0-9.]+$'  -- Ensure standard_value is numeric using TEXT casting and regex
+LIMIT 100;  -- Limit to 100 rows
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li>The query joins several ChEMBL tables (activities, component_sequences, compound_structures, target_dictionary) to retrieve activity data, compound SMILES, and target information.</li>
+<li>It filters for IC50 values reported in nM units.</li>
+<li><code>act.standard_value::TEXT ~ '^[0-9\.]+$'</code> This is the crucial part. It explicitly casts <code>standard_value</code> to <code>TEXT</code> before applying the regular expression.  The regular expression <code>^[0-9\.]+$</code> checks if the value contains only digits and periods, ensuring it's a numeric value.</li>
+<li><code>LIMIT 100</code> limits the result set to 100 rows.</li>
+</ul>
+<p><strong>How to Run:</strong></p>
+<ol>
+<li>Open pgAdmin and connect to your database (IP: 192.168.206.136, user: rd, pass: rd, database: chembl_35).</li>
+<li>Open a query window.</li>
+<li>Paste the SQL code into the query window.</li>
+<li>Execute the query.</li>
+<li><strong>Important:</strong> After the query executes successfully, export the result set to a CSV file named <code>Topic_CheMBL_35_49.csv</code> and save it in the <code>../data/</code> directory relative to your notebook. Make sure the CSV file includes a header row.</li>
+</ol>
+<p><strong>3. Python Code:</strong></p>
+<p>Here's the Python code to read the CSV, perform some basic data cleaning, and calculate molecular descriptors using RDKit.</p>
+<p>```python</p>
+<h1>File: notebook/Topic_CheMBL_35_49_1_data_processing.ipynb</h1>
+<p>import pandas as pd
+import os
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.metrics import mean_squared_error # Import mean_squared_error</p>
+<h1>Define the base path (adjust if needed)</h1>
+<p>base_path = ".." # Assuming the notebook is one level down from the base
+data_path = os.path.join(base_path, "data", "Topic_CheMBL_35_49.csv")</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}.  Make sure you saved the CSV correctly.")
+    exit()</p>
+<h1>Data Cleaning</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])  # Remove rows with missing SMILES or standard_value
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce') # Convert to numeric, handle errors
+df = df.dropna(subset=['standard_value']) # Remove rows where conversion to numeric failed
+df = df[df['standard_value'] &gt; 0] # Remove standard_value &lt;= 0, log transform will cause error.</p>
+<h1>RDKit Descriptor Calculation</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MW'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    return descriptors</p>
+<h1>Apply descriptor calculation</h1>
+<p>df['descriptors'] = df['canonical_smiles'].apply(calculate_descriptors)
+df = df.dropna(subset=['descriptors']) # Remove rows where descriptor calculation failed
+df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Example usage of mean_squared_error (if you had predicted values)</h1>
+<h1>Assuming you have 'predicted_value' column</h1>
+<h1>from sklearn.metrics import mean_squared_error</h1>
+<h1>Example data</h1>
+<h1>df['predicted_value'] = np.random.rand(len(df)) * 1000  # Replace with your actual predicted values</h1>
+<h1>Check if 'predicted_value' exists</h1>
+<h1>if 'predicted_value' in df.columns:</h1>
+<h1>mse = mean_squared_error(df['standard_value'], df['predicted_value']) # Default squared=True</h1>
+<h1>print(f"Mean Squared Error: {mse}")</h1>
+<h1></h1>
+<h1># If you need RMSE (Root Mean Squared Error), take the square root</h1>
+<h1>rmse = np.sqrt(mse)</h1>
+<h1>print(f"Root Mean Squared Error: {rmse}")</h1>
+<h1>else:</h1>
+<h1>print("No predicted_value column found. Skipping MSE/RMSE calculation.")</h1>
+<h1>Display the first few rows of the processed DataFrame</h1>
+<p>print(df.head())
+```</p>
+<p><strong>Explanation:</strong></p>
+<ol>
+<li><strong>Imports:</strong> Imports necessary libraries (pandas, os, RDKit, numpy, scikit-learn).</li>
+<li><strong>File Path:</strong>  Constructs the full path to your CSV file using <code>os.path.join</code>.</li>
+<li><strong>Data Loading:</strong> Loads the CSV file into a pandas DataFrame. Includes error handling in case the file is not found.</li>
+<li><strong>Data Cleaning:</strong><ul>
+<li>Removes rows with missing <code>canonical_smiles</code> or <code>standard_value</code>.</li>
+<li>Converts the <code>standard_value</code> column to numeric, handling potential errors.</li>
+<li>Removes rows where the conversion to numeric failed.</li>
+<li>Remove rows where standard_value is less or equal to 0.</li>
+</ul>
+</li>
+<li><strong>Descriptor Calculation:</strong><ul>
+<li>Defines a function <code>calculate_descriptors</code> to calculate RDKit descriptors (Molecular Weight, LogP, H-bond donors, H-bond acceptors) from a SMILES string.</li>
+<li>Applies this function to the <code>canonical_smiles</code> column to create a new 'descriptors' column.</li>
+<li>Handles cases where descriptor calculation might fail (invalid SMILES).</li>
+<li>Expand the descriptors to different column</li>
+</ul>
+</li>
+<li><strong>MSE Example:</strong><ul>
+<li>Demonstrates how to use <code>mean_squared_error</code> <em>without</em> the <code>squared=False</code> parameter (to be compatible with older scikit-learn versions).</li>
+<li>It calculates both MSE and RMSE (Root Mean Squared Error).</li>
+<li>Includes a check to see if the <code>predicted_value</code> column exists before trying to calculate the error. This is important if you're not always running a prediction step.</li>
+</ul>
+</li>
+<li><strong>Output:</strong> Prints the first few rows of the processed DataFrame to verify the results.</li>
+</ol>
+<p><strong>Addressing the <code>squared=False</code> Error:</strong></p>
+<p>The <code>squared</code> parameter was introduced in a later version of scikit-learn. To fix this with your older version, calculate the MSE and then take the square root to get the RMSE (Root Mean Squared Error).  The example in the code above demonstrates this approach.</p>
+<p><strong>Folder Structure and <code>base_path</code>:</strong></p>
+<p>The <code>base_path = ".."</code> is crucial. It assumes your Jupyter Notebook (<code>.ipynb</code> file) is located in a <code>notebook</code> directory, which is one level below the root of your AIMLops project directory (where the <code>data</code> directory resides).  Adjust the <code>base_path</code> if your folder structure is different.</p>
+<p><strong>4. Example Runs (5 Examples):</strong></p>
+<p>These examples illustrate how you can use the code above to process different subsets of your data or perform different analyses.</p>
+<p><strong>Example 1: Filter by Target</strong></p>
+<p>```python</p>
+<h1>Inside the notebook, after loading the data:</h1>
+<h1>Filter for a specific target (replace with a real target_chembl_id)</h1>
+<p>target_id = 'CHEMBL205'  # Example Target
+df_filtered = df[df['target_chembl_id'] == target_id].copy() # Create a copy to avoid SettingWithCopyWarning</p>
+<h1>Calculate descriptors for the filtered data</h1>
+<p>df_filtered['descriptors'] = df_filtered['canonical_smiles'].apply(calculate_descriptors)
+df_filtered = df_filtered.dropna(subset=['descriptors']) # Remove rows where descriptor calculation failed
+df_filtered = pd.concat([df_filtered.drop(['descriptors'], axis=1), df_filtered['descriptors'].apply(pd.Series)], axis=1)</p>
+<p>print(f"Number of compounds for target {target_id}: {len(df_filtered)}")
+print(df_filtered.head())
+```</p>
+<p><strong>Example 2: Filter by Activity Value Range</strong></p>
+<p>```python</p>
+<h1>Inside the notebook, after loading the data:</h1>
+<h1>Filter for compounds with IC50 values within a specific range</h1>
+<p>min_ic50 = 10
+max_ic50 = 100
+df_filtered = df[(df['standard_value'] &gt;= min_ic50) &amp; (df['standard_value'] &lt;= max_ic50)].copy() # Create a copy</p>
+<h1>Calculate descriptors for the filtered data</h1>
+<p>df_filtered['descriptors'] = df_filtered['canonical_smiles'].apply(calculate_descriptors)
+df_filtered = df_filtered.dropna(subset=['descriptors']) # Remove rows where descriptor calculation failed
+df_filtered = pd.concat([df_filtered.drop(['descriptors'], axis=1), df_filtered['descriptors'].apply(pd.Series)], axis=1)</p>
+<p>print(f"Number of compounds with IC50 between {min_ic50} and {max_ic50} nM: {len(df_filtered)}")
+print(df_filtered.head())
+```</p>
+<p><strong>Example 3: Calculate More RDKit Descriptors</strong></p>
+<p>```python</p>
+<h1>Modify the calculate_descriptors function:</h1>
+<p>from rdkit.Chem import Lipinski</p>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MW'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    descriptors['RotatableBonds'] = Descriptors.NumRotatableBonds(mol)
+    descriptors['Lipinski_HBA'] = Lipinski.NumHAcceptors(mol)
+    descriptors['Lipinski_HBD'] = Lipinski.NumHDonors(mol)
+    return descriptors
+```</p>
+<p>Then, run the descriptor calculation as before:</p>
+<p>```python</p>
+<h1>Apply descriptor calculation</h1>
+<p>df['descriptors'] = df['canonical_smiles'].apply(calculate_descriptors)
+df = df.dropna(subset=['descriptors']) # Remove rows where descriptor calculation failed
+df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)
+print(df.head())
+```</p>
+<p><strong>Example 4: Save the Processed Data</strong></p>
+<p>```python</p>
+<h1>After processing the data (including descriptor calculation):</h1>
+<p>output_path = os.path.join(base_path, "data", "Topic_CheMBL_35_49_processed.csv")
+df.to_csv(output_path, index=False)
+print(f"Processed data saved to: {output_path}")
+```</p>
+<p><strong>Example 5: Basic Statistics of Descriptors</strong></p>
+<p>```python</p>
+<h1>After descriptor calculation:</h1>
+<p>print("Descriptive Statistics for Molecular Weight (MW):")
+print(df['MW'].describe())</p>
+<p>print("\nDescriptive Statistics for LogP:")
+print(df['LogP'].describe())</p>
+<h1>Visualize the distribution of LogP (requires matplotlib or seaborn)</h1>
+<p>import matplotlib.pyplot as plt
+plt.hist(df['LogP'], bins=20)
+plt.xlabel("LogP")
+plt.ylabel("Frequency")
+plt.title("Distribution of LogP Values")
+plt.show()
+```</p>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>Error Handling:</strong>  The code includes basic error handling (e.g., checking for file existence, handling invalid SMILES).  Expand this error handling to make your code more robust.</li>
+<li><strong>Memory Management:</strong> When working with larger datasets, be mindful of memory usage. Consider using techniques like chunking to process the data in smaller pieces.</li>
+<li><strong>Data Validation:</strong>  Always validate your data to ensure its quality and consistency.</li>
+<li><strong>Documentation:</strong>  Add comments to your code to explain what it does.</li>
+</ul>
+<p><strong>In Summary (En Español):</strong></p>
+<p>Has estado trabajando en un proyecto de análisis de datos de ChEMBL 35 usando RDKit, siguiendo una estructura tipo AIMLops. Has encontrado algunos errores con tus consultas SQL y la versión de scikit-learn. Para arreglar el error de SQL, necesitas convertir el valor <code>standard_value</code> a texto antes de aplicar la expresión regular.  Para el error de scikit-learn, usa la función <code>mean_squared_error</code> y luego calcula la raíz cuadrada para obtener el RMSE. Los ejemplos te muestran cómo filtrar los datos por objetivo, rango de valores de actividad y cómo calcular descriptores moleculares adicionales. También se te muestra cómo guardar los datos procesados y obtener estadísticas básicas de los descriptores.  Recuerda ajustar las rutas de los archivos (<code>base_path</code>) según tu estructura de carpetas.</p>
+<p><strong>In English:</strong></p>
+<p>You've been working on a ChEMBL 35 data analysis project using RDKit, following an AIMLops-style structure. You've encountered some errors with your SQL queries and scikit-learn version. To fix the SQL error, you need to cast the <code>standard_value</code> to text before applying the regular expression. For the scikit-learn error, use the <code>mean_squared_error</code> function and then calculate the square root to get the RMSE. The examples show you how to filter the data by target, activity value range, and how to calculate additional molecular descriptors. You're also shown how to save the processed data and obtain basic statistics of the descriptors. Remember to adjust the file paths (<code>base_path</code>) according to your folder structure.</p>
+<p>Good luck with your project! Let me know if you have any more questions.</p>
+        </body>
+        </html>
+        

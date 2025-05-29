@@ -1,0 +1,322 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_86</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Integrating adverse event data (SIDER/FAERS)</h1>
+<hr />
+<p>Okay, I understand. You're working with ChEMBL 35 data in a structured project environment using the AIMLops template. You're using PostgreSQL for data storage, RDKit for cheminformatics, and Jupyter notebooks for code execution. You want guidance on running your <code>Topic_CheMBL_35_86</code> analysis, dealing with specific errors, and limiting data to 100 rows. Let's break this down.</p>
+<p><strong>Analysis and Guidance (English &amp; Vietnamese)</strong></p>
+<p><strong>1. Analysis Model (Phân tích Mô hình)</strong></p>
+<p>Your project likely involves analyzing bioactivity data from ChEMBL 35. A typical workflow might include:</p>
+<ul>
+<li><strong>Data Extraction and Cleaning:</strong>  Using SQL to extract relevant information from the ChEMBL database, focusing on specific target proteins, assays, or activity types.  This often involves filtering data based on quality criteria (e.g., activity type, standard units, confidence scores). Cleaning involves handling missing values and converting data into a consistent format.</li>
+<li><strong>Feature Engineering:</strong>  Using RDKit to generate molecular descriptors (e.g., fingerprints, physicochemical properties) from the SMILES strings of the compounds. These descriptors become the features used in your models.</li>
+<li><strong>Data Analysis/Modeling:</strong> Using machine learning to build predictive models. This could involve regression (e.g., predicting pIC50 values) or classification (e.g., predicting active vs. inactive compounds). Common algorithms include linear regression, random forests, support vector machines, and neural networks.</li>
+<li><strong>Model Evaluation:</strong> Evaluating the performance of your models using appropriate metrics (e.g., R-squared, RMSE for regression; accuracy, precision, recall, F1-score for classification).</li>
+<li><strong>Visualization and Interpretation:</strong> Visualizing data and model results to gain insights into the relationships between molecular features and bioactivity.</li>
+</ul>
+<p><strong>Vietnamese Translation:</strong></p>
+<ul>
+<li><strong>Trích xuất và làm sạch dữ liệu:</strong> Sử dụng SQL để trích xuất thông tin liên quan từ cơ sở dữ liệu ChEMBL, tập trung vào các protein mục tiêu, xét nghiệm hoặc loại hoạt động cụ thể. Điều này thường bao gồm lọc dữ liệu dựa trên các tiêu chí chất lượng (ví dụ: loại hoạt động, đơn vị tiêu chuẩn, điểm tin cậy). Làm sạch bao gồm xử lý các giá trị bị thiếu và chuyển đổi dữ liệu thành một định dạng nhất quán.</li>
+<li><strong>Thiết kế đặc trưng:</strong> Sử dụng RDKit để tạo các mô tả phân tử (ví dụ: dấu vân tay, thuộc tính lý hóa) từ chuỗi SMILES của các hợp chất. Các mô tả này trở thành các đặc trưng được sử dụng trong mô hình của bạn.</li>
+<li><strong>Phân tích/Mô hình hóa dữ liệu:</strong> Sử dụng máy học để xây dựng các mô hình dự đoán. Điều này có thể bao gồm hồi quy (ví dụ: dự đoán giá trị pIC50) hoặc phân loại (ví dụ: dự đoán các hợp chất hoạt động so với không hoạt động). Các thuật toán phổ biến bao gồm hồi quy tuyến tính, rừng ngẫu nhiên, máy vectơ hỗ trợ và mạng nơ-ron.</li>
+<li><strong>Đánh giá mô hình:</strong> Đánh giá hiệu suất của mô hình của bạn bằng các số liệu phù hợp (ví dụ: R-squared, RMSE cho hồi quy; độ chính xác, độ thu hồi, điểm F1 cho phân loại).</li>
+<li><strong>Trực quan hóa và diễn giải:</strong> Trực quan hóa dữ liệu và kết quả mô hình để hiểu rõ hơn về mối quan hệ giữa các đặc điểm phân tử và hoạt tính sinh học.</li>
+</ul>
+<p><strong>2. SQL and Python Code (Mã SQL và Python)</strong></p>
+<p>Here's an example of SQL code to extract data, addressing the error you mentioned, and then Python code to process it.</p>
+<p><strong>SQL Code (extract_chembl_data.sql):</strong></p>
+<p>```sql
+-- SQL Code to extract ChEMBL data (limited to 100 rows)</p>
+<p>SELECT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.pchembl_value
+FROM
+    compound_structures cs
+JOIN
+    molecule_dictionary md ON cs.molregno = md.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    assays ass ON act.assay_id = ass.assay_id
+JOIN
+    target_dictionary td ON ass.tid = td.tid
+WHERE
+    td.target_name = 'Your Target of Interest'  -- Replace with your target
+    AND act.standard_type = 'IC50'           -- Example bioactivity type
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9.]+$'  -- Corrected regex for numeric check
+    AND act.pchembl_value IS NOT NULL
+LIMIT 100;</p>
+<p>-- Save the result to a CSV file
+\copy (SELECT * FROM (
+SELECT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.pchembl_value
+FROM
+    compound_structures cs
+JOIN
+    molecule_dictionary md ON cs.molregno = md.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    assays ass ON act.assay_id = ass.assay_id
+JOIN
+    target_dictionary td ON ass.tid = td.tid
+WHERE
+    td.target_name = 'Your Target of Interest'  -- Replace with your target
+    AND act.standard_type = 'IC50'           -- Example bioactivity type
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9.]+$'  -- Corrected regex for numeric check
+    AND act.pchembl_value IS NOT NULL
+LIMIT 100
+) as subquery) TO '../data/chembl_data.csv' DELIMITER ',' CSV HEADER;
+```</p>
+<p><strong>Explanation of the SQL:</strong></p>
+<ul>
+<li><strong>JOINs:</strong>  This query joins several ChEMBL tables to retrieve compound structures, activities, assay information, and target information.</li>
+<li><strong><code>WHERE</code> clause:</strong> This clause filters the data:<ul>
+<li><code>td.target_name = 'Your Target of Interest'</code> :  Replace this with the name of your target protein.</li>
+<li><code>act.standard_type = 'IC50'</code>: Specifies the type of activity you're interested in.  Change this if you're looking for Ki, EC50, etc.</li>
+<li><code>act.standard_units = 'nM'</code>: Only include activities measured in nanomolars.</li>
+<li><code>act.standard_value IS NOT NULL</code>:  Excludes rows with missing standard values.</li>
+<li><code>act.standard_value::text ~ '^[0-9.]+$'</code>: <strong>Important Correction:</strong> This line addresses the error you encountered.  It first casts the <code>standard_value</code> to text, then uses a regular expression (<code>~</code>) to check if the value contains only numbers and periods.  This ensures that you're only including numeric values in your data.</li>
+<li><code>act.pchembl_value IS NOT NULL</code>: Excludes rows with missing pChEMBL values.</li>
+</ul>
+</li>
+<li><strong><code>LIMIT 100</code>:</strong>  This limits the results to the first 100 rows.</li>
+<li><strong><code>\copy</code></strong>: Save the result to a CSV file</li>
+</ul>
+<p><strong>Important:</strong></p>
+<ol>
+<li><strong>Replace <code>'Your Target of Interest'</code> with the actual target name you're interested in.</strong></li>
+<li>Run this SQL in pgAdmin.  It will save a file named <code>chembl_data.csv</code> in your <code>../data/</code> directory.</li>
+<li>Make sure your user has the right permissions to write to this directory.</li>
+</ol>
+<p><strong>Python Code (Topic_CheMBL_35_86_1_data_processing.ipynb):</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score</p>
+<h1>Define the base path</h1>
+<p>base_path = ".."  # Assuming your notebook is in the 'notebooks' directory</p>
+<h1>Construct the path to the CSV file</h1>
+<p>data_file = os.path.join(base_path, "data", "chembl_data.csv")</p>
+<h1>Load the data using pandas</h1>
+<p>try:
+    df = pd.read_csv(data_file)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: File not found at {data_file}")
+    exit()</p>
+<h1>Display the first few rows of the DataFrame</h1>
+<p>print(df.head())</p>
+<h1>Basic Data Cleaning</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'pchembl_value']) # Drop rows with missing SMILES or pChEMBL values</p>
+<h1>RDKit Feature Generation (Example: Calculate Molecular Weight and LogP)</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None, None  # Handle invalid SMILES
+    mw = Descriptors.MolWt(mol)
+    logp = Descriptors.MolLogP(mol)
+    return mw, logp</p>
+<p>df[['molecular_weight', 'logp']] = df['canonical_smiles'].apply(lambda x: pd.Series(calculate_descriptors(x)))
+df = df.dropna() #drop rows with invalid smiles</p>
+<h1>Display the DataFrame with new features</h1>
+<p>print(df.head())</p>
+<h1>Prepare data for machine Learning</h1>
+<h1>Define features and target</h1>
+<p>X = df[['molecular_weight', 'logp']]  # Features: Molecular Weight and LogP
+y = df['pchembl_value'] # Target: pChEMBL value</p>
+<h1>Split the data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Create a Linear Regression model</h1>
+<p>model = LinearRegression()</p>
+<h1>Train the model</h1>
+<p>model.fit(X_train, y_train)</p>
+<h1>Make predictions on the test set</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<h1>Old scikit-learn version does not support parameters squared=False in the mean_squared_error function</h1>
+<h1>Calculate Mean Squared Error (MSE)</h1>
+<p>mse = mean_squared_error(y_test, y_pred)</p>
+<h1>Calculate R-squared</h1>
+<p>r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>Explanation of the Python Code:</strong></p>
+<ul>
+<li><strong>Import Libraries:</strong> Imports necessary libraries (pandas, RDKit, scikit-learn).</li>
+<li><strong>Define Paths:</strong> Defines the path to the CSV file using <code>os.path.join</code>.  This ensures that the code works regardless of your current working directory.</li>
+<li><strong>Load Data:</strong> Loads the CSV data into a pandas DataFrame.</li>
+<li><strong>Data Cleaning:</strong> Removes rows with missing SMILES strings or pChEMBL values.</li>
+<li><strong>Feature Generation (RDKit):</strong>  Defines a function <code>calculate_descriptors</code> to calculate molecular weight (MW) and LogP using RDKit.  These are simple example features.  You can add more complex descriptors as needed. The code handles <code>None</code> returns from RDKit which indicate invalid SMILES strings.</li>
+<li><strong>Feature Selection:</strong> Selects molecular weight and LogP as features (<code>X</code>) and pChEMBL value as the target variable (<code>y</code>).</li>
+<li><strong>Data Splitting:</strong> Splits the data into training and testing sets.</li>
+<li><strong>Model Training:</strong> Creates a Linear Regression model and trains it using the training data.</li>
+<li><strong>Model Evaluation:</strong> Predicts pChEMBL values for the test set and evaluates the model using Mean Squared Error (MSE) and R-squared.</li>
+<li><strong>Error Handling:</strong> Include <code>try...except</code> for file handling and <code>if mol is None</code> in the <code>calculate_descriptors</code> function to handle invalid SMILES strings, this prevents your program from crashing.</li>
+</ul>
+<p><strong>Vietnamese Translation (Giải thích Mã Python):</strong></p>
+<ul>
+<li><strong>Nhập thư viện:</strong> Nhập các thư viện cần thiết (pandas, RDKit, scikit-learn).</li>
+<li><strong>Xác định đường dẫn:</strong> Xác định đường dẫn đến tệp CSV bằng <code>os.path.join</code>. Điều này đảm bảo rằng mã hoạt động bất kể thư mục làm việc hiện tại của bạn.</li>
+<li><strong>Tải dữ liệu:</strong> Tải dữ liệu CSV vào một DataFrame pandas.</li>
+<li><strong>Làm sạch dữ liệu:</strong> Loại bỏ các hàng có chuỗi SMILES hoặc giá trị pChEMBL bị thiếu.</li>
+<li><strong>Tạo đặc trưng (RDKit):</strong> Xác định một hàm <code>calculate_descriptors</code> để tính toán trọng lượng phân tử (MW) và LogP bằng RDKit. Đây là những đặc trưng ví dụ đơn giản. Bạn có thể thêm các mô tả phức tạp hơn nếu cần. Mã xử lý các giá trị <code>None</code> trả về từ RDKit, cho biết các chuỗi SMILES không hợp lệ.</li>
+<li><strong>Chọn đặc trưng:</strong> Chọn trọng lượng phân tử và LogP làm đặc trưng (<code>X</code>) và giá trị pChEMBL làm biến mục tiêu (<code>y</code>).</li>
+<li><strong>Chia dữ liệu:</strong> Chia dữ liệu thành các tập huấn luyện và kiểm tra.</li>
+<li><strong>Huấn luyện mô hình:</strong> Tạo mô hình Hồi quy tuyến tính và huấn luyện nó bằng dữ liệu huấn luyện.</li>
+<li><strong>Đánh giá mô hình:</strong> Dự đoán các giá trị pChEMBL cho tập kiểm tra và đánh giá mô hình bằng Lỗi bình phương trung bình (MSE) và R-squared.</li>
+<li><strong>Xử lý lỗi:</strong> Bao gồm <code>try...except</code> để xử lý tệp và <code>if mol is None</code> trong hàm <code>calculate_descriptors</code> để xử lý các chuỗi SMILES không hợp lệ, điều này ngăn chương trình của bạn bị sập.</li>
+</ul>
+<p><strong>3.  Addressing the <code>mean_squared_error</code> Error (Giải quyết lỗi <code>mean_squared_error</code>)</strong></p>
+<p>The error <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code> indicates that you're using an older version of scikit-learn.  The <code>squared=False</code> parameter was introduced in a later version of the library, which is used to return the Root Mean Squared Error (RMSE) instead of the MSE.</p>
+<p><strong>Solution:</strong> Since you have an older version, remove the <code>squared=False</code> parameter from the <code>mean_squared_error</code> function call.</p>
+<p>```python</p>
+<h1>Calculate Mean Squared Error (MSE)</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+```</p>
+<p>If you need RMSE you would need to calculate it manually:
+```python</p>
+<h1>Calculate Mean Squared Error (MSE)</h1>
+<p>mse = mean_squared_error(y_test, y_pred)</p>
+<h1>Calculate Root Mean Squared Error (RMSE)</h1>
+<p>rmse = np.sqrt(mse)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"Root Mean Squared Error: {rmse}")
+```</p>
+<p><strong>Vietnamese Translation (Giải pháp cho lỗi):</strong></p>
+<p>Lỗi <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code> chỉ ra rằng bạn đang sử dụng phiên bản cũ hơn của scikit-learn. Tham số <code>squared=False</code> đã được giới thiệu trong một phiên bản thư viện sau này, được sử dụng để trả về Lỗi bình phương gốc trung bình (RMSE) thay vì MSE.</p>
+<p><strong>Giải pháp:</strong> Vì bạn có một phiên bản cũ hơn, hãy xóa tham số <code>squared=False</code> khỏi lệnh gọi hàm <code>mean_squared_error</code>. Nếu bạn cần RMSE, bạn sẽ cần phải tính toán nó bằng cách thủ công:</p>
+<p>```python</p>
+<h1>Tính Lỗi bình phương trung bình (MSE)</h1>
+<p>mse = mean_squared_error(y_test, y_pred)</p>
+<h1>Tính Lỗi bình phương gốc trung bình (RMSE)</h1>
+<p>rmse = np.sqrt(mse)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"Root Mean Squared Error: {rmse}")
+```</p>
+<p><strong>4. AIMLops Structure (Cấu trúc AIMLops)</strong></p>
+<p>You've correctly identified the use of <code>os.path.join</code> to handle file paths. Here's how your project structure might look and how it relates to the code:</p>
+<p><code>my_chembl_project/
+├── data/                  # Contains the chembl_data.csv file
+│   └── chembl_data.csv
+├── notebooks/            # Contains your Jupyter notebooks
+│   └── Topic_CheMBL_35_86_1_data_processing.ipynb
+│   └── Topic_CheMBL_35_86_2_model_building.ipynb  # (Example - for a second notebook)
+├── scripts/                # (Optional) For reusable Python scripts
+│   └── data_extraction.py   # (Example)
+├── models/                 # (Optional) For saving trained models
+│   └── linear_regression_model.pkl
+├── requirements.txt      # List of Python dependencies
+└── README.md</code></p>
+<p>Your <code>base_path</code> in the notebook is set to <code>".."</code>.  This means your notebook is located one level deeper than the root of your project.</p>
+<p><strong>5. Five Examples (Năm ví dụ)</strong></p>
+<p>Here are five examples extending the base code:</p>
+<p><strong>Example 1: Calculate More RDKit Descriptors (Ví dụ 1: Tính toán nhiều mô tả RDKit hơn)</strong></p>
+<p>```python
+from rdkit.Chem import Lipinski</p>
+<p>def calculate_more_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None, None, None, None</p>
+<pre><code># Calculate more descriptors
+mw = Descriptors.MolWt(mol)
+logp = Descriptors.MolLogP(mol)
+hbd = Lipinski.NumHDonors(mol) #Hydrogen Bond Donors
+hba = Lipinski. NumHAcceptors(mol) #Hydrogen Bond Acceptors
+return mw, logp, hbd, hba
+</code></pre>
+<p>df[['molecular_weight', 'logp', 'hbd', 'hba']] = df['canonical_smiles'].apply(lambda x: pd.Series(calculate_more_descriptors(x)))</p>
+<p>df = df.dropna()
+X = df[['molecular_weight', 'logp', 'hbd', 'hba']]
+```</p>
+<p><strong>Example 2:  Different Machine Learning Model (Ví dụ 2: Mô hình học máy khác)</strong></p>
+<p>```python
+from sklearn.ensemble import RandomForestRegressor</p>
+<h1>Create a Random Forest Regressor model</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42) #You can tune n_estimators</p>
+<h1>Train the model</h1>
+<p>model.fit(X_train, y_train)
+```</p>
+<p><strong>Example 3:  Using pIC50 instead of pChEMBLValue (Ví dụ 3: Sử dụng pIC50 thay vì pChEMBLValue)</strong></p>
+<p>First, make sure your SQL includes the <code>pchembl_value</code> . Then, in your python script:</p>
+<p><code>python
+y = df['pchembl_value'] # Target: pChEMBL value</code></p>
+<p><strong>Example 4: Filtering by a Specific Target (Ví dụ 4: Lọc theo mục tiêu cụ thể)</strong></p>
+<p>Modify your SQL query to target a particular protein, for example:</p>
+<p><code>sql
+WHERE
+    td.target_name = 'Tyrosine-protein kinase SYK'
+    AND act.standard_type = 'IC50'</code></p>
+<p><strong>Example 5:  Saving the Trained Model (Ví dụ 5: Lưu mô hình đã huấn luyện)</strong></p>
+<p>```python
+import pickle</p>
+<h1>After training your model:</h1>
+<p>model_file = os.path.join(base_path, "models", "linear_regression_model.pkl")
+pickle.dump(model, open(model_file, 'wb'))</p>
+<h1>To load the model later:</h1>
+<p>loaded_model = pickle.load(open(model_file, 'rb'))
+```</p>
+<p><strong>Key Takeaways:</strong></p>
+<ul>
+<li><strong>Address the SQL error</strong> by casting <code>act.standard_value</code> to text and using a regular expression to check for numeric values.</li>
+<li><strong>Remove <code>squared=False</code></strong> from <code>mean_squared_error</code> or upgrade your scikit-learn version.</li>
+<li><strong>Pay attention to file paths</strong> and use <code>os.path.join</code> to ensure your code works consistently.</li>
+<li><strong>Adapt the examples</strong> to your specific research question and the data you're working with.</li>
+</ul>
+<p>Remember to install the necessary libraries: <code>pip install pandas rdkit-pypi scikit-learn</code>. Good luck with your analysis! I am here if you have more questions.</p>
+        </body>
+        </html>
+        

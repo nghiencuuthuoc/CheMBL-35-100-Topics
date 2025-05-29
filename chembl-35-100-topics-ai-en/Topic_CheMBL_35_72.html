@@ -1,0 +1,230 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_72</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Plotting IC50 distribution across targets</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project using RDKit within an AIMLops-structured environment, and you're encountering some issues with your SQL queries and potentially your scikit-learn version. Let's break down the analysis, provide the code (SQL and Python), and address your errors, keeping in mind the limited data constraint (100 rows).</p>
+<p>Here's a breakdown of the analysis and the code:</p>
+<p><strong>1. Analysis Model</strong></p>
+<p>The goal seems to be to extract relevant data from the ChEMBL database, likely to analyze activity data (IC50, Ki, etc.) for specific targets or compounds. A typical analysis might involve:</p>
+<ul>
+<li><strong>Data Extraction:</strong> Querying the ChEMBL database to retrieve activity data, compound structures (SMILES strings), and target information.</li>
+<li><strong>Data Cleaning and Transformation:</strong> Handling missing values, converting activity units, and transforming SMILES strings into RDKit molecules.</li>
+<li><strong>Feature Engineering:</strong> Generating molecular descriptors using RDKit (e.g., topological polar surface area, number of rotatable bonds, etc.).</li>
+<li><strong>Data Analysis and Modeling:</strong>  Exploring the relationship between molecular descriptors and activity values, potentially using machine learning models (e.g., regression) to predict activity.</li>
+</ul>
+<p><strong>2. Addressing Errors</strong></p>
+<ul>
+<li>
+<p><strong>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9.]+$'</strong>: This error arises because the <code>~</code> operator is typically used for regular expression matching against text data.  However, the <code>standard_value</code> column is likely of a numeric data type (e.g., <code>numeric</code>, <code>float</code>). You need to use a numeric comparison or cast the column to text if you want to use regular expressions.</p>
+</li>
+<li>
+<p><strong>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</strong>: This simply means you are using an older version of scikit-learn. You'll need to either update scikit-learn (<code>pip install --upgrade scikit-learn</code>) or remove the <code>squared=False</code> argument.  Since you are using the AIMLops structure, updating the environment might be preferable. But here's how to proceed without updating.  If you want the Root Mean Squared Error (RMSE), take the square root of the Mean Squared Error (MSE) result.</p>
+</li>
+</ul>
+<p><strong>3. Code (SQL and Python)</strong></p>
+<p>Here's the code, following your specified file structure and addressing the errors.</p>
+<p>```sql
+-- SQL: Extracting Data from ChEMBL (limit to 100 rows)
+-- File: ../data/chembl_data.csv</p>
+<p>SELECT
+    cmp.chembl_id,
+    cmp.molecule_structures,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.target_chembl_id
+FROM
+    compound_structures cmp
+JOIN
+    activities act ON cmp.molregno = act.molregno
+WHERE
+    act.standard_type IN ('IC50', 'Ki', 'Kd')  -- Example activity types
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0  --Avoid log transform of 0
+    AND act.standard_value::text ~ '^[0-9.]+$' -- Ensure standard_value is numeric
+LIMIT 100;</p>
+<p>```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><code>cmp.chembl_id</code>:  The ChEMBL ID of the compound.</li>
+<li><code>cmp.molecule_structures</code>: Contains SMILES strings of the molecule.</li>
+<li><code>act.standard_type</code>:  The type of activity (e.g., IC50, Ki).</li>
+<li><code>act.standard_value</code>: The activity value.</li>
+<li><code>act.standard_units</code>: The units of the activity value.</li>
+<li><code>act.target_chembl_id</code>: The ChEMBL ID of the target.</li>
+<li><code>WHERE</code> clause filters the data to include only IC50, Ki, and Kd values in nM.  It also ensures that <code>standard_value</code> is not null and contains a non-zero positive numeric value.  The <code>act.standard_value::text ~ '^[0-9\.]+$'</code> casts the numeric value to text before using the regex.</li>
+<li><code>LIMIT 100</code> limits the output to 100 rows.</li>
+</ul>
+<p>```python</p>
+<h1>Python: Analyzing ChEMBL Data using RDKit</h1>
+<h1>File: notebooks/Topic_CheMBL_35_72_1_data_analysis.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error</p>
+<h1>Define base path</h1>
+<p>base_path = "../data"  # Adjust if your data directory is different</p>
+<h1>Load data from CSV</h1>
+<p>data_file = os.path.join(base_path, "chembl_data.csv")
+try:
+    df = pd.read_csv(data_file)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_file}.  Make sure you ran the SQL query and saved the result to this location.")
+    exit()</p>
+<h1>Data Cleaning and Transformation</h1>
+<p>df = df.dropna(subset=['molecule_structures'])  # Remove rows with missing SMILES
+df = df[df['standard_value'].notna()] #drop NA values</p>
+<h1>Convert standard_value to numeric</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')</p>
+<h1>Convert SMILES to RDKit molecules</h1>
+<p>def smiles_to_mol(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is not None:
+            return mol
+        else:
+            return None
+    except:
+        return None</p>
+<p>df['molecule'] = df['molecule_structures'].apply(smiles_to_mol)
+df = df.dropna(subset=['molecule']) #remove rows that failed smiles conversion</p>
+<h1>Activity Transformation (pIC50) - common for modeling</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] * 1e-9)  # Convert nM to M and calculate pIC50</p>
+<h1>Feature Engineering (Molecular Descriptors)</h1>
+<p>def calculate_descriptors(mol):
+    try:
+        descriptors = {
+            "MW": Descriptors.MolWt(mol),
+            "LogP": Descriptors.MolLogP(mol),
+            "HBD": Descriptors.NumHDonors(mol),
+            "HBA": Descriptors.NumHAcceptors(mol),
+            "TPSA": Descriptors.TPSA(mol),
+            "RotatableBonds": Descriptors.NumRotatableBonds(mol)
+        }
+        return descriptors
+    except:
+        return None</p>
+<p>df['descriptors'] = df['molecule'].apply(calculate_descriptors)
+df = df.dropna(subset=['descriptors'])
+df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Data Splitting</h1>
+<p>X = df[['MW', 'LogP', 'HBD', 'HBA', 'TPSA', 'RotatableBonds']]
+y = df['pIC50']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Model Training</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Model Evaluation</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse) #Calculating RMSE because squared=False is unavailable</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"Root Mean Squared Error: {rmse}")
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Imports:</strong> Imports necessary libraries (pandas, RDKit, scikit-learn).</li>
+<li><strong>Data Loading:</strong> Loads the CSV file you created from the SQL query.</li>
+<li><strong>Data Cleaning:</strong> Removes rows with missing SMILES strings or activity values.</li>
+<li><strong>SMILES Conversion:</strong> Converts SMILES strings to RDKit <code>Mol</code> objects.  Includes error handling for invalid SMILES.</li>
+<li><strong>Activity Transformation:</strong>  Converts <code>standard_value</code> (assumed to be in nM) to pIC50 values (a logarithmic scale, which is often better for modeling).  Important:  Adjust the transformation if your <code>standard_units</code> are different.</li>
+<li><strong>Feature Engineering:</strong> Calculates molecular descriptors using RDKit.  This example calculates molecular weight (MW), LogP, hydrogen bond donors (HBD), hydrogen bond acceptors (HBA), topological polar surface area (TPSA), and the number of rotatable bonds.</li>
+<li><strong>Data Splitting:</strong> Splits the data into training and testing sets.</li>
+<li><strong>Model Training:</strong> Trains a linear regression model.</li>
+<li><strong>Model Evaluation:</strong> Predicts activity values for the test set and calculates the Mean Squared Error (MSE) and Root Mean Squared Error (RMSE).</li>
+<li><strong>Error Handling:</strong> Includes <code>try...except</code> blocks for error handling during SMILES conversion and descriptor calculation.  Rows that cause errors are removed from the DataFrame.</li>
+</ul>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>Target Selection:</strong>  In the SQL query, you may want to add a <code>WHERE</code> clause to filter by a specific <code>target_chembl_id</code> to focus your analysis on a particular target.</li>
+<li><strong>Activity Type:</strong>  The code assumes you are primarily interested in IC50, Ki, and Kd values.  Adjust the <code>WHERE</code> clause in the SQL query if you need to include other activity types.</li>
+<li><strong>Units:</strong>  The code assumes activity values are in nM.  Adjust the activity transformation step if your data uses different units.</li>
+<li><strong>Descriptor Selection:</strong>  The code calculates a basic set of molecular descriptors.  You may want to experiment with different descriptors based on the specific target and compounds you are analyzing.</li>
+<li><strong>Model Selection:</strong>  Linear regression is a simple model.  You may want to explore other machine learning models (e.g., random forests, support vector machines) if linear regression doesn't provide satisfactory results.</li>
+<li><strong>Error Handling:</strong> The error handling is basic.  You might want to add more sophisticated error handling and logging to your code.</li>
+</ul>
+<p><strong>4. Five Examples (Based on Possible Analysis Scenarios)</strong></p>
+<p>Here are five examples of how you could use this code in different analysis scenarios:</p>
+<ol>
+<li>
+<p><strong>Target-Specific Analysis:</strong></p>
+<ul>
+<li>Modify the SQL query to filter for a specific <code>target_chembl_id</code>. For example, if you are interested in analyzing data for EGFR (Epidermal Growth Factor Receptor), find its ChEMBL ID and add <code>AND act.target_chembl_id = 'CHEMBL203'</code> to your SQL query.</li>
+<li>The Python code will then analyze the activity data and molecular descriptors for compounds active against EGFR.</li>
+</ul>
+</li>
+<li>
+<p><strong>Activity Type Comparison:</strong></p>
+<ul>
+<li>Modify the SQL query to include only IC50 values (<code>AND act.standard_type = 'IC50'</code>) and run the Python code. Then, repeat the process for Ki values (<code>AND act.standard_type = 'Ki'</code>).</li>
+<li>Compare the performance of the linear regression model for predicting IC50 versus Ki values. This might reveal differences in the structure-activity relationship for different activity types.</li>
+</ul>
+</li>
+<li>
+<p><strong>Descriptor Importance Analysis:</strong></p>
+<ul>
+<li>After training the linear regression model, examine the coefficients of the model to determine which molecular descriptors have the greatest impact on predicted activity.</li>
+<li>This can provide insights into the structural features that are most important for activity against the target.</li>
+</ul>
+</li>
+<li>
+<p><strong>Outlier Analysis:</strong></p>
+<ul>
+<li>Identify compounds in the test set for which the predicted activity values are significantly different from the actual activity values (i.e., outliers).</li>
+<li>Examine the structures of these outlier compounds to see if they have any unusual features that might explain why they are not well-predicted by the model.</li>
+</ul>
+</li>
+<li>
+<p><strong>Virtual Screening:</strong></p>
+<ul>
+<li>After training the model, use it to predict the activity of new compounds (e.g., compounds from a virtual library).</li>
+<li>Select the compounds with the highest predicted activity values for further experimental testing.</li>
+</ul>
+</li>
+</ol>
+<p><strong>In Summary (En Resumen)</strong></p>
+<p>This comprehensive guide provides you with the SQL and Python code to start your ChEMBL 35 data analysis project. It addresses the errors you encountered and gives you a clear framework for data extraction, cleaning, transformation, feature engineering, and modeling.  Remember to adapt the code to your specific analysis goals, and experiment with different parameters, descriptors, and models to achieve the best results.</p>
+<p><strong>Español (Spanish)</strong></p>
+<p>Esta guía completa te proporciona el código SQL y Python para comenzar tu proyecto de análisis de datos de ChEMBL 35. Aborda los errores que encontraste y te brinda un marco claro para la extracción, limpieza, transformación, ingeniería de características y modelado de datos. Recuerda adaptar el código a tus objetivos de análisis específicos y experimentar con diferentes parámetros, descriptores y modelos para lograr los mejores resultados.  ¡Buena suerte!</p>
+        </body>
+        </html>
+        

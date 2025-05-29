@@ -1,0 +1,361 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_53</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Antiviral compounds mapping to COVID-19 targets</h1>
+<hr />
+<p>Okay, I understand. You're working with ChEMBL 35 data using RDKit, following an AIMLops template structure. You need guidance on structuring your project, running SQL queries, and implementing Python code for analysis, addressing specific errors encountered. You want to focus on retrieving a small subset of data (100 rows) for faster prototyping and provide 5 examples.</p>
+<p>Here's a breakdown of the approach, including SQL and Python code snippets, and addressing the errors you've encountered.</p>
+<p><strong>1. Project Structure &amp; AIMLops Template Adherence</strong></p>
+<p>Following the AIMLops pattern, a typical project structure looks like this:</p>
+<p><code>Topic_CheMBL_35_53/  # Root directory
+├── data/            # Raw data, CSV files extracted from ChEMBL
+├── notebooks/       # Jupyter notebooks for exploration and analysis
+│   ├── Topic_CheMBL_35_53_1_EDA.ipynb   # Exploratory Data Analysis
+│   ├── Topic_CheMBL_35_53_2_Model.ipynb # Model building, e.g., regression
+│   └── ...
+├── src/             # Python modules for reusable functions
+│   ├── data_processing.py
+│   ├── model_training.py
+│   └── utils.py
+├── models/          # Serialized models (e.g., pickle files)
+├── reports/         # Generated reports (e.g., HTML, PDFs)
+├── config/          # Configuration files (e.g., database connection details)
+├── README.md        # Project documentation
+└── requirements.txt # Python dependencies</code></p>
+<p>This organized structure makes your project maintainable, reproducible, and scalable.</p>
+<p><strong>2. Analysis Model &amp; Strategy</strong></p>
+<p>Since you're not specifying a specific task beyond working with ChEMBL data, let's outline a simple, common drug discovery workflow that you can adapt:</p>
+<ul>
+<li><strong>Data Extraction &amp; Preparation:</strong>  Fetch data from ChEMBL using SQL, focusing on bioactivity data (e.g., IC50 values) and compound structures (SMILES).  Convert SMILES strings to RDKit molecules.</li>
+<li><strong>Exploratory Data Analysis (EDA):</strong> Calculate molecular properties using RDKit (e.g., molecular weight, LogP, number of hydrogen bond donors/acceptors).  Visualize the distributions of these properties.</li>
+<li><strong>Feature Engineering:</strong>  Generate more complex molecular descriptors or fingerprints using RDKit (e.g., Morgan fingerprints).</li>
+<li><strong>Modeling (Regression):</strong>  Build a regression model to predict bioactivity (e.g., IC50) based on the calculated molecular descriptors. Common choices are linear regression, Random Forest, or Support Vector Regression.</li>
+<li><strong>Model Evaluation:</strong>  Assess the model's performance using metrics like Mean Squared Error (MSE), R-squared, and other relevant measures.</li>
+<li><strong>Iterate:</strong> refine the analysis steps above</li>
+</ul>
+<p><strong>3. SQL Code (Extracting Data)</strong></p>
+<p>```sql
+-- File: data/chembl_data.sql</p>
+<p>SELECT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.relation
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type = 'IC50'  -- Focus on IC50 values
+    AND act.standard_units = 'nM'  -- Focus on nM units
+    AND act.relation = '=' --Only select the exactly value (=)
+    AND act.standard_value ~ '^[0-9.]+$' -- ensure <code>standard_value</code> contains only numeric value
+LIMIT 100;  -- Limit to 100 rows
+-- Ensure you have created an output to save the result as a CSV file.
+-- For example, in pgAdmin, right-click on the query result and select "Copy with Headers" or "Save as CSV".
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong><code>molecule_dictionary</code>, <code>compound_structures</code>, <code>activities</code></strong>:  These are core ChEMBL tables.</li>
+<li><strong><code>JOIN</code></strong>:  Connects the tables based on molecule identifiers (<code>molregno</code>).</li>
+<li><strong><code>WHERE</code></strong>:  Filters the data to IC50 values in nM, and retrieves the standard value.</li>
+<li><strong><code>LIMIT 100</code></strong>:  Restricts the output to the first 100 rows for faster testing.</li>
+<li><strong><code>act.standard_value ~ '^[0-9\.]+$'</code></strong>:  This regular expression filter makes sure that the <code>standard_value</code> column contains only numbers and periods, preventing errors during numeric conversion in Python.  <strong>This addresses error (a) in your question.</strong></li>
+</ul>
+<p><strong>How to Run (using psql or pgAdmin):</strong></p>
+<ol>
+<li>
+<p><strong>psql:</strong>
+    <code>bash
+    psql -h 192.168.206.136 -U rd -d chembl_35 -f data/chembl_data.sql -o data/chembl_data.csv -F ',' -A -t</code></p>
+<ul>
+<li><code>-h</code>: Host IP address</li>
+<li><code>-U</code>: User</li>
+<li><code>-d</code>: Database name</li>
+<li><code>-f</code>: SQL file</li>
+<li><code>-o</code>: Output file</li>
+<li><code>-F ','</code>: Set the field separator to a comma for CSV format.</li>
+<li><code>-A</code>: Turn off unaligned output.</li>
+<li><code>-t</code>: Turn off table header and row count output.</li>
+</ul>
+</li>
+<li>
+<p><strong>pgAdmin:</strong></p>
+<ul>
+<li>Connect to your PostgreSQL server.</li>
+<li>Open a query window for the <code>chembl_35</code> database.</li>
+<li>Paste the SQL code into the query window.</li>
+<li>Execute the query.</li>
+<li>Right-click on the query result grid.</li>
+<li>Select "Copy with Headers" or "Save as CSV" to save the result to <code>data/chembl_data.csv</code>.</li>
+</ul>
+</li>
+</ol>
+<p><strong>4. Python Code (Notebook Example - <code>Topic_CheMBL_35_53_1_EDA.ipynb</code>)</strong></p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_53_1_EDA.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns</p>
+<h1>Define the base path based on your project structure</h1>
+<p>base_path = os.getcwd()  # Assuming notebook is in the "notebooks" directory</p>
+<h1>Load the data</h1>
+<p>data_path = os.path.join(base_path, 'data', 'chembl_data.csv')  # Fix: Correct path
+print(f"Loading data from: {data_path}")
+try:
+    df = pd.read_csv(data_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}.  Make sure you ran the SQL query and saved the CSV correctly.")
+    raise  # Re-raise the exception to stop execution</p>
+<p>print(df.head())
+print(df.shape)</p>
+<h1>Data Cleaning and Conversion</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce') # Convert to numeric
+df = df.dropna(subset=['standard_value']) # Remove any rows where conversion failed
+df = df[df['relation'] == '='] # Filter the records with relation
+df = df[df['standard_units'] == 'nM'] # Filter the records with units
+print(df.shape)</p>
+<h1>RDKit Molecule Creation</h1>
+<p>df['molecule'] = df['canonical_smiles'].apply(lambda x: Chem.MolFromSmiles(x))
+df = df.dropna(subset=['molecule']) # Remove invalid SMILES
+print(df.shape)</p>
+<h1>Calculate Molecular Properties (Example)</h1>
+<p>def calculate_mw(mol):
+    try:
+        return Descriptors.MolWt(mol)
+    except:
+        return None</p>
+<p>df['molecular_weight'] = df['molecule'].apply(calculate_mw)
+df = df.dropna(subset=['molecular_weight'])</p>
+<h1>Basic EDA (Example)</h1>
+<p>plt.figure(figsize=(8, 6))
+sns.histplot(df['molecular_weight'], kde=True)
+plt.title('Distribution of Molecular Weight')
+plt.xlabel('Molecular Weight')
+plt.ylabel('Frequency')
+plt.show()</p>
+<h1>Display data structure</h1>
+<p>print(df.info())
+```</p>
+<p><strong>Explanation:</strong></p>
+<ol>
+<li><strong>Path Handling:</strong>  Uses <code>os.path.join</code> to construct the correct file path.  Includes error handling for file not found.</li>
+<li><strong>Data Loading:</strong> Reads the CSV file into a Pandas DataFrame.</li>
+<li><strong>Data Cleaning:</strong>  Handles missing values (<code>dropna</code>), converts <code>standard_value</code> to numeric, and removes rows with invalid SMILES.</li>
+<li><strong>RDKit Integration:</strong> Creates RDKit molecule objects from SMILES strings.</li>
+<li><strong>Molecular Property Calculation:</strong>  Demonstrates calculating molecular weight using RDKit.</li>
+<li><strong>EDA:</strong>  Creates a simple histogram of molecular weights.</li>
+<li><strong>Error handling</strong>: Added try and except block</li>
+</ol>
+<p><strong>5. Python Code (Notebook Example - <code>Topic_CheMBL_35_53_2_Model.ipynb</code>)</strong></p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_53_2_Model.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
+import warnings
+warnings.filterwarnings('ignore')</p>
+<h1>Define the base path</h1>
+<p>base_path = os.getcwd()</p>
+<h1>Load the data</h1>
+<p>data_path = os.path.join(base_path, 'data', 'chembl_data.csv')
+df = pd.read_csv(data_path)</p>
+<h1>Data Cleaning and Conversion (same as in EDA notebook)</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce') # Convert to numeric
+df = df.dropna(subset=['standard_value']) # Remove any rows where conversion failed
+df = df[df['relation'] == '='] # Filter the records with relation
+df = df[df['standard_units'] == 'nM'] # Filter the records with units</p>
+<h1>RDKit Molecule Creation</h1>
+<p>df['molecule'] = df['canonical_smiles'].apply(lambda x: Chem.MolFromSmiles(x))
+df = df.dropna(subset=['molecule'])</p>
+<h1>Feature Engineering (Morgan Fingerprints)</h1>
+<p>def calculate_morgan_fingerprint(mol, radius=2, nBits=2048):
+    try:
+        return AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=nBits)
+    except:
+        return None</p>
+<p>df['fingerprint'] = df['molecule'].apply(calculate_morgan_fingerprint)
+df = df.dropna(subset=['fingerprint'])</p>
+<h1>Prepare Data for Modeling</h1>
+<p>X = np.array([list(fp) for fp in df['fingerprint']])  # Convert fingerprints to numpy array
+y = np.log10(df['standard_value'])  # Log transform IC50 values (important for skewed data)</p>
+<h1>Data Scaling</h1>
+<p>scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X) # Scale the features</p>
+<h1>Split Data</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)</p>
+<h1>Model Training</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Model Evaluation</h1>
+<p>y_pred = model.predict(X_test)</p>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Save the model (optional)</h1>
+<p>import joblib
+model_path = os.path.join(base_path, 'models', 'linear_regression_model.pkl')
+joblib.dump(model, model_path)
+print(f"Model saved to {model_path}")
+```</p>
+<p><strong>Explanation:</strong></p>
+<ol>
+<li><strong>Feature Engineering:</strong> Calculates Morgan fingerprints (ECFP4) using RDKit. This converts the molecule structure into numerical representation.</li>
+<li><strong>Data Preparation:</strong> Converts fingerprints to a NumPy array suitable for scikit-learn.  Log-transforms the <code>standard_value</code> (IC50) to handle skewed data, which is very common in bioactivity data.</li>
+<li><strong>Data Scaling</strong>: Apply feature scaling with StandardScaler</li>
+<li><strong>Data Splitting:</strong> Splits the data into training and testing sets.</li>
+<li><strong>Model Training:</strong> Trains a Linear Regression model.  This is a simple example; you can experiment with other models like Random Forest or Support Vector Regression.</li>
+<li><strong>Model Evaluation:</strong> Calculates MSE and R-squared to evaluate the model's performance.</li>
+<li><strong>Model Saving (Optional):</strong> Demonstrates how to save the trained model using <code>joblib</code>.</li>
+</ol>
+<p><strong>Addressing Error (b): Old scikit-learn version</strong></p>
+<p>The error "old scikit-learn version does not support parameters squared=False in the mean_squared_error function" means your scikit-learn version is too old.  The <code>squared=False</code> parameter was introduced in a later version of scikit-learn.</p>
+<p><strong>Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Upgrade scikit-learn:</strong></p>
+<p><code>bash
+pip install --upgrade scikit-learn</code></p>
+</li>
+<li>
+<p><strong>Remove <code>squared=False</code> (Alternative if upgrading isn't possible):</strong></p>
+<p>If you <em>cannot</em> upgrade scikit-learn for some reason, remove the <code>squared=False</code> argument from the <code>mean_squared_error</code> function.  The default behavior (without <code>squared=False</code>) is to return the <em>mean squared error</em>.  If you want the root mean squared error (RMSE), take the square root of the MSE:</p>
+<p><code>python
+mse = mean_squared_error(y_test, y_pred)  # Remove squared=False
+rmse = np.sqrt(mse) # Calculate the RMSE manually
+print(f"Root Mean Squared Error: {rmse}")</code></p>
+</li>
+</ol>
+<p><strong>6. Five Examples</strong></p>
+<p>Here are 5 example modifications or extensions you can make to the above code:</p>
+<ol>
+<li>
+<p><strong>Different Regression Model:</strong> Replace <code>LinearRegression</code> with <code>RandomForestRegressor</code> or <code>SVR</code> (Support Vector Regression) from scikit-learn.  You'll need to import the appropriate class from <code>sklearn.ensemble</code> or <code>sklearn.svm</code>.  Experiment with hyperparameter tuning for better performance.</p>
+<p><code>python
+from sklearn.ensemble import RandomForestRegressor
+model = RandomForestRegressor(n_estimators=100, random_state=42)  # Example hyperparameters</code></p>
+</li>
+<li>
+<p><strong>More Molecular Descriptors:</strong> Add more RDKit descriptors.  Explore the <code>rdkit.Chem.Descriptors</code> module for properties like LogP, number of hydrogen bond donors/acceptors, TPSA, etc.  Add these as columns to your DataFrame.  Be careful of multicollinearity (highly correlated descriptors).</p>
+<p><code>python
+df['logp'] = df['molecule'].apply(lambda x: Descriptors.MolLogP(x))
+df['hbd'] = df['molecule'].apply(lambda x: Descriptors.NumHDonors(x))</code></p>
+</li>
+<li>
+<p><strong>Different Fingerprint Type:</strong> Experiment with different types of RDKit fingerprints, such as <code>AtomPairFP</code> or <code>TopologicalTorsion</code>. You'll need to adjust the code to use the appropriate RDKit functions.</p>
+<p>```python
+from rdkit.Chem import AtomPairs
+def calculate_atom_pair_fingerprint(mol):
+    try:
+        return AtomPairs.GetAtomPairFingerprint(mol)
+    except:
+        return None</p>
+<p>df['fingerprint'] = df['molecule'].apply(calculate_atom_pair_fingerprint)
+```</p>
+<p><strong>Important:</strong> AtomPairFingerprint and TopologicalTorsionFingerprint are sparse fingerprints. You might need to convert them to dense vectors before using them in scikit-learn:</p>
+<p>```python
+from rdkit.Chem import AtomPairs
+from scipy.sparse import csr_matrix
+def calculate_atom_pair_fingerprint(mol):
+    try:
+        fp = AtomPairs.GetAtomPairFingerprint(mol)
+        return fp
+    except:
+        return None
+df['fingerprint'] = df['molecule'].apply(calculate_atom_pair_fingerprint)
+df = df.dropna(subset=['fingerprint'])</p>
+<h1>Convert sparse fingerprints to dense vectors</h1>
+<p>X = []
+for fp in df['fingerprint']:
+    X.append(fp.ToList())  # Convert to a list of integers
+X = np.array(X)
+```</p>
+</li>
+<li>
+<p><strong>Data Visualization:</strong> Create more informative visualizations using <code>matplotlib</code> or <code>seaborn</code>. Examples include scatter plots of predicted vs. actual values, box plots of bioactivity values for different compound classes, or heatmaps of descriptor correlations.</p>
+<p><code>python
+plt.figure(figsize=(8, 6))
+plt.scatter(y_test, y_pred, alpha=0.5)
+plt.xlabel('Actual Log IC50')
+plt.ylabel('Predicted Log IC50')
+plt.title('Predicted vs. Actual Log IC50')
+plt.show()</code></p>
+</li>
+<li>
+<p><strong>Cross-Validation:</strong> Implement cross-validation to get a more robust estimate of model performance. Use <code>KFold</code> or <code>cross_val_score</code> from <code>sklearn.model_selection</code>.</p>
+<p><code>python
+from sklearn.model_selection import cross_val_score, KFold
+model = LinearRegression()
+cv = KFold(n_splits=5, shuffle=True, random_state=42)  # 5-fold cross-validation
+scores = cross_val_score(model, X_scaled, y, cv=cv, scoring='neg_mean_squared_error')
+mse_scores = -scores  # Convert negative MSE to positive MSE
+print("Cross-validation MSE:", mse_scores)
+print("Mean MSE:", mse_scores.mean())</code></p>
+</li>
+</ol>
+<p><strong>7. Error Handling and Logging</strong></p>
+<p>Incorporate comprehensive error handling (using <code>try...except</code> blocks) and logging to make your code more robust and easier to debug. Use the <code>logging</code> module in Python.</p>
+<p><strong>Summary (In summary)</strong></p>
+<p>You now have a solid foundation for your ChEMBL 35 data analysis project. Remember to adapt the code snippets and examples to your specific research questions and data. Good luck!</p>
+<p><strong>Résumé (French Translation)</strong></p>
+<p>Vous avez maintenant une base solide pour votre projet d'analyse de données ChEMBL 35. N'oubliez pas d'adapter les extraits de code et les exemples à vos questions de recherche spécifiques et à vos données. Bonne chance !</p>
+<p><strong>Key Considerations:</strong></p>
+<ul>
+<li><strong>Database Connection Security:</strong>  Avoid hardcoding database credentials directly in your notebooks or code. Use environment variables or a configuration file (<code>config/</code>) to store sensitive information securely.</li>
+<li><strong>Reproducibility:</strong>  Use a <code>requirements.txt</code> file to specify all Python dependencies. This ensures that your project can be easily reproduced by others.  Use a consistent random seed (<code>random_state</code>) in your code for reproducibility.</li>
+<li><strong>Documentation:</strong>  Write clear and concise comments in your code and maintain a <code>README.md</code> file to document your project.</li>
+</ul>
+<p>This comprehensive guide should help you get started and address the issues you've encountered. Let me know if you have any more questions.</p>
+        </body>
+        </html>
+        

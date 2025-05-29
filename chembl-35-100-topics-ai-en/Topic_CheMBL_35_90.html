@@ -1,0 +1,535 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_90</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Merging ChEMBL with chemical vendor data</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project using RDKit, with a specific focus on the <code>Topic_CheMBL_35_90</code> topic. You're facing issues with SQL operators and scikit-learn version compatibility, and you want to follow an AIMLops-inspired folder structure. Let's break down the analysis, provide the code, and address the errors.</p>
+<p><strong>1. Analysis Model</strong></p>
+<p>The core of your analysis will likely involve:</p>
+<ul>
+<li><strong>Data Extraction (SQL):</strong>  Fetching relevant data from the Chembl 35 database. This will involve querying specific tables (e.g., <code>activities</code>, <code>molecule_dictionary</code>, etc.) based on your <code>Topic_CheMBL_35_90</code> topic. You'll be filtering and limiting the data to 100 rows to manage the processing load.</li>
+<li><strong>Data Preprocessing (Python/RDKit):</strong>  Cleaning, transforming, and preparing the data for analysis.  This involves handling missing values, converting SMILES strings to RDKit molecules, and potentially calculating molecular descriptors.</li>
+<li><strong>Exploratory Data Analysis (Python):</strong>  Exploring the data to understand its distribution, relationships between variables, and potential insights. This will involve using libraries like Pandas, Matplotlib, and Seaborn for visualization and statistical analysis.</li>
+<li><strong>Modeling (Python):</strong>  Developing a predictive model to analyze activities. Possible models include:<ul>
+<li><strong>Regression Models:</strong>  If your activity data is continuous (e.g., IC50 values), you might use linear regression, support vector regression (SVR), or random forest regression.</li>
+<li><strong>Classification Models:</strong>  If your activity data is categorical (e.g., active/inactive), you might use logistic regression, support vector machines (SVM), or random forest classification.</li>
+</ul>
+</li>
+<li><strong>Evaluation (Python):</strong>  Assessing the performance of your model using appropriate metrics (e.g., R-squared, RMSE for regression; accuracy, precision, recall for classification).</li>
+</ul>
+<p><strong>2. Folder Structure (AIMLops Inspired)</strong></p>
+<p>Given your description, let's define the folder structure. I'll assume a simplified structure for this example. Adjust as needed.</p>
+<p><code>project_root/
+├── data/           # CSV files extracted from Chembl
+├── notebooks/      # Jupyter notebooks
+│   ├── Topic_CheMBL_35_90_1_data_extraction.ipynb
+│   ├── Topic_CheMBL_35_90_2_data_preprocessing.ipynb
+│   ├── Topic_CheMBL_35_90_3_eda.ipynb
+│   ├── Topic_CheMBL_35_90_4_modeling.ipynb
+│   └── Topic_CheMBL_35_90_5_evaluation.ipynb
+├── sql/            # SQL scripts
+│   └── Topic_CheMBL_35_90_extraction.sql
+└── README.md       # Project description</code></p>
+<p><strong>3. Code (SQL &amp; Python)</strong></p>
+<p>Here's the SQL and Python code, addressing the errors and filtering to 100 rows.</p>
+<p><strong>3.1 SQL Code (<code>sql/Topic_CheMBL_35_90_extraction.sql</code>)</strong></p>
+<p>```sql
+-- SQL script to extract activity data from ChEMBL 35, limited to 100 rows
+-- based on Topic_CheMBL_35_90</p>
+<p>-- Adjust this WHERE clause according to your 'Topic_CheMBL_35_90' criteria
+-- This is a placeholder - you MUST replace it with your actual filtering logic.
+-- Example:  Targeting a specific target protein.  Replace 'CHEMBL205' with your actual target chembl_id
+-- Example targeting: CHEMBL205
+SELECT
+    md.chembl_id,
+    act.standard_value,
+    act.standard_units,
+    act.standard_type
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.chembl_id = 'CHEMBL205' -- Filter by the target chembl_id for TOPIC_CheMBL_35_90
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_units = 'nM'
+    AND act.standard_type = 'IC50'
+    AND act.standard_value::text ~ '^[0-9.]+$' -- Corrected operator for numeric check</p>
+<p>LIMIT 100;
+```</p>
+<p><strong>Explanation of SQL Correction:</strong></p>
+<ul>
+<li><strong><code>act.standard_value::text ~ '^[0-9\.]+$'</code></strong>:  The error <code>ERROR: operator does not exist: numeric ~ unknown</code> occurs because you are trying to use the regular expression operator <code>~</code> directly on a numeric column.  The corrected code casts the <code>standard_value</code> to text (<code>::text</code>) before applying the regular expression, allowing the check to work correctly. The regular expression <code>^[0-9\.]+$</code> ensures that the value contains only digits and periods.</li>
+</ul>
+<p><strong>3.2 Python Code (Jupyter Notebooks)</strong></p>
+<p>Here's the Python code, split across several notebooks to align with your structure.</p>
+<p><strong>Notebook 1: <code>notebooks/Topic_CheMBL_35_90_1_data_extraction.ipynb</code></strong></p>
+<p>```python
+import os
+import psycopg2
+import pandas as pd</p>
+<h1>Database credentials</h1>
+<p>db_ip = '192.168.206.136'
+db_user = 'rd'
+db_pass = 'rd'
+db_name = 'chembl_35'</p>
+<h1>Output file path</h1>
+<p>base_path = os.getcwd()  # Get current working directory, which should be 'project_root'
+data_path = os.path.join(base_path, 'data', 'chembl_35_data.csv')
+sql_path = os.path.join(base_path, 'sql', 'Topic_CheMBL_35_90_extraction.sql')</p>
+<h1>Function to execute SQL query and save to CSV</h1>
+<p>def extract_data(sql_file, csv_file, db_host, db_name, db_user, db_pass):
+    try:
+        # Read SQL query from file
+        with open(sql_file, 'r') as f:
+            sql_query = f.read()</p>
+<pre><code>    # Connect to PostgreSQL
+    conn = psycopg2.connect(host=db_host, database=db_name, user=db_user, password=db_pass)
+    cur = conn.cursor()
+
+    # Execute the query
+    cur.execute(sql_query)
+
+    # Fetch the results
+    results = cur.fetchall()
+
+    # Get column names
+    column_names = [desc[0] for desc in cur.description]
+
+    # Convert results to a Pandas DataFrame
+    df = pd.DataFrame(results, columns=column_names)
+
+    # Save DataFrame to CSV
+    df.to_csv(csv_file, index=False)
+
+    print(f"Data extracted and saved to {csv_file}")
+
+except Exception as e:
+    print(f"Error: {e}")
+
+finally:
+    if conn:
+        cur.close()
+        conn.close()
+</code></pre>
+<h1>Run the extraction</h1>
+<p>extract_data(sql_path, data_path, db_ip, db_name, db_user, db_pass)
+```</p>
+<p><strong>Notebook 2: <code>notebooks/Topic_CheMBL_35_90_2_data_preprocessing.ipynb</code></strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+import numpy as np</p>
+<h1>Input CSV file path</h1>
+<p>base_path = os.getcwd()
+data_path = os.path.join(base_path, 'data', 'chembl_35_data.csv')</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}.  Make sure you ran the data extraction notebook first.")
+    exit()</p>
+<h1>Data Cleaning and Transformation</h1>
+<p>def preprocess_data(df):
+    # 1. Handle Missing Values (if any) - Replace with median for numeric columns
+    for col in df.columns:
+        if df[col].dtype in ['int64', 'float64']:
+            df[col] = df[col].fillna(df[col].median())  # Or another strategy</p>
+<pre><code># 2. Convert ChEMBL ID to SMILES (This requires another query or a lookup table - placeholder)
+# This assumes you have a way to get SMILES from ChEMBL ID.
+# For demonstration, I'll create fake SMILES.  REPLACE THIS WITH REAL LOOKUP.
+smiles_list = ['CC(=O)Oc1ccccc1C(=O)O' for _ in range(len(df))]  # Dummy SMILES
+df['smiles'] = smiles_list
+
+# 3. Convert SMILES to RDKit Mol objects
+df['mol'] = df['smiles'].apply(lambda x: Chem.MolFromSmiles(x))
+
+# 4. Remove rows with invalid molecules
+df = df[df['mol'].notna()]
+
+# 5. Standardize Activity Values (e.g., convert all to pIC50 if necessary)
+# Assuming you want to convert IC50 to pIC50.  This part is crucial and needs adjustment based on your activity data
+# and topic
+df = df[df['standard_value'].notna()]
+df['pIC50'] = -np.log10(df['standard_value'].astype(float) * 1e-9)  # Convert IC50 in nM to pIC50
+
+return df
+</code></pre>
+<p>df = preprocess_data(df.copy()) # Work on a copy to avoid modifying the original DataFrame</p>
+<p>print(df.head())
+print(df.dtypes)
+```</p>
+<p><strong>Notebook 3: <code>notebooks/Topic_CheMBL_35_90_3_eda.ipynb</code></strong></p>
+<p>```python
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<h1>Load the preprocessed data</h1>
+<p>base_path = os.getcwd()
+data_path = os.path.join(base_path, 'data', 'chembl_35_data.csv')</p>
+<p>try:
+    df = pd.read_csv(data_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}.  Make sure you ran the data extraction notebook first.")
+    exit()</p>
+<h1>Basic EDA</h1>
+<p>print(df.describe())</p>
+<h1>Distribution of pIC50 values</h1>
+<p>plt.figure(figsize=(8, 6))
+sns.histplot(df['pIC50'], kde=True)
+plt.title('Distribution of pIC50 Values')
+plt.xlabel('pIC50')
+plt.ylabel('Frequency')
+plt.show()</p>
+<h1>Example:  Correlation between molecular weight and pIC50 (requires descriptor calculation in preprocessing)</h1>
+<h1>from rdkit.Chem import Descriptors  # Import inside this notebook to avoid circular dependencies</h1>
+<h1>df['mol_wt'] = df['mol'].apply(Descriptors.MolWt)  # Requires 'mol' column from previous notebook</h1>
+<h1>plt.figure(figsize=(8, 6))</h1>
+<h1>sns.scatterplot(x='mol_wt', y='pIC50', data=df)</h1>
+<h1>plt.title('Molecular Weight vs. pIC50')</h1>
+<h1>plt.xlabel('Molecular Weight')</h1>
+<h1>plt.ylabel('pIC50')</h1>
+<h1>plt.show()</h1>
+<h1>Add more EDA based on your specific questions and topic.</h1>
+<p>```</p>
+<p><strong>Notebook 4: <code>notebooks/Topic_CheMBL_35_90_4_modeling.ipynb</code></strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit.Chem import AllChem
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+from joblib import dump</p>
+<h1>Load the preprocessed data</h1>
+<p>base_path = os.getcwd()
+data_path = os.path.join(base_path, 'data', 'chembl_35_data.csv')</p>
+<p>try:
+    df = pd.read_csv(data_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}.  Make sure you ran the data extraction notebook first.")
+    exit()</p>
+<h1>Feature Generation (using RDKit)</h1>
+<p>def generate_descriptors(mol):
+    fp = AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=2048) #EFCF6 fingerprints with radius 2
+    return list(fp)</p>
+<p>df['descriptors'] = df['mol'].apply(generate_descriptors)</p>
+<h1>Prepare data for modeling</h1>
+<p>X = list(df['descriptors'])
+y = df['pIC50']</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a RandomForestRegressor model</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f'Mean Squared Error: {mse}')
+print(f'R-squared: {r2}')</p>
+<h1>Save the model</h1>
+<p>model_path = os.path.join(base_path, 'models', 'random_forest_model.joblib')
+os.makedirs(os.path.join(base_path, 'models'), exist_ok=True)  # Create the 'models' directory if it doesn't exist
+dump(model, model_path)
+print(f"Model saved to {model_path}")
+```</p>
+<p><strong>Notebook 5: <code>notebooks/Topic_CheMBL_35_90_5_evaluation.ipynb</code></strong></p>
+<p>```python
+import os
+import pandas as pd
+from joblib import load
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<h1>Load the preprocessed data</h1>
+<p>base_path = os.getcwd()
+data_path = os.path.join(base_path, 'data', 'chembl_35_data.csv')
+model_path = os.path.join(base_path, 'models', 'random_forest_model.joblib')</p>
+<p>try:
+    df = pd.read_csv(data_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}.  Make sure you ran the data extraction notebook first.")
+    exit()</p>
+<h1>Load the model</h1>
+<p>try:
+    model = load(model_path)
+except FileNotFoundError:
+    print(f"Error: Model not found at {model_path}. Make sure you ran the modeling notebook first.")
+    exit()</p>
+<h1>Prepare data for evaluation</h1>
+<p>X = list(df['descriptors'])
+y = df['pIC50']</p>
+<h1>Split data into training and testing sets (consistent split is important for proper evaluation)</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)  # Same random_state as training!</p>
+<h1>Make predictions on the test set</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f'Mean Squared Error: {mse}')
+print(f'R-squared: {r2}')</p>
+<h1>Plot predicted vs. actual values</h1>
+<p>plt.figure(figsize=(8, 6))
+sns.scatterplot(x=y_test, y=y_pred)
+plt.xlabel('Actual pIC50')
+plt.ylabel('Predicted pIC50')
+plt.title('Actual vs. Predicted pIC50 Values')
+plt.show()</p>
+<h1>Residual plot</h1>
+<p>residuals = y_test - y_pred
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x=y_pred, y=residuals)
+plt.xlabel('Predicted pIC50')
+plt.ylabel('Residuals')
+plt.title('Residual Plot')
+plt.axhline(y=0, color='r', linestyle='--')  # Add a horizontal line at y=0
+plt.show()
+```</p>
+<p><strong>Explanation of Python Code:</strong></p>
+<ul>
+<li><strong>Data Loading:</strong>  The code loads the CSV file you create from the SQL query.  It uses <code>os.path.join</code> to correctly construct file paths based on your folder structure.</li>
+<li><strong>RDKit Integration:</strong>  It uses RDKit to convert SMILES strings to RDKit molecule objects (<code>Chem.MolFromSmiles</code>).</li>
+<li><strong>Descriptor Generation</strong>: Generates Molecular descriptors using RDKit</li>
+<li><strong>Model Training &amp; Prediction:</strong> Trains and evaluates a Random Forest Regressor model using sklearn</li>
+<li><strong>pIC50 Calculation:</strong> Converts IC50 values to pIC50 values.  <strong>Important:</strong> Adapt this part to your specific activity data.</li>
+<li><strong>Error Handling:</strong>  Includes <code>try...except</code> blocks to gracefully handle potential errors like file not found.</li>
+<li><strong>File Paths:</strong>  Uses <code>os.path.join</code> to create platform-independent file paths.</li>
+<li><strong>Scikit-learn:</strong> It utilizes scikit-learn for model building and evaluation.</li>
+<li><strong>Model Saving:</strong> Saves the trained model using <code>joblib</code> for later use.</li>
+</ul>
+<p><strong>Addressing the <code>squared=False</code> error:</strong></p>
+<p>The error "old scikit-learn version does not support parameters squared=False in the mean_squared_error function" means you are using an older version of scikit-learn.  The <code>squared</code> parameter was introduced in a later version.</p>
+<p><strong>Solution:</strong></p>
+<ol>
+<li>
+<p><strong>Update scikit-learn:</strong>  The best solution is to update scikit-learn to the latest version (or at least a version that supports <code>squared=False</code>).  You can do this using pip:</p>
+<p><code>bash
+pip install --upgrade scikit-learn</code></p>
+</li>
+<li>
+<p><strong>Alternative (if you cannot update):</strong>  If updating is not possible (e.g., due to environment constraints), you can calculate the RMSE manually:</p>
+<p>```python
+from sklearn.metrics import mean_squared_error
+import numpy as np</p>
+<h1>Calculate MSE</h1>
+<p>mse = mean_squared_error(y_test, y_pred)</p>
+<h1>Calculate RMSE (Root Mean Squared Error)</h1>
+<p>rmse = np.sqrt(mse)</p>
+<p>print(f'Root Mean Squared Error: {rmse}')  # Print RMSE instead of MSE if you need it
+```</p>
+</li>
+</ol>
+<p><strong>4. Examples for Topic_CheMBL_35_90</strong></p>
+<p>Here are five examples of how you might define your <code>Topic_CheMBL_35_90</code> and the corresponding SQL adjustments:</p>
+<ol>
+<li>
+<p><strong>Topic:</strong> Compounds active against a specific target protein (e.g., EGFR).</p>
+<ul>
+<li>
+<p><strong>SQL (Adjusted <code>WHERE</code> clause):</strong></p>
+<p><code>sql
+WHERE
+    td.chembl_id = 'CHEMBL205' -- EGFR
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_units = 'nM'
+    AND act.standard_type = 'IC50'
+    AND act.standard_value::text ~ '^[0-9\.]+$'
+LIMIT 100;</code></p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Topic:</strong> Compounds with high binding affinity to a specific target (e.g., Ki &lt; 100 nM for DHFR).</p>
+<ul>
+<li>
+<p><strong>SQL (Adjusted <code>WHERE</code> clause):</strong></p>
+<p><code>sql
+WHERE
+    td.chembl_id = 'CHEMBL134'  -- DHFR
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_units = 'nM'
+    AND act.standard_type = 'Ki'
+    AND act.standard_value::text ~ '^[0-9\.]+$'
+    AND act.standard_value &lt;= 100
+LIMIT 100;</code></p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Topic:</strong> Compounds that inhibit a specific enzyme (e.g., Acetylcholinesterase) with high potency (IC50 &lt; 50 nM).</p>
+<ul>
+<li>
+<p><strong>SQL (Adjusted <code>WHERE</code> clause):</strong></p>
+<p><code>sql
+WHERE
+    td.chembl_id = 'CHEMBL232' -- Acetylcholinesterase
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_units = 'nM'
+    AND act.standard_type = 'IC50'
+    AND act.standard_value::text ~ '^[0-9\.]+$'
+    AND act.standard_value &lt;= 50
+LIMIT 100;</code></p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Topic:</strong>  Selective inhibitors of a particular kinase (e.g., VEGFR2) compared to other kinases.</p>
+<ul>
+<li>
+<p><strong>SQL (More complex, requires subqueries or joins to compare activities against multiple targets):</strong></p>
+<p><code>sql
+-- This is a simplified example; a full implementation would need to compare activities
+-- across multiple target tables and involve subqueries or more complex joins.
+SELECT
+    md.chembl_id,
+    act.standard_value,
+    act.standard_units,
+    act.standard_type
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.chembl_id = 'CHEMBL302'  -- VEGFR2
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_units = 'nM'
+    AND act.standard_type = 'IC50'
+    AND act.standard_value::text ~ '^[0-9\.]+$'
+--  AND &lt;Add logic to compare VEGFR2 activity to activity against other kinases&gt;
+LIMIT 100;</code></p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Topic:</strong> Compounds with activity against a specific disease target (e.g., Alzheimer's Disease, requires linking to disease data in ChEMBL). This is often less direct and requires careful analysis of target-disease relationships.</p>
+<ul>
+<li>
+<p><strong>SQL (Requires understanding of ChEMBL's target-disease relationships.  This is a placeholder.):</strong></p>
+<p><code>sql
+--  This requires knowledge of how ChEMBL links targets to diseases.
+--  The following is a very generic placeholder and WILL NOT WORK without modification.
+SELECT
+    md.chembl_id,
+    act.standard_value,
+    act.standard_units,
+    act.standard_type
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+--  JOIN &lt;Other tables to link targets to Alzheimer's Disease&gt;
+WHERE
+    -- &lt;Filtering based on disease association - NEEDS SPECIFIC CHemBL TABLES/FIELDS&gt;
+    act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_units = 'nM'
+    AND act.standard_type = 'IC50'
+    AND act.standard_value::text ~ '^[0-9\.]+$'
+LIMIT 100;</code></p>
+</li>
+</ul>
+</li>
+</ol>
+<p><strong>Important Notes:</strong></p>
+<ul>
+<li><strong>Replace Placeholders:</strong>  You <strong>MUST</strong> replace the placeholder <code>WHERE</code> clauses in the SQL code with the actual logic for your <code>Topic_CheMBL_35_90</code>. The examples above are just illustrations.</li>
+<li><strong>SMILES Lookup:</strong> The Python code assumes you have a way to get SMILES strings from ChEMBL IDs. This might involve querying the <code>molecule_dictionary</code> table or using a separate lookup table.</li>
+<li><strong>Activity Standardization:</strong> The activity standardization (e.g., converting to pIC50) is crucial.  Adapt the code based on the specific activity types (IC50, Ki, EC50, etc.) and units in your data.</li>
+<li><strong>RDKit Installation:</strong>  Ensure you have RDKit installed: <code>conda install -c conda-forge rdkit</code> or <code>pip install rdkit</code>.</li>
+<li><strong>Error Handling:</strong> The code includes basic error handling. Add more robust error handling as needed.</li>
+<li><strong>Dependencies:</strong>  Make sure you have all the necessary Python libraries installed: <code>pandas</code>, <code>psycopg2</code>, <code>rdkit</code>, <code>scikit-learn</code>, <code>matplotlib</code>, <code>seaborn</code>, <code>joblib</code>.</li>
+<li><strong>Model Selection</strong>: Adjust your model based on your specific data and objectives.  Consider other regression or classification models.  Experiment with different hyperparameters.</li>
+<li><strong>Feature Engineering</strong>: Create new relevant features for your model.</li>
+</ul>
+<p><strong>In Summary</strong></p>
+<p>This provides a comprehensive guide to your project, addressing the errors, organizing the code, and providing examples. Remember to adapt the code to your specific <code>Topic_CheMBL_35_90</code> and data characteristics.  Good luck!</p>
+<p><strong>Traducción al Español (Spanish Translation)</strong></p>
+<p><strong>1. Análisis del Modelo (Spanish: Análisis del Modelo)</strong></p>
+<p>El núcleo de tu análisis probablemente involucrará:</p>
+<ul>
+<li><strong>Extracción de Datos (SQL):</strong> Obtener datos relevantes de la base de datos Chembl 35. Esto implicará consultar tablas específicas (ej., <code>activities</code>, <code>molecule_dictionary</code>, etc.) basadas en tu tema <code>Topic_CheMBL_35_90</code>.  Estarás filtrando y limitando los datos a 100 filas para manejar la carga de procesamiento.</li>
+<li><strong>Preprocesamiento de Datos (Python/RDKit):</strong> Limpiar, transformar y preparar los datos para el análisis. Esto implica manejar valores faltantes, convertir cadenas SMILES a moléculas RDKit y potencialmente calcular descriptores moleculares.</li>
+<li><strong>Análisis Exploratorio de Datos (Python):</strong> Explorar los datos para comprender su distribución, las relaciones entre las variables y las posibles ideas. Esto implicará el uso de bibliotecas como Pandas, Matplotlib y Seaborn para la visualización y el análisis estadístico.</li>
+<li><strong>Modelado (Python):</strong> Desarrollar un modelo predictivo para analizar las actividades.  Los modelos posibles incluyen:<ul>
+<li><strong>Modelos de Regresión:</strong> Si tus datos de actividad son continuos (ej., valores IC50), podrías usar regresión lineal, regresión de vector de soporte (SVR) o regresión de bosque aleatorio.</li>
+<li><strong>Modelos de Clasificación:</strong> Si tus datos de actividad son categóricos (ej., activo/inactivo), podrías usar regresión logística, máquinas de vector de soporte (SVM) o clasificación de bosque aleatorio.</li>
+</ul>
+</li>
+<li><strong>Evaluación (Python):</strong> Evaluar el rendimiento de tu modelo utilizando métricas apropiadas (ej., R-cuadrado, RMSE para regresión; precisión, exactitud, recall para clasificación).</li>
+</ul>
+<p><strong>2. Estructura de Carpetas (Inspirada en AIMLops) (Spanish: Estructura de Carpetas)</strong></p>
+<p>Dada tu descripción, definamos la estructura de carpetas. Asumiré una estructura simplificada para este ejemplo. Ajusta según sea necesario.  (See the folder structure above in English)</p>
+<p><strong>3. Código (SQL &amp; Python) (Spanish: Código)</strong></p>
+<p>Aquí está el código SQL y Python, abordando los errores y filtrando a 100 filas. (See the code above in English, paying attention to the SQL correction and the Python explanations).</p>
+<p><strong>Explicación de la Corrección de SQL (Spanish: Explicación de la Corrección de SQL):</strong></p>
+<p>El error <code>ERROR: operator does not exist: numeric ~ unknown</code> ocurre porque estás intentando usar el operador de expresión regular <code>~</code> directamente en una columna numérica. El código corregido convierte el <code>standard_value</code> a texto (<code>::text</code>) antes de aplicar la expresión regular, permitiendo que la comprobación funcione correctamente. La expresión regular <code>^[0-9\.]+$</code> asegura que el valor contenga sólo dígitos y puntos.</p>
+<p><strong>Abordando el error <code>squared=False</code> (Spanish: Abordando el error <code>squared=False</code>):</strong></p>
+<p>El error "old scikit-learn version does not support parameters squared=False in the mean_squared_error function" significa que estás utilizando una versión anterior de scikit-learn. El parámetro <code>squared</code> se introdujo en una versión posterior. (See the solution above in English)</p>
+<p><strong>4. Ejemplos para Topic_CheMBL_35_90 (Spanish: Ejemplos para Topic_CheMBL_35_90)</strong></p>
+<p>Aquí hay cinco ejemplos de cómo podrías definir tu <code>Topic_CheMBL_35_90</code> y los ajustes SQL correspondientes: (See the examples above in English, remember to translate the descriptions to Spanish if needed for clarity in your documentation).</p>
+<p><strong>Notas Importantes (Spanish: Notas Importantes):</strong></p>
+<ul>
+<li><strong>Reemplaza los Marcadores de Posición:</strong> Debes <strong>REEMPLAZAR</strong> las cláusulas <code>WHERE</code> de marcador de posición en el código SQL con la lógica real para tu <code>Topic_CheMBL_35_90</code>. Los ejemplos anteriores son sólo ilustraciones.</li>
+<li><strong>Búsqueda de SMILES:</strong> El código Python asume que tienes una forma de obtener cadenas SMILES de los ID de ChEMBL. Esto podría implicar consultar la tabla <code>molecule_dictionary</code> o usar una tabla de búsqueda separada.</li>
+<li><strong>Estandarización de la Actividad:</strong> La estandarización de la actividad (ej., conversión a pIC50) es crucial. Adapta el código en función de los tipos de actividad específicos (IC50, Ki, EC50, etc.) y las unidades en tus datos.</li>
+<li><strong>Instalación de RDKit:</strong> Asegúrate de tener RDKit instalado: <code>conda install -c conda-forge rdkit</code> o <code>pip install rdkit</code>.</li>
+<li><strong>Manejo de Errores:</strong> El código incluye un manejo de errores básico. Añade un manejo de errores más robusto según sea necesario.</li>
+<li><strong>Dependencias:</strong> Asegúrate de tener todas las bibliotecas de Python necesarias instaladas: <code>pandas</code>, <code>psycopg2</code>, <code>rdkit</code>, <code>scikit-learn</code>, <code>matplotlib</code>, <code>seaborn</code>, <code>joblib</code>.</li>
+<li><strong>Selección de Modelo</strong>: Ajusta tu modelo según tus datos y objetivos específicos. Considera otros modelos de regresión o clasificación. Experimenta con diferentes hiperparámetros.</li>
+<li><strong>Ingeniería de Características</strong>: Crea nuevas características relevantes para tu modelo.</li>
+</ul>
+<p><strong>En Resumen (Spanish: En Resumen)</strong></p>
+<p>Esto proporciona una guía completa para tu proyecto, abordando los errores, organizando el código y proporcionando ejemplos. Recuerda adaptar el código a tu <code>Topic_CheMBL_35_90</code> específico y a las características de los datos. ¡Buena suerte!</p>
+        </body>
+        </html>
+        

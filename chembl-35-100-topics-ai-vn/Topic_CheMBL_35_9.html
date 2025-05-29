@@ -1,0 +1,254 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_9</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Tìm kiếm tương đồng Tanimoto với ChEMBL và RDKit</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 bằng RDKit. Dưới đây là phân tích chi tiết, hướng dẫn, và các ví dụ code để bạn bắt đầu, tập trung vào chủ đề <strong>Topic_CheMBL_35_9</strong>.</p>
+<p><strong>1. Phân tích và Mô hình Phân tích (Analysis and Analysis Model)</strong></p>
+<p><strong>Chủ đề (Topic):</strong> Topic_CheMBL_35_9 có thể liên quan đến một mục tiêu cụ thể (ví dụ: một protein, một loại enzyme) hoặc một loại hoạt động sinh học (ví dụ: ức chế, kích hoạt). Phân tích này sẽ tập trung vào việc xây dựng mô hình dự đoán hoạt tính của các hợp chất dựa trên cấu trúc hóa học của chúng.</p>
+<p><strong>Mô hình phân tích (Analysis Model):</strong></p>
+<ul>
+<li><strong>Thu thập dữ liệu (Data Acquisition):</strong> Lấy dữ liệu từ cơ sở dữ liệu ChEMBL 35.</li>
+<li><strong>Tiền xử lý dữ liệu (Data Preprocessing):</strong><ul>
+<li>Làm sạch dữ liệu: Loại bỏ các giá trị không hợp lệ, trùng lặp.</li>
+<li>Chuẩn hóa dữ liệu: Đảm bảo tính nhất quán của dữ liệu.</li>
+<li>Tính toán các thuộc tính cấu trúc (Molecular Descriptors): Sử dụng RDKit để tính toán các thuộc tính hóa học từ SMILES (Simplified Molecular Input Line Entry System).</li>
+</ul>
+</li>
+<li><strong>Lựa chọn đặc trưng (Feature Selection):</strong> Chọn các thuộc tính quan trọng nhất để xây dựng mô hình.</li>
+<li><strong>Xây dựng mô hình (Model Building):</strong> Sử dụng các thuật toán học máy (ví dụ: Random Forest, Support Vector Machines) để xây dựng mô hình dự đoán.</li>
+<li><strong>Đánh giá mô hình (Model Evaluation):</strong> Đánh giá hiệu suất của mô hình bằng các chỉ số phù hợp (ví dụ: RMSE, R^2).</li>
+</ul>
+<p><strong>2. Hướng dẫn song ngữ (Bilingual Instructions)</strong></p>
+<p><strong>Tiếng Anh (English):</strong></p>
+<p>This analysis focuses on building a predictive model for compound activity based on their chemical structures. The process involves data acquisition from ChEMBL 35, preprocessing (cleaning, standardization), calculating molecular descriptors using RDKit, feature selection, model building using machine learning algorithms, and model evaluation.</p>
+<p><strong>Tiếng Việt (Vietnamese):</strong></p>
+<p>Phân tích này tập trung vào việc xây dựng mô hình dự đoán hoạt tính của các hợp chất dựa trên cấu trúc hóa học của chúng. Quá trình này bao gồm thu thập dữ liệu từ ChEMBL 35, tiền xử lý dữ liệu (làm sạch, chuẩn hóa), tính toán các thuộc tính phân tử bằng RDKit, lựa chọn đặc trưng, xây dựng mô hình bằng các thuật toán học máy, và đánh giá mô hình.</p>
+<p><strong>3. Code SQL và Python (SQL and Python Code)</strong></p>
+<p><strong>SQL (để lấy dữ liệu từ ChEMBL 35):</strong></p>
+<p><code>sql
+-- Select 100 rows for demonstration purposes
+SELECT DISTINCT
+    act.molregno,
+    act.standard_value,
+    act.standard_units,
+    act.standard_type,
+    md.chembl_id,
+    md.canonical_smiles
+FROM activities act
+JOIN molecule_dictionary md ON act.molregno = md.molregno
+WHERE act.standard_type = 'IC50'  -- You can change this to your desired activity type
+  AND act.standard_units = 'nM'
+  AND act.standard_value IS NOT NULL
+  AND act.standard_value &gt; 0 -- Exclude zero values
+  AND act.standard_value ~ '^[0-9\.]+$' -- Ensure standard_value is numeric
+LIMIT 100;</code></p>
+<p><strong>Giải thích (Explanation):</strong></p>
+<ul>
+<li><code>SELECT DISTINCT</code>: Chọn các hàng duy nhất.</li>
+<li><code>act.molregno</code>: ID phân tử.</li>
+<li><code>act.standard_value</code>: Giá trị hoạt tính.</li>
+<li><code>act.standard_units</code>: Đơn vị hoạt tính.</li>
+<li><code>act.standard_type</code>: Loại hoạt tính (ví dụ: IC50).</li>
+<li><code>md.chembl_id</code>: ChEMBL ID.</li>
+<li><code>md.canonical_smiles</code>: SMILES string (biểu diễn cấu trúc hóa học).</li>
+<li><code>FROM activities act JOIN molecule_dictionary md ON act.molregno = md.molregno</code>: Kết nối hai bảng <code>activities</code> và <code>molecule_dictionary</code> dựa trên <code>molregno</code>.</li>
+<li><code>WHERE act.standard_type = 'IC50'</code>: Lọc theo loại hoạt tính.</li>
+<li><code>AND act.standard_units = 'nM'</code>: Lọc theo đơn vị hoạt tính.</li>
+<li><code>AND act.standard_value IS NOT NULL</code>: Loại bỏ các giá trị NULL.</li>
+<li><code>AND act.standard_value &gt; 0</code>: Loại bỏ các giá trị bằng 0.</li>
+<li><code>AND act.standard_value ~ '^[0-9\.]+$'</code>: <strong>Sửa lỗi (Fixing the Error)</strong>: Đảm bảo rằng <code>standard_value</code> là một số.  Biểu thức chính quy <code>^[0-9\.]+$</code> kiểm tra xem chuỗi chỉ chứa các chữ số và dấu chấm.</li>
+<li><code>LIMIT 100</code>: Giới hạn kết quả ở 100 hàng.</li>
+</ul>
+<p><strong>Python (để tiền xử lý dữ liệu và tính toán thuộc tính):</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Define base path</h1>
+<p>base_path = '.'  # Adjust as needed</p>
+<h1>File path to the CSV file</h1>
+<p>csv_file_path = os.path.join(base_path, 'data', 'chembl_data.csv') # Replace 'chembl_data.csv' with your actual filename</p>
+<h1>Load data from CSV</h1>
+<p>try:
+    df = pd.read_csv(csv_file_path)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: File not found at {csv_file_path}")
+    exit()</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value']) # Drop rows with missing SMILES or standard_value</p>
+<h1>Convert standard_value to numeric and filter out non-numeric values</h1>
+<p>df = df[pd.to_numeric(df['standard_value'], errors='coerce').notna()]
+df['standard_value'] = pd.to_numeric(df['standard_value'])</p>
+<h1>Function to calculate molecular descriptors using RDKit</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    for name, func in Descriptors.descList:
+        try:
+            descriptors[name] = func(mol)
+        except:
+            descriptors[name] = np.nan  # Handle potential errors during descriptor calculation
+    return pd.Series(descriptors)</p>
+<h1>Apply the descriptor calculation to each SMILES string</h1>
+<p>descriptors_df = df['canonical_smiles'].apply(calculate_descriptors)</p>
+<h1>Merge descriptors with the main dataframe</h1>
+<p>df = pd.concat([df, descriptors_df], axis=1)</p>
+<h1>Remove rows with NaN values in descriptors</h1>
+<p>df = df.dropna(axis=0)</p>
+<h1>Feature Selection (Example: Select top 10 descriptors)</h1>
+<h1>You can use more sophisticated feature selection techniques here</h1>
+<p>X = df.drop(columns=['molregno', 'chembl_id', 'canonical_smiles', 'standard_units', 'standard_type'])
+y = df['standard_value']</p>
+<h1>Scale the features</h1>
+<p>scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)</p>
+<h1>Model Building (Random Forest Regressor)</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)  # You can adjust hyperparameters
+model.fit(X_train, y_train)</p>
+<h1>Model Evaluation</h1>
+<p>y_pred = model.predict(X_test)
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"RMSE: {rmse}")
+print(f"R^2: {r2}")
+```</p>
+<p><strong>Giải thích (Explanation):</strong></p>
+<ul>
+<li><strong>Import Libraries:</strong> Import các thư viện cần thiết.</li>
+<li><strong>Load Data:</strong> Tải dữ liệu từ file CSV.</li>
+<li><strong>Data Cleaning:</strong> Loại bỏ các hàng có giá trị <code>NaN</code> trong cột <code>canonical_smiles</code> và <code>standard_value</code>.</li>
+<li><strong>Descriptor Calculation:</strong> Sử dụng RDKit để tính toán các thuộc tính phân tử từ SMILES string.</li>
+<li><strong>Feature Selection:</strong> Chọn các thuộc tính quan trọng nhất (ví dụ: sử dụng SelectKBest).</li>
+<li><strong>Data Scaling:</strong> Chuẩn hóa dữ liệu bằng StandardScaler.</li>
+<li><strong>Model Building:</strong> Xây dựng mô hình Random Forest Regressor.</li>
+<li><strong>Model Evaluation:</strong> Đánh giá mô hình bằng RMSE và R^2.</li>
+</ul>
+<p><strong>4. Ví dụ Code SQL và Python mẫu (Example SQL and Python Code)</strong></p>
+<p><strong>Ví dụ 1: Lọc theo mục tiêu cụ thể (Filtering by Specific Target)</strong></p>
+<p><strong>SQL:</strong></p>
+<p><code>sql
+SELECT DISTINCT
+    act.molregno,
+    act.standard_value,
+    act.standard_units,
+    act.standard_type,
+    md.chembl_id,
+    md.canonical_smiles
+FROM activities act
+JOIN molecule_dictionary md ON act.molregno = md.molregno
+JOIN target_dictionary td ON act.tid = td.tid
+WHERE td.chembl_id = 'CHEMBL205'  -- Example target: 'CHEMBL205' (e.g., Dopamine D4 receptor)
+  AND act.standard_type = 'Ki'
+  AND act.standard_units = 'nM'
+  AND act.standard_value IS NOT NULL
+  AND act.standard_value &gt; 0
+  AND act.standard_value ~ '^[0-9\.]+$'
+LIMIT 100;</code></p>
+<p><strong>Python:</strong></p>
+<p>```python</p>
+<h1>After loading data, filter based on a specific range of activity values</h1>
+<p>df_filtered = df[(df['standard_value'] &gt;= 100) &amp; (df['standard_value'] &lt;= 1000)]
+print(f"Number of compounds after filtering: {len(df_filtered)}")
+```</p>
+<p><strong>Ví dụ 2: Tính toán thuộc tính LogP (Calculating LogP)</strong></p>
+<p><strong>Python:</strong></p>
+<p>```python
+from rdkit.Chem import AllChem
+from rdkit.Chem import Crippen</p>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    return Crippen.MolLogP(mol)</p>
+<p>df['logp'] = df['canonical_smiles'].apply(calculate_logp)
+df = df.dropna(subset=['logp'])
+print(df[['canonical_smiles', 'logp']].head())
+```</p>
+<p><strong>Ví dụ 3: Sử dụng Support Vector Regression (Using Support Vector Regression)</strong></p>
+<p><strong>Python:</strong></p>
+<p>```python
+from sklearn.svm import SVR</p>
+<h1>Model Building (Support Vector Regression)</h1>
+<p>model = SVR(kernel='rbf')  # You can adjust hyperparameters
+model.fit(X_train, y_train)</p>
+<h1>Model Evaluation</h1>
+<p>y_pred = model.predict(X_test)
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"RMSE (SVR): {rmse}")
+print(f"R^2 (SVR): {r2}")
+```</p>
+<p><strong>Ví dụ 4: Lưu kết quả vào file CSV (Saving Results to CSV)</strong></p>
+<p><strong>Python:</strong></p>
+<p>```python</p>
+<h1>After model evaluation, save the predictions to a CSV file</h1>
+<p>results = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
+results.to_csv(os.path.join(base_path, 'data', 'predictions.csv'), index=False)
+```</p>
+<p><strong>Ví dụ 5: Lọc theo hoạt tính (Filtering by Activity values)</strong></p>
+<p><strong>SQL:</strong></p>
+<p><code>sql
+SELECT DISTINCT
+    act.molregno,
+    act.standard_value,
+    act.standard_units,
+    act.standard_type,
+    md.chembl_id,
+    md.canonical_smiles
+FROM activities act
+JOIN molecule_dictionary md ON act.molregno = md.molregno
+WHERE act.standard_type = 'IC50'  -- You can change this to your desired activity type
+  AND act.standard_units = 'nM'
+  AND act.standard_value IS NOT NULL
+  AND act.standard_value &gt; 10 and  act.standard_value &lt; 100 -- Exclude zero values
+  AND act.standard_value ~ '^[0-9\.]+$' -- Ensure standard_value is numeric
+LIMIT 100;</code></p>
+<p>Tôi hy vọng những hướng dẫn và ví dụ này sẽ giúp bạn bắt đầu dự án của mình một cách hiệu quả. Nếu bạn có bất kỳ câu hỏi nào khác, đừng ngần ngại hỏi!</p>
+        </body>
+        </html>
+        

@@ -1,0 +1,359 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_33</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Sequence similarity clustering of targets</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project using RDKit, following an AIMLops template, and using a PostgreSQL database. You're facing some errors and need guidance on how to proceed.</p>
+<p>Here's a breakdown of the analysis model, the necessary code (SQL and Python), error fixes, file structure considerations, and examples, presented in both English and Vietnamese.</p>
+<p><strong>1. Analysis Model &amp; Strategy (English &amp; Vietnamese)</strong></p>
+<p><strong>English:</strong></p>
+<p>The goal is to extract and analyze data from ChEMBL 35 to support drug research and development. This involves:</p>
+<ul>
+<li><strong>Data Extraction:</strong>  Using SQL queries to retrieve relevant data from the ChEMBL database (specifically focusing on bioactivity data). Limiting the result set to 100 rows to avoid performance issues.</li>
+<li><strong>Data Cleaning and Transformation:</strong> Cleaning the extracted data (e.g., handling missing values, converting data types).  The <code>ERROR: operator does not exist: numeric ~ unknown</code> indicates a type mismatch during a regular expression comparison in SQL, which needs to be addressed.</li>
+<li><strong>Feature Engineering:</strong>  Potentially generating molecular descriptors using RDKit from the ChEMBL structures (SMILES strings).  This allows us to represent molecules numerically.</li>
+<li><strong>Data Analysis and Modeling:</strong>  Performing exploratory data analysis (EDA) to understand the data distribution, relationships, and potential patterns.  Then, build predictive models to relate molecular properties to bioactivity.  The error related to <code>squared=False</code> in <code>mean_squared_error</code> indicates using an older version of scikit-learn.</li>
+<li><strong>Visualization:</strong>  Visualizing the results (e.g., scatter plots, histograms) to gain insights and communicate findings.</li>
+</ul>
+<p><strong>Vietnamese:</strong></p>
+<p>Mục tiêu là trích xuất và phân tích dữ liệu từ ChEMBL 35 để hỗ trợ nghiên cứu và phát triển thuốc. Điều này bao gồm:</p>
+<ul>
+<li><strong>Trích xuất dữ liệu:</strong> Sử dụng các truy vấn SQL để truy xuất dữ liệu liên quan từ cơ sở dữ liệu ChEMBL (tập trung đặc biệt vào dữ liệu hoạt tính sinh học). Giới hạn tập kết quả thành 100 hàng để tránh các vấn đề về hiệu suất.</li>
+<li><strong>Làm sạch và chuyển đổi dữ liệu:</strong> Làm sạch dữ liệu đã trích xuất (ví dụ: xử lý các giá trị bị thiếu, chuyển đổi các loại dữ liệu). Lỗi <code>ERROR: operator does not exist: numeric ~ unknown</code> cho thấy sự không khớp loại trong quá trình so sánh biểu thức chính quy trong SQL, cần được giải quyết.</li>
+<li><strong>Kỹ thuật đặc trưng:</strong> Có khả năng tạo ra các mô tả phân tử bằng cách sử dụng RDKit từ cấu trúc ChEMBL (chuỗi SMILES). Điều này cho phép chúng ta biểu diễn các phân tử bằng số.</li>
+<li><strong>Phân tích và mô hình hóa dữ liệu:</strong> Thực hiện phân tích dữ liệu thăm dò (EDA) để hiểu phân phối dữ liệu, mối quan hệ và các mẫu tiềm năng. Sau đó, xây dựng các mô hình dự đoán để liên hệ các thuộc tính phân tử với hoạt tính sinh học. Lỗi liên quan đến <code>squared=False</code> trong <code>mean_squared_error</code> cho thấy việc sử dụng phiên bản scikit-learn cũ hơn.</li>
+<li><strong>Trực quan hóa:</strong> Trực quan hóa kết quả (ví dụ: biểu đồ phân tán, biểu đồ tần suất) để có được thông tin chi tiết và truyền đạt kết quả.</li>
+</ul>
+<p><strong>2. Code (SQL &amp; Python) - English &amp; Vietnamese</strong></p>
+<p><strong>SQL (English):</strong></p>
+<p>```sql
+-- File: ../data/chembl_bioactivity_100.csv</p>
+<p>SELECT
+    cmp.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.activity_comment,
+    mol.molfile
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+JOIN
+    compound_structures mol ON cmp.molregno = mol.molregno
+WHERE
+    act.standard_type = 'IC50'  -- Filter for a specific activity type
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9.]+$'  --Fix:Cast standard_value to text before applying regex
+    AND act.standard_units = 'nM'
+LIMIT 100;
+```</p>
+<p><strong>SQL (Vietnamese):</strong></p>
+<p>```sql
+-- File: ../data/chembl_bioactivity_100.csv</p>
+<p>SELECT
+    cmp.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.activity_comment,
+    mol.molfile
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+JOIN
+    compound_structures mol ON cmp.molregno = mol.molregno
+WHERE
+    act.standard_type = 'IC50'  -- Lọc cho một loại hoạt động cụ thể
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9.]+$'  -- Sửa lỗi: Ép standard_value thành text trước khi áp dụng biểu thức chính quy
+    AND act.standard_units = 'nM'
+LIMIT 100;
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li>The SQL query selects relevant information (ChEMBL ID, activity type, value, units, activity comment, and molfile) from the <code>activities</code>, <code>molecule_dictionary</code>, and <code>compound_structures</code> tables.</li>
+<li>The <code>WHERE</code> clause filters for:<ul>
+<li><code>standard_type = 'IC50'</code>:  IC50 values (a common measure of bioactivity).  You can change this to another activity type if needed.</li>
+<li><code>standard_relation = '='</code>: Only exact values, not greater than or less than.</li>
+<li><code>standard_value IS NOT NULL</code>:  Excludes rows with missing activity values.</li>
+<li><code>act.standard_value::text ~ '^[0-9\.]+$'</code>: Ensures that the <code>standard_value</code> contains only numbers and periods (to filter out invalid entries). This fixes the "operator does not exist" error by explicitly casting the numeric <code>standard_value</code> to text before applying the regular expression.</li>
+<li><code>standard_units = 'nM'</code>: Values in nanomolar (nM).</li>
+</ul>
+</li>
+<li><code>LIMIT 100</code> limits the result set to 100 rows.  This is crucial for your memory constraints.</li>
+</ul>
+<p><strong>Important:</strong></p>
+<ol>
+<li><strong>Run this SQL code using pgAdmin</strong> on your PostgreSQL server (192.168.206.136, user: rd, pass: rd, database: chembl_35).</li>
+<li><strong>Save the results</strong> as a CSV file named <code>chembl_bioactivity_100.csv</code> in the <code>../data/</code> directory of your AIMLops project.  Make sure the CSV file has a header row.</li>
+</ol>
+<p><strong>Python (English):</strong></p>
+<p>```python</p>
+<h1>File: notebook/Topic_CheMBL_35_33_1_data_analysis.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt</p>
+<h1>Define the base path</h1>
+<p>base_path = ".."  # Assuming notebook is in the notebook directory</p>
+<h1>Construct the path to the CSV file</h1>
+<p>data_file = os.path.join(base_path, "data", "chembl_bioactivity_100.csv")</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(data_file)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_file}.  Make sure you ran the SQL query and saved the CSV file.")
+    exit()</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>df = df.dropna(subset=['molfile', 'standard_value'])  # Remove rows with missing SMILES or activity values
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce') # ensure correct type and drop errors
+df = df.dropna(subset=['standard_value']) # Remove rows where conversion to numeric failed
+df = df[df['standard_value'] &gt; 0]  # Remove non-positive values (log transform will fail)
+df['pIC50'] = -np.log10(df['standard_value'] * 1e-9) # Convert IC50 to pIC50</p>
+<h1>Feature Engineering (Molecular Descriptors)</h1>
+<p>def calculate_descriptors(mol):
+    try:
+        descriptors = {}
+        descriptors['MW'] = Descriptors.MolWt(mol)
+        descriptors['LogP'] = Descriptors.MolLogP(mol)
+        descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+        descriptors['HBD'] = Descriptors.NumHDonors(mol)
+        descriptors['TPSA'] = Descriptors.TPSA(mol)</p>
+<pre><code>    return pd.Series(descriptors)
+except:
+    return pd.Series([None]*5) # handle exceptions
+</code></pre>
+<p>mols = [Chem.MolFromMolBlock(mol) for mol in df['molfile']]
+df[['MW', 'LogP', 'HBA', 'HBD', 'TPSA']] = pd.DataFrame([calculate_descriptors(mol) if mol else [None]*5 for mol in mols])</p>
+<p>df = df.dropna() # Drop any rows with NA from descriptor calculation</p>
+<h1>Model Training</h1>
+<p>X = df[['MW', 'LogP', 'HBA', 'HBD', 'TPSA']]
+y = df['pIC50']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Model Evaluation</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)  # No need for squared=False, using a current scikit-learn version is preferable
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Visualization</h1>
+<p>plt.scatter(y_test, y_pred)
+plt.xlabel("Actual pIC50")
+plt.ylabel("Predicted pIC50")
+plt.title("Actual vs. Predicted pIC50")
+plt.show()
+```</p>
+<p><strong>Python (Vietnamese):</strong></p>
+<p>```python</p>
+<h1>File: notebook/Topic_CheMBL_35_33_1_phan_tich_du_lieu.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt</p>
+<h1>Định nghĩa đường dẫn cơ sở</h1>
+<p>base_path = ".."  # Giả sử notebook nằm trong thư mục notebook</p>
+<h1>Xây dựng đường dẫn đến tệp CSV</h1>
+<p>data_file = os.path.join(base_path, "data", "chembl_bioactivity_100.csv")</p>
+<h1>Tải dữ liệu</h1>
+<p>try:
+    df = pd.read_csv(data_file)
+except FileNotFoundError:
+    print(f"Lỗi: Không tìm thấy tệp tại {data_file}. Đảm bảo bạn đã chạy truy vấn SQL và lưu tệp CSV.")
+    exit()</p>
+<h1>Làm sạch và tiền xử lý dữ liệu</h1>
+<p>df = df.dropna(subset=['molfile', 'standard_value'])  # Xóa các hàng có SMILES hoặc giá trị hoạt động bị thiếu
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce') # đảm bảo kiểu chính xác và loại bỏ lỗi
+df = df.dropna(subset=['standard_value']) # Xóa các hàng mà chuyển đổi sang số không thành công
+df = df[df['standard_value'] &gt; 0]  # Loại bỏ các giá trị không dương (chuyển đổi log sẽ thất bại)
+df['pIC50'] = -np.log10(df['standard_value'] * 1e-9) # Chuyển đổi IC50 sang pIC50</p>
+<h1>Kỹ thuật đặc trưng (Mô tả phân tử)</h1>
+<p>def calculate_descriptors(mol):
+    try:
+        descriptors = {}
+        descriptors['MW'] = Descriptors.MolWt(mol)
+        descriptors['LogP'] = Descriptors.MolLogP(mol)
+        descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+        descriptors['HBD'] = Descriptors.NumHDonors(mol)
+        descriptors['TPSA'] = Descriptors.TPSA(mol)</p>
+<pre><code>    return pd.Series(descriptors)
+except:
+    return pd.Series([None]*5) # Xử lý ngoại lệ
+</code></pre>
+<p>mols = [Chem.MolFromMolBlock(mol) for mol in df['molfile']]
+df[['MW', 'LogP', 'HBA', 'HBD', 'TPSA']] = pd.DataFrame([calculate_descriptors(mol) if mol else [None]*5 for mol in mols])</p>
+<p>df = df.dropna() # Loại bỏ bất kỳ hàng nào có NA từ tính toán mô tả</p>
+<h1>Huấn luyện mô hình</h1>
+<p>X = df[['MW', 'LogP', 'HBA', 'HBD', 'TPSA']]
+y = df['pIC50']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Đánh giá mô hình</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)  # Không cần squared=False, tốt nhất là sử dụng phiên bản scikit-learn hiện tại
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Lỗi bình phương trung bình: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Trực quan hóa</h1>
+<p>plt.scatter(y_test, y_pred)
+plt.xlabel("pIC50 thực tế")
+plt.ylabel("pIC50 dự đoán")
+plt.title("pIC50 thực tế so với pIC50 dự đoán")
+plt.show()
+```</p>
+<p><strong>Explanation:</strong></p>
+<ol>
+<li><strong>Import Libraries:</strong> Imports necessary libraries (pandas, RDKit, scikit-learn, matplotlib).</li>
+<li><strong>File Path:</strong>  Uses <code>os.path.join(base_path, "data", "chembl_bioactivity_100.csv")</code> to construct the correct file path to your data.</li>
+<li><strong>Data Loading:</strong> Loads the CSV data into a pandas DataFrame. Includes error handling if the file is not found.</li>
+<li><strong>Data Cleaning:</strong><ul>
+<li>Removes rows with missing <code>molfile</code> or <code>standard_value</code>.</li>
+<li>Converts <code>standard_value</code> to numeric and removes rows where the conversion fails.</li>
+<li>Removes non-positive standard values, as log transformation is used later.</li>
+<li>Converts IC50 values to pIC50 (a more common representation in drug discovery).  The conversion is <code>pIC50 = -log10(IC50 in Molar)</code>.  Since your IC50 is in nM, we multiply by <code>1e-9</code> to convert to Molar.</li>
+</ul>
+</li>
+<li><strong>Feature Engineering:</strong><ul>
+<li>Defines a function <code>calculate_descriptors</code> that uses RDKit to calculate common molecular descriptors (Molecular Weight, LogP, Hydrogen Bond Acceptors, Hydrogen Bond Donors, and Topological Polar Surface Area).</li>
+<li>Iterates through the molecules and calculates the descriptors.  Handles potential errors during descriptor calculation.</li>
+<li>Creates new columns in the DataFrame for the calculated descriptors.</li>
+<li>Drops any remaining rows with NA values that may have resulted from descriptor calculation issues.</li>
+</ul>
+</li>
+<li><strong>Model Training:</strong><ul>
+<li>Selects the molecular descriptors as features (<code>X</code>) and pIC50 as the target variable (<code>y</code>).</li>
+<li>Splits the data into training and testing sets.</li>
+<li>Trains a linear regression model.</li>
+</ul>
+</li>
+<li><strong>Model Evaluation:</strong><ul>
+<li>Predicts pIC50 values for the test set.</li>
+<li>Calculates the Mean Squared Error (MSE) and R-squared (R2) to evaluate the model's performance.</li>
+<li>Prints the evaluation metrics.</li>
+</ul>
+</li>
+<li><strong>Visualization:</strong> Creates a scatter plot of actual vs. predicted pIC50 values.</li>
+</ol>
+<p><strong>Important Considerations and Error Fixes:</strong></p>
+<ul>
+<li><strong>File Paths:</strong>  Double-check that the file paths are correct.  The <code>base_path = ".."</code> assumes your notebook is in a subdirectory called "notebook" and that the data is in the <code>../data</code> directory.  Adjust this if your file structure is different.</li>
+<li><strong>RDKit Installation:</strong> Make sure you have RDKit installed in your Jupyter Notebook environment.  You can install it using <code>conda install -c conda-forge rdkit</code> or <code>pip install rdkit</code>.</li>
+<li><strong>scikit-learn Version:</strong> The <code>squared=False</code> error in <code>mean_squared_error</code> indicates you are using an older version of scikit-learn.  The best approach is to update scikit-learn: <code>conda update scikit-learn</code> or <code>pip install --upgrade scikit-learn</code>.  However, the code above removes the <code>squared=False</code> parameter to maintain compatibility with older versions.</li>
+<li><strong>Data Cleaning is Crucial:</strong> The quality of your model depends on the quality of your data.  Pay close attention to handling missing values, incorrect data types, and outliers.</li>
+<li>** molfile must be molblock format:** The rdkit reads the molfile from the database in the format molblock, otherwise it can read the smiles format</li>
+</ul>
+<p><strong>3. AIMLops Folder Tree &amp; File Placement</strong></p>
+<p>Based on the AIMLops template, your structure should look something like this:</p>
+<p><code>Topic_CheMBL_35_33/
+├── data/
+│   └── chembl_bioactivity_100.csv  # Your extracted data
+├── notebooks/
+│   └── Topic_CheMBL_35_33_1_data_analysis.ipynb  # Jupyter Notebook
+├── src/
+│   └──  # (Optional:  For more complex code, refactor functions into Python modules here)
+└── models/
+    └── # (Optional: Save trained models here)</code></p>
+<p><strong>4. 5 Examples of How to Use the Code</strong></p>
+<p>Here are 5 ways you can adapt and use the provided code:</p>
+<ol>
+<li>
+<p><strong>Change the Activity Type:</strong> Modify the SQL query to extract data for a different <code>standard_type</code> (e.g., <code>'Ki'</code>, <code>'Kd'</code>).  Then, adjust the interpretation in the Python code accordingly.</p>
+<p><code>sql
+WHERE
+    act.standard_type = 'Ki'  -- Example:  Change to Ki
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9\.]+$'
+    AND act.standard_units = 'nM'</code></p>
+</li>
+<li>
+<p><strong>Explore Different Descriptors:</strong>  Add or remove molecular descriptors in the <code>calculate_descriptors</code> function.  RDKit provides a wide range of descriptors.  Refer to the RDKit documentation for available descriptors.</p>
+<p>```python
+def calculate_descriptors(mol):
+    try:
+        descriptors = {}
+        descriptors['MW'] = Descriptors.MolWt(mol)
+        descriptors['LogP'] = Descriptors.MolLogP(mol)
+        descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+        descriptors['HBD'] = Descriptors.NumHDonors(mol)
+        descriptors['TPSA'] = Descriptors.TPSA(mol)
+        descriptors['RotatableBonds'] = Descriptors.NumRotatableBonds(mol)  # Example: Add Rotatable Bonds
+        return pd.Series(descriptors)
+    except:
+        return pd.Series([None]*6) # handle exceptions</p>
+<p>mols = [Chem.MolFromMolBlock(mol) for mol in df['molfile']]
+df[['MW', 'LogP', 'HBA', 'HBD', 'TPSA','RotatableBonds']] = pd.DataFrame([calculate_descriptors(mol) if mol else [None]*6 for mol in mols])
+```</p>
+</li>
+<li>
+<p><strong>Try a Different Model:</strong>  Experiment with different machine learning models from scikit-learn (e.g., Random Forest, Support Vector Regression).  You'll need to adjust the model instantiation and fitting steps.</p>
+<p>```python
+from sklearn.ensemble import RandomForestRegressor</p>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)  # Example: Random Forest
+model.fit(X_train, y_train)
+```</p>
+</li>
+<li>
+<p><strong>Adjust the Test Size:</strong>  Change the <code>test_size</code> parameter in <code>train_test_split</code> to control the proportion of data used for testing.</p>
+<p><code>python
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)  # Example: 30% for testing</code></p>
+</li>
+<li>
+<p><strong>Add More Data:</strong> If you have more computational resources, increase the <code>LIMIT</code> in the SQL query to retrieve more data. Be mindful of memory usage.  You might need to use techniques like batch processing if you are dealing with very large datasets.</p>
+<p><code>sql
+LIMIT 1000; -- Example:  Get 1000 rows (be cautious!)</code></p>
+</li>
+</ol>
+<p>Remember to carefully analyze the results of each modification to understand its impact on the model's performance. Good luck!</p>
+        </body>
+        </html>
+        

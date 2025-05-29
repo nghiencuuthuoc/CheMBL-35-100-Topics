@@ -1,0 +1,363 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_59</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Orphan drug discovery via ChEMBL</h1>
+<hr />
+<p>Okay, I understand. You're working on a ChEMBL 35 data analysis project using RDKit, and you want to follow an AIMLops-inspired structure with Jupyter notebooks. You're using a PostgreSQL database hosted on 192.168.206.136 and need help with SQL queries and Python code to extract and analyze the data, keeping in mind the errors you've encountered.  You specifically want to explore "Topic_CheMBL_35_59" and need 5 example analyses after the initial setup.</p>
+<p>Here's a breakdown of how we can approach this, including SQL and Python code snippets, error handling, and considerations for your AIMLops structure:</p>
+<p><strong>1. Project Structure and AIMLops Adherence:</strong></p>
+<p>Following the AIMLops template:</p>
+<p><code>project_root/
+├── data/          # Stores the extracted CSV data from ChEMBL
+├── notebooks/     # Jupyter notebooks for analysis and experimentation
+│   ├── Topic_CheMBL_35_59_1_Data_Extraction.ipynb
+│   ├── Topic_CheMBL_35_59_2_Analysis.ipynb
+├── src/           # (Optional) Python modules for reusable functions (e.g., data cleaning, model building)
+├── models/        # (Optional) Saved machine learning models
+├── README.md      # Project description, instructions, and dependencies</code></p>
+<ul>
+<li><strong><code>data/</code></strong>:  This will hold the CSV files extracted from your ChEMBL database using SQL queries.</li>
+<li><strong><code>notebooks/</code></strong>: This directory contains your Jupyter notebooks.  <code>Topic_CheMBL_35_59_1_Data_Extraction.ipynb</code> will focus on data retrieval, and <code>Topic_CheMBL_35_59_2_Analysis.ipynb</code> will contain the analysis.</li>
+<li><strong><code>src/</code></strong>: If you have reusable Python code, put it here in modules. This helps keep your notebooks clean.</li>
+<li><strong><code>models/</code></strong>: If you build and train any machine learning models, save them here.</li>
+</ul>
+<p><strong>2. Addressing the Errors:</strong></p>
+<ul>
+<li><strong>SQL Error: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong>:  This error occurs because the <code>~</code> operator is used for regular expression matching with text data. <code>standard_value</code> is likely a numeric column (e.g., <code>INTEGER</code>, <code>REAL</code>, <code>NUMERIC</code>). You should use numeric comparisons instead. If the column is sometimes a string, you may need to cast it to a numeric type first or filter out non-numeric values in a safer way.</li>
+<li><strong>Scikit-learn Error: <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong>: This indicates you are using an older version of scikit-learn.  You have two options:<ul>
+<li><strong>Upgrade scikit-learn:</strong> This is the preferred solution.  Run <code>pip install scikit-learn --upgrade</code> in your terminal.</li>
+<li><strong>Remove <code>squared=False</code>:</strong>  If you <em>cannot</em> upgrade, you can remove the <code>squared=False</code> argument. This will return the Mean Squared Error (MSE) instead of the Root Mean Squared Error (RMSE). Remember to adjust your interpretation accordingly.</li>
+</ul>
+</li>
+</ul>
+<p><strong>3. SQL Code (for <code>Topic_CheMBL_35_59_1_Data_Extraction.ipynb</code>):</strong></p>
+<p>This SQL query retrieves data from the ChEMBL database, focusing on bioactivities and molecules.  It's designed to be limited to 100 rows for initial testing.</p>
+<p>```sql
+-- data/chembl_35_59_bioactivities.csv</p>
+<p>SELECT
+    cmp.chembl_id AS molecule_chembl_id,
+    cmp.pref_name AS molecule_name,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.activity_comment,
+    targ.target_type,
+    targ.pref_name AS target_name,
+    act.pchembl_value,
+    mol.structure AS smiles
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+JOIN
+    target_dictionary targ ON act.tid = targ.tid
+JOIN
+    compound_structures mol ON cmp.molregno = mol.molregno</p>
+<p>WHERE act.standard_type IN ('IC50', 'Ki', 'EC50')  -- Common activity types
+    AND act.standard_units = 'nM'                    -- Focus on nM values
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0                      -- Exclude zero or negative values
+    AND act.pchembl_value IS NOT NULL   -- Require pChEMBL value
+    AND targ.target_type = 'SINGLE PROTEIN'         -- Filter for single protein targets
+ORDER BY act.pchembl_value DESC
+LIMIT 100;
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong><code>SELECT ... FROM ... JOIN ...</code></strong>:  This structure joins the necessary tables (activities, molecule_dictionary, target_dictionary, compound_structures) to retrieve molecule information, activity data, target information, and SMILES strings.</li>
+<li><strong><code>WHERE ...</code></strong>: This clause filters the data:<ul>
+<li><code>act.standard_type IN ('IC50', 'Ki', 'EC50')</code>:  Selects only common and well-defined activity types.  Adjust this if you have a specific activity type related to Topic 59.</li>
+<li><code>act.standard_units = 'nM'</code>:  Ensures that the activity values are in nanomolar units for consistency.</li>
+<li><code>act.standard_value IS NOT NULL AND act.standard_value &gt; 0</code>:  Excludes missing or non-positive activity values.</li>
+<li><code>act.pchembl_value IS NOT NULL</code>:  Only includes entries where the pChEMBL value is available (a more processed and comparable activity measure).</li>
+<li><code>targ.target_type = 'SINGLE PROTEIN'</code>: Filters results to a target that is a single protein.</li>
+</ul>
+</li>
+<li><strong><code>ORDER BY act.pchembl_value DESC</code></strong>: Orders results by potency (pChEMBL value) in descending order, putting the most potent compounds at the top.</li>
+<li><strong><code>LIMIT 100</code></strong>:  Limits the result set to the first 100 rows, as requested.</li>
+</ul>
+<p><strong>Saving the Data (using <code>psql</code> from the command line):</strong></p>
+<p><code>bash
+psql -h 192.168.206.136 -U rd -d chembl_35 -c "\copy (SELECT cmp.chembl_id AS molecule_chembl_id, cmp.pref_name AS molecule_name, act.standard_type, act.standard_value, act.standard_units, act.activity_comment, targ.target_type, targ.pref_name AS target_name, act.pchembl_value, mol.structure AS smiles FROM activities act JOIN molecule_dictionary cmp ON act.molregno = cmp.molregno JOIN target_dictionary targ ON act.tid = targ.tid JOIN compound_structures mol ON cmp.molregno = mol.molregno WHERE act.standard_type IN ('IC50', 'Ki', 'EC50') AND act.standard_units = 'nM' AND act.standard_value IS NOT NULL AND act.standard_value &gt; 0  AND act.pchembl_value IS NOT NULL AND targ.target_type = 'SINGLE PROTEIN' ORDER BY act.pchembl_value DESC LIMIT 100) TO 'data/chembl_35_59_bioactivities.csv' DELIMITER ',' CSV HEADER;"</code></p>
+<ul>
+<li>Replace <code>-h</code>, <code>-U</code>, and <code>-d</code> with your correct server, username, and database information.</li>
+</ul>
+<p><strong>4. Python Code (for <code>Topic_CheMBL_35_59_2_Analysis.ipynb</code>):</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from rdkit.Chem import Lipinski
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np  # needed for safe log calculations</p>
+<h1>Base path for the project (adapt to your actual project root)</h1>
+<p>base_path = "."  # Assuming the notebook is in the 'notebooks' directory</p>
+<h1>Load the data</h1>
+<p>data_path = os.path.join(base_path, "data", "chembl_35_59_bioactivities.csv")
+try:
+    df = pd.read_csv(data_path)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}")
+    df = None # Handle the error appropriately</p>
+<p>if df is not None: # Only proceed if the DataFrame was loaded successfully</p>
+<pre><code># Data Cleaning and Preprocessing
+df = df.dropna(subset=['smiles', 'pchembl_value'])  # Handle missing SMILES or pChEMBL values
+
+# Function to calculate molecular weight
+def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return None
+
+# Function to calculate LogP
+def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolLogP(mol)
+    else:
+        return None
+
+# Apply the functions to create new columns
+df['mol_weight'] = df['smiles'].apply(calculate_mw)
+df['log_p'] = df['smiles'].apply(calculate_logp)
+
+# Basic statistics and visualization (example)
+print(df.describe())
+
+# Plotting pChEMBL vs. Molecular Weight
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x='mol_weight', y='pchembl_value', data=df)
+plt.xlabel('Molecular Weight')
+plt.ylabel('pChEMBL Value')
+plt.title('pChEMBL Value vs. Molecular Weight')
+plt.show()
+
+# Linear Regression Example (predicting pChEMBL from molecular weight)
+X = df[['mol_weight']].fillna(df['mol_weight'].mean())  # Handle potential NaN values
+y = df['pchembl_value']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+
+# Visualize the regression line
+plt.figure(figsize=(8, 6))
+plt.scatter(X_test, y_test, color='blue', label='Actual')
+plt.plot(X_test, y_pred, color='red', linewidth=2, label='Predicted')
+plt.xlabel('Molecular Weight')
+plt.ylabel('pChEMBL Value')
+plt.title('Linear Regression: pChEMBL vs. Molecular Weight')
+plt.legend()
+plt.show()
+</code></pre>
+<p>```</p>
+<p><strong>Explanation:</strong></p>
+<ol>
+<li><strong>Import Libraries</strong>: Imports necessary libraries for data manipulation, cheminformatics (RDKit), visualization, and machine learning (scikit-learn).</li>
+<li><strong>Define Base Path</strong>: Sets the base path for accessing files.</li>
+<li><strong>Load Data</strong>: Loads the CSV file into a Pandas DataFrame.  Includes error handling for the case where the file is not found.</li>
+<li><strong>Data Cleaning</strong>:<ul>
+<li>Removes rows with missing SMILES strings or pChEMBL values.  This ensures that the RDKit functions and the regression model will work correctly.</li>
+</ul>
+</li>
+<li><strong>Feature Calculation (RDKit)</strong>:<ul>
+<li><code>calculate_mw(smiles)</code>: Calculates the molecular weight of a molecule from its SMILES string using RDKit.  Handles cases where the SMILES string is invalid.</li>
+<li><code>calculate_logp(smiles)</code>: Calculates the LogP (octanol-water partition coefficient) of a molecule from its SMILES string using RDKit. Handles cases where the SMILES string is invalid.</li>
+</ul>
+</li>
+<li><strong>Visualization</strong>:<ul>
+<li>Creates a scatter plot of pChEMBL value versus molecular weight using Seaborn.</li>
+</ul>
+</li>
+<li><strong>Linear Regression</strong>:<ul>
+<li>Prepares the data for linear regression.  <code>X</code> is the molecular weight (independent variable), and <code>y</code> is the pChEMBL value (dependent variable).  Handles any remaining NaN values by filling them with the mean.</li>
+<li>Splits the data into training and testing sets.</li>
+<li>Creates a <code>LinearRegression</code> model, trains it on the training data, and makes predictions on the test data.</li>
+<li>Calculates the Mean Squared Error (MSE) and R-squared (R2) to evaluate the model's performance.</li>
+<li>Visualizes the regression line along with the actual data points.</li>
+</ul>
+</li>
+</ol>
+<p><strong>5. Five Example Analyses (Expand on these in <code>Topic_CheMBL_35_59_2_Analysis.ipynb</code>):</strong></p>
+<p>Here are five analysis ideas you can implement, building on the basic code:</p>
+<ol>
+<li>
+<p><strong>Lipinski's Rule of Five Analysis:</strong></p>
+<ul>
+<li>Calculate Lipinski's Rule of Five properties (molecular weight, LogP, number of hydrogen bond donors, number of hydrogen bond acceptors) using RDKit.</li>
+<li>Create a new column indicating whether a compound violates any of Lipinski's rules.</li>
+<li>Analyze the distribution of compounds that violate the rules and see if there's a correlation with activity (pChEMBL value).</li>
+</ul>
+<p>```python
+def lipinski_rule(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        mw = Descriptors.MolWt(mol)
+        logp = Descriptors.MolLogP(mol)
+        hbd = Lipinski.NumHDonors(mol)
+        hba = Lipinski.NumHAcceptors(mol)
+        violations = 0
+        if mw &gt; 500:
+            violations += 1
+        if logp &gt; 5:
+            violations += 1
+        if hbd &gt; 5:
+            violations += 1
+        if hba &gt; 10:
+            violations += 1
+        return violations
+    else:
+        return None</p>
+<p>df['lipinski_violations'] = df['smiles'].apply(lipinski_rule)</p>
+<h1>Analysis</h1>
+<p>print(df['lipinski_violations'].value_counts())
+sns.boxplot(x='lipinski_violations', y='pchembl_value', data=df)
+plt.show()
+```</p>
+</li>
+<li>
+<p><strong>Activity Distribution by Target:</strong></p>
+<ul>
+<li>Group the data by <code>target_name</code>.</li>
+<li>Calculate the mean and standard deviation of pChEMBL values for each target.</li>
+<li>Visualize the distribution of activities for the top N targets (e.g., top 10).</li>
+</ul>
+<p>```python
+target_activity = df.groupby('target_name')['pchembl_value'].agg(['mean', 'std', 'count'])
+target_activity = target_activity.sort_values(by='mean', ascending=False)
+print(target_activity.head(10)) # Top 10 targets by average pChEMBL</p>
+<h1>Example visualization</h1>
+<p>top_targets = target_activity.head(5).index  # Select top 5 targets
+sns.boxplot(x='target_name', y='pchembl_value', data=df[df['target_name'].isin(top_targets)])
+plt.xticks(rotation=45, ha='right')
+plt.show()
+```</p>
+</li>
+<li>
+<p><strong>Correlation Analysis:</strong></p>
+<ul>
+<li>Calculate the correlation matrix between molecular properties (molecular weight, LogP) and activity (pChEMBL value).</li>
+<li>Visualize the correlation matrix using a heatmap.</li>
+</ul>
+<p><code>python
+correlation_matrix = df[['pchembl_value', 'mol_weight', 'log_p']].corr()
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+plt.show()</code></p>
+</li>
+<li>
+<p><strong>pChEMBL Value Prediction with Multiple Features (Multiple Linear Regression):</strong></p>
+<ul>
+<li>Extend the linear regression model to use both molecular weight and LogP as predictors.</li>
+<li>Evaluate the model's performance using MSE and R-squared.</li>
+</ul>
+<p>```python
+X = df[['mol_weight', 'log_p']].fillna(df[['mol_weight', 'log_p']].mean())
+y = df['pchembl_value']</p>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<p>y_pred = model.predict(X_test)</p>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+</li>
+<li>
+<p><strong>Activity Cliff Analysis:</strong></p>
+<ul>
+<li>This requires more complex calculations. The idea is to find pairs of molecules that are structurally very similar but have significantly different activities.  You'd need to:<ul>
+<li>Calculate molecular similarity using RDKit (e.g., Tanimoto similarity based on Morgan fingerprints).</li>
+<li>Define a threshold for similarity and a threshold for activity difference.</li>
+<li>Identify molecule pairs that meet both criteria.  This helps identify structural features that are critical for activity.</li>
+</ul>
+</li>
+</ul>
+<p>```python
+from rdkit.Chem import AllChem
+from rdkit import DataStructs</p>
+<p>def calculate_morgan_fingerprint(smiles, radius=2):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        fp = AllChem.GetMorganFingerprint(mol, radius)
+        return fp
+    else:
+        return None</p>
+<p>df['morgan_fp'] = df['smiles'].apply(calculate_morgan_fingerprint)
+df = df.dropna(subset=['morgan_fp'])  # Remove molecules with invalid fingerprints</p>
+<h1>Now you need to compare all pairs of molecules.  This is computationally expensive</h1>
+<h1>For a smaller dataset, you can iterate through all pairs.  For larger datasets, consider using a more efficient data structure like a BallTree.</h1>
+<h1>This is a very simplified example for illustration only</h1>
+<p>similarity_threshold = 0.8
+activity_difference_threshold = 2.0  # pChEMBL units</p>
+<p>for i in range(len(df)):
+    for j in range(i + 1, len(df)):  # Avoid comparing a molecule to itself and avoid duplicate comparisons
+        fp1 = df['morgan_fp'].iloc[i]
+        fp2 = df['morgan_fp'].iloc[j]
+        similarity = DataStructs.TanimotoSimilarity(fp1, fp2)
+        activity_difference = abs(df['pchembl_value'].iloc[i] - df['pchembl_value'].iloc[j])</p>
+<pre><code>    if similarity &gt; similarity_threshold and activity_difference &gt; activity_difference_threshold:
+        print(f"Activity Cliff Found: Molecule 1: {df['molecule_chembl_id'].iloc[i]}, pChEMBL: {df['pchembl_value'].iloc[i]}, Molecule 2: {df['molecule_chembl_id'].iloc[j]}, pChEMBL: {df['pchembl_value'].iloc[j]}, Similarity: {similarity}")
+        # Further analysis:  Examine the structural differences between these molecules
+</code></pre>
+<p>```</p>
+</li>
+</ol>
+<p><strong>6. Languages：</strong></p>
+<p><strong>English:</strong></p>
+<p>This approach provides a solid foundation for your ChEMBL 35 data analysis project. Remember to adapt the SQL queries and Python code to your specific research questions and the characteristics of "Topic_CheMBL_35_59". Good luck!</p>
+<p><strong>Chinese (Simplified):</strong></p>
+<p>这个方法为你的ChEMBL 35数据分析项目提供了一个坚实的基础。请记住根据你具体的研究问题和 "Topic_CheMBL_35_59" 的特点来调整 SQL 查询和 Python 代码。祝你好运!</p>
+        </body>
+        </html>
+        

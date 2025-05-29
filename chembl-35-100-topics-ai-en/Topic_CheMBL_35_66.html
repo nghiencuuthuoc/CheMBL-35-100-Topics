@@ -1,0 +1,612 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_66</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Hyperparameter tuning with Optuna for drug models</h1>
+<hr />
+<p>Okay, I understand. I'm acting as your Pharmaceutical R&amp;D Specialist, assisting you with your ChEMBL 35 data analysis project. You're using PostgreSQL, RDKit, and Jupyter notebooks following the AIMLops template, and you need guidance on data extraction, analysis, and code implementation, specifically addressing the errors you've encountered.</p>
+<p>Here's a detailed breakdown, guidance, and code examples in both English and Indonesian:</p>
+<p><strong>1. Analysis Model Overview</strong></p>
+<p>The overall analysis model will likely involve these steps:</p>
+<ul>
+<li><strong>Data Extraction:</strong>  Extract relevant data from the ChEMBL 35 database using SQL queries. This involves filtering for specific activities, molecules, and properties of interest. You'll save this data into CSV files.</li>
+<li><strong>Data Preprocessing:</strong> Load the CSV data into pandas DataFrames within your Jupyter notebook. Clean and preprocess the data, handling missing values, converting data types, and preparing features for analysis. This will likely involve RDKit for molecular feature generation.</li>
+<li><strong>Feature Engineering (RDKit):</strong>  Utilize RDKit to calculate relevant molecular descriptors (e.g., molecular weight, logP, number of hydrogen bond donors/acceptors, topological polar surface area). These descriptors will serve as features for your analysis.</li>
+<li><strong>Activity Filtering:</strong> Filter out activity records with standard values not representing numbers.</li>
+<li><strong>Exploratory Data Analysis (EDA):</strong> Perform EDA to visualize data distributions, identify outliers, and uncover relationships between molecular descriptors and activity values.</li>
+<li><strong>Modeling (Example: Regression):</strong>  Build a regression model (e.g., linear regression, random forest) to predict activity values based on the calculated molecular descriptors.</li>
+<li><strong>Model Evaluation:</strong> Evaluate the performance of the model using appropriate metrics (e.g., Mean Squared Error - MSE, R-squared).</li>
+<li><strong>Interpretation:</strong>  Interpret the results of the model to gain insights into the relationship between molecular structure and activity.</li>
+</ul>
+<p><strong>Analisis Model Overview (Indonesian)</strong></p>
+<p>Model analisis secara keseluruhan akan melibatkan langkah-langkah berikut:</p>
+<ul>
+<li><strong>Ekstraksi Data:</strong> Ekstrak data yang relevan dari database ChEMBL 35 menggunakan query SQL. Ini melibatkan penyaringan aktivitas, molekul, dan properti tertentu yang menarik. Anda akan menyimpan data ini ke dalam file CSV.</li>
+<li><strong>Pra-pemrosesan Data:</strong> Muat data CSV ke dalam pandas DataFrames di dalam Jupyter notebook Anda. Bersihkan dan pra-proses data, tangani nilai yang hilang, konversi tipe data, dan siapkan fitur untuk analisis. Ini kemungkinan akan melibatkan RDKit untuk pembuatan fitur molekuler.</li>
+<li><strong>Rekayasa Fitur (RDKit):</strong> Manfaatkan RDKit untuk menghitung deskriptor molekuler yang relevan (misalnya, berat molekul, logP, jumlah donor/akseptor ikatan hidrogen, area permukaan polar topologi). Deskriptor ini akan berfungsi sebagai fitur untuk analisis Anda.</li>
+<li><strong>Penyaringan Aktivitas:</strong> Saring catatan aktivitas dengan nilai standar yang tidak mewakili angka.</li>
+<li><strong>Analisis Data Eksplorasi (EDA):</strong> Lakukan EDA untuk memvisualisasikan distribusi data, mengidentifikasi outlier, dan mengungkap hubungan antara deskriptor molekuler dan nilai aktivitas.</li>
+<li><strong>Pemodelan (Contoh: Regresi):</strong> Bangun model regresi (misalnya, regresi linier, random forest) untuk memprediksi nilai aktivitas berdasarkan deskriptor molekuler yang dihitung.</li>
+<li><strong>Evaluasi Model:</strong> Evaluasi kinerja model menggunakan metrik yang sesuai (misalnya, Mean Squared Error - MSE, R-squared).</li>
+<li><strong>Interpretasi:</strong> Interpretasikan hasil model untuk mendapatkan wawasan tentang hubungan antara struktur molekul dan aktivitas.</li>
+</ul>
+<p><strong>2. Addressing Errors and Code</strong></p>
+<p><strong>Error A: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p>This error indicates that PostgreSQL is having trouble applying the regular expression <code>^[0-9\.]+$</code> to a <code>numeric</code> column (likely <code>act.standard_value</code>). The <code>~</code> operator in PostgreSQL is used for regular expression matching on text data, not numeric data.</p>
+<p><strong>Solution:</strong></p>
+<p>Instead of using regular expressions, you should directly cast the column to text and then use the regular expression or, more efficiently, filter out rows where <code>standard_value</code> is not a number using <code>IS NOT NULL</code> and ensuring the value is greater than or equal to zero if required.  Since we are retrieving the top 100, the impact of doing this is minimal, and will prevent errors.  This SQL has been updated below to reflect this.</p>
+<p><strong>Error B: <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<p>This error means that your scikit-learn version is older than 0.20, where the <code>squared</code> parameter was introduced in the <code>mean_squared_error</code> function.</p>
+<p><strong>Solution:</strong></p>
+<ol>
+<li><strong>Upgrade Scikit-learn:</strong> The best solution is to upgrade your scikit-learn library:
+    <code>bash
+    pip install -U scikit-learn</code></li>
+<li>
+<p><strong>Conditional Code (if upgrade is not possible):</strong>  If you absolutely cannot upgrade scikit-learn (not recommended), you can write conditional code:</p>
+<p>```python
+from sklearn.metrics import mean_squared_error
+import sklearn</p>
+<p>if sklearn.<strong>version</strong> &gt;= '0.20':
+    mse = mean_squared_error(y_true, y_pred, squared=False)
+else:
+    mse = mean_squared_error(y_true, y_pred)**0.5  # Calculate RMSE manually
+```</p>
+</li>
+</ol>
+<p><strong>3. SQL Code (chembl_35_66.sql)</strong></p>
+<p>```sql
+-- Select 100 rows from the activities table and related tables
+-- Filter by standard_type = 'IC50' and ensure standard_value is numeric.
+-- Use a safe numeric check instead of regular expressions.</p>
+<p>SELECT
+    mol.chembl_id,
+    act.standard_value,
+    act.standard_units,
+    act.standard_type,
+    cmp.structure_text AS smiles
+FROM
+    activities act
+JOIN
+    molecule_dictionary mol ON act.molregno = mol.molregno
+JOIN
+    compound_structures cmp ON mol.molregno = cmp.molregno
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_value IS NOT NULL  -- Ensure standard_value is not null
+    AND act.standard_units = 'nM'
+ORDER BY
+    act.standard_value ASC  --order to grab the lowest values first.
+LIMIT 100;</p>
+<p>-- Save the results to a CSV file (../data/chembl_35_66.csv) using pgAdmin or psql.
+```</p>
+<p><strong>SQL Code (Indonesian)</strong></p>
+<p>```sql
+-- Pilih 100 baris dari tabel activities dan tabel terkait
+-- Filter berdasarkan standard_type = 'IC50' dan pastikan standard_value adalah numerik.
+-- Gunakan pemeriksaan numerik yang aman alih-alih ekspresi reguler.</p>
+<p>SELECT
+    mol.chembl_id,
+    act.standard_value,
+    act.standard_units,
+    act.standard_type,
+    cmp.structure_text AS smiles
+FROM
+    activities act
+JOIN
+    molecule_dictionary mol ON act.molregno = mol.molregno
+JOIN
+    compound_structures cmp ON mol.molregno = cmp.molregno
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_value IS NOT NULL  -- Pastikan standard_value tidak null
+    AND act.standard_units = 'nM'
+ORDER BY
+    act.standard_value ASC  --Urutkan untuk mengambil nilai terendah terlebih dahulu.
+LIMIT 100;</p>
+<p>-- Simpan hasil ke file CSV (../data/chembl_35_66.csv) menggunakan pgAdmin atau psql.
+```</p>
+<p><strong>Important:</strong>  Execute this SQL query in pgAdmin and save the result as <code>../data/chembl_35_66.csv</code>.  Make sure the path <code>../data</code> exists.</p>
+<p><strong>4. Python Code (Topic_CheMBL_35_66_1_Data_Loading_and_Preprocessing.ipynb)</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import sklearn</p>
+<h1>Define base path</h1>
+<p>base_path = ".."  # Assuming your notebook is in the 'notebooks' directory</p>
+<h1>Load data from CSV</h1>
+<p>data_path = os.path.join(base_path, "data", "chembl_35_66.csv")
+df = pd.read_csv(data_path)</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>df = df.dropna(subset=['standard_value', 'smiles'])  # Remove rows with missing values in essential columns</p>
+<h1>Convert standard_value to numeric (explicitly)</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value']) #Remove rows that cannot be converted to numeric</p>
+<h1>Handle duplicate Smiles.  Keep the one with the lowest IC50 value</h1>
+<p>df = df.sort_values('standard_value').drop_duplicates(subset='smiles', keep='first')</p>
+<h1>RDKit Feature Generation</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None  # Handle invalid SMILES
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    return descriptors</p>
+<h1>Apply descriptor calculation to each molecule</h1>
+<p>df['descriptors'] = df['smiles'].apply(calculate_descriptors)</p>
+<h1>Remove rows where descriptor calculation failed</h1>
+<p>df = df.dropna(subset=['descriptors'])</p>
+<h1>Expand the descriptors column into individual columns</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Display the first few rows of the processed data</h1>
+<p>print(df.head())</p>
+<h1>Prepare data for modeling</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']]  # Features
+y = np.log10(df['standard_value']) # Target (log transformed IC50) - useful for normalizing data</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Model Training (Linear Regression)</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Model Prediction</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Model Evaluation</h1>
+<p>mse = mean_squared_error(y_test, y_pred) # Calculate MSE. This will work even in older sklearn versions
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>Python Code (Indonesian)</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import sklearn</p>
+<h1>Tentukan base path</h1>
+<p>base_path = ".."  # Asumsi notebook Anda berada di direktori 'notebooks'</p>
+<h1>Muat data dari CSV</h1>
+<p>data_path = os.path.join(base_path, "data", "chembl_35_66.csv")
+df = pd.read_csv(data_path)</p>
+<h1>Pembersihan dan Pra-pemrosesan Data</h1>
+<p>df = df.dropna(subset=['standard_value', 'smiles'])  # Hapus baris dengan nilai yang hilang di kolom penting</p>
+<h1>Konversi standard_value ke numerik (secara eksplisit)</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value']) #Hapus baris yang tidak dapat dikonversi ke numerik</p>
+<h1>Tangani duplikat Smiles. Simpan yang memiliki nilai IC50 terendah</h1>
+<p>df = df.sort_values('standard_value').drop_duplicates(subset='smiles', keep='first')</p>
+<h1>Pembuatan Fitur RDKit</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None  # Tangani SMILES yang tidak valid
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    return descriptors</p>
+<h1>Terapkan perhitungan deskriptor ke setiap molekul</h1>
+<p>df['descriptors'] = df['smiles'].apply(calculate_descriptors)</p>
+<h1>Hapus baris di mana perhitungan deskriptor gagal</h1>
+<p>df = df.dropna(subset=['descriptors'])</p>
+<h1>Perluas kolom deskriptor menjadi kolom individual</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Tampilkan beberapa baris pertama dari data yang diproses</h1>
+<p>print(df.head())</p>
+<h1>Siapkan data untuk pemodelan</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']]  # Fitur
+y = np.log10(df['standard_value']) # Target (IC50 yang ditransformasi log) - berguna untuk menormalkan data</p>
+<h1>Pisahkan data menjadi set pelatihan dan pengujian</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Pelatihan Model (Regresi Linier)</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Prediksi Model</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluasi Model</h1>
+<p>mse = mean_squared_error(y_test, y_pred) # Hitung MSE. Ini akan berfungsi bahkan dalam versi sklearn yang lebih lama
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>5. Example Analysis and Code (Additional Notebooks)</strong></p>
+<p>Here are 5 additional example notebooks you can create, building upon the initial data loading and preprocessing:</p>
+<ul>
+<li><strong>Topic_CheMBL_35_66_2_EDA_and_Visualization.ipynb:</strong>  Focuses on Exploratory Data Analysis.</li>
+<li><strong>Topic_CheMBL_35_66_3_RandomForest_Regression.ipynb:</strong> Implements a Random Forest Regression model.</li>
+<li><strong>Topic_CheMBL_35_66_4_Feature_Importance.ipynb:</strong>  Analyzes feature importance from the Random Forest model.</li>
+<li><strong>Topic_CheMBL_35_66_5_Model_Evaluation_and_Comparison.ipynb:</strong> Compares the performance of Linear Regression and Random Forest.</li>
+<li><strong>Topic_CheMBL_35_66_6_Outlier_Analysis.ipynb:</strong>  Explores outliers in the data and their impact on the model.</li>
+</ul>
+<p>I'll provide code snippets for each of these examples.  Remember to run the first notebook (<code>Topic_CheMBL_35_66_1_Data_Loading_and_Preprocessing.ipynb</code>) <em>first</em> and ensure the <code>df</code> DataFrame is correctly created before running the other notebooks.</p>
+<p><strong>Example 1: Topic_CheMBL_35_66_2_EDA_and_Visualization.ipynb</strong></p>
+<p>```python</p>
+<h1>EDA and Visualization</h1>
+<p>import matplotlib.pyplot as plt
+import seaborn as sns
+import os
+import pandas as pd
+import numpy as np</p>
+<h1>Load data from CSV (assuming the first notebook has been run and the dataframe exists)</h1>
+<p>base_path = ".."
+data_path = os.path.join(base_path, "data", "chembl_35_66.csv")
+df = pd.read_csv(data_path)</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>df = df.dropna(subset=['standard_value', 'smiles'])  # Remove rows with missing values in essential columns</p>
+<h1>Convert standard_value to numeric (explicitly)</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value']) #Remove rows that cannot be converted to numeric</p>
+<h1>Handle duplicate Smiles.  Keep the one with the lowest IC50 value</h1>
+<p>df = df.sort_values('standard_value').drop_duplicates(subset='smiles', keep='first')</p>
+<h1>RDKit Feature Generation</h1>
+<p>from rdkit import Chem
+from rdkit.Chem import Descriptors
+def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None  # Handle invalid SMILES
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    return descriptors</p>
+<h1>Apply descriptor calculation to each molecule</h1>
+<p>df['descriptors'] = df['smiles'].apply(calculate_descriptors)</p>
+<h1>Remove rows where descriptor calculation failed</h1>
+<p>df = df.dropna(subset=['descriptors'])</p>
+<h1>Expand the descriptors column into individual columns</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Distribution of IC50 values</h1>
+<p>plt.figure(figsize=(10, 6))
+sns.histplot(np.log10(df['standard_value']), kde=True)
+plt.title('Distribution of Log10(IC50)')
+plt.xlabel('Log10(IC50)')
+plt.ylabel('Frequency')
+plt.show()</p>
+<h1>Scatter plots of descriptors vs. IC50</h1>
+<p>descriptors = ['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']
+for descriptor in descriptors:
+    plt.figure(figsize=(8, 6))
+    sns.scatterplot(x=df[descriptor], y=np.log10(df['standard_value']))
+    plt.title(f'{descriptor} vs. Log10(IC50)')
+    plt.xlabel(descriptor)
+    plt.ylabel('Log10(IC50)')
+    plt.show()</p>
+<h1>Correlation heatmap</h1>
+<p>correlation_matrix = df[descriptors + ['standard_value']].corr()
+plt.figure(figsize=(10, 8))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+plt.title('Correlation Heatmap')
+plt.show()
+```</p>
+<p><strong>Example 2: Topic_CheMBL_35_66_3_RandomForest_Regression.ipynb</strong></p>
+<p>```python</p>
+<h1>RandomForest Regression Model</h1>
+<p>import os
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt</p>
+<h1>Load data from CSV</h1>
+<p>base_path = ".."
+data_path = os.path.join(base_path, "data", "chembl_35_66.csv")
+df = pd.read_csv(data_path)</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>df = df.dropna(subset=['standard_value', 'smiles'])  # Remove rows with missing values in essential columns</p>
+<h1>Convert standard_value to numeric (explicitly)</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value']) #Remove rows that cannot be converted to numeric</p>
+<h1>Handle duplicate Smiles.  Keep the one with the lowest IC50 value</h1>
+<p>df = df.sort_values('standard_value').drop_duplicates(subset='smiles', keep='first')</p>
+<h1>RDKit Feature Generation</h1>
+<p>from rdkit import Chem
+from rdkit.Chem import Descriptors
+def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None  # Handle invalid SMILES
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    return descriptors</p>
+<h1>Apply descriptor calculation to each molecule</h1>
+<p>df['descriptors'] = df['smiles'].apply(calculate_descriptors)</p>
+<h1>Remove rows where descriptor calculation failed</h1>
+<p>df = df.dropna(subset=['descriptors'])</p>
+<h1>Expand the descriptors column into individual columns</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Prepare data for modeling</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']]
+y = np.log10(df['standard_value'])</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Model Training (Random Forest Regression)</h1>
+<p>rf_model = RandomForestRegressor(n_estimators=100, random_state=42)  # Adjust hyperparameters as needed
+rf_model.fit(X_train, y_train)</p>
+<h1>Model Prediction</h1>
+<p>y_pred = rf_model.predict(X_test)</p>
+<h1>Model Evaluation</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Scatter plot of predicted vs. actual values</h1>
+<p>plt.figure(figsize=(8, 6))
+plt.scatter(y_test, y_pred)
+plt.xlabel("Actual Log10(IC50)")
+plt.ylabel("Predicted Log10(IC50)")
+plt.title("Actual vs. Predicted Log10(IC50) (Random Forest)")
+plt.show()
+```</p>
+<p><strong>Example 3: Topic_CheMBL_35_66_4_Feature_Importance.ipynb</strong></p>
+<p>```python</p>
+<h1>Feature Importance</h1>
+<p>import os
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+import matplotlib.pyplot as plt</p>
+<h1>Load data from CSV</h1>
+<p>base_path = ".."
+data_path = os.path.join(base_path, "data", "chembl_35_66.csv")
+df = pd.read_csv(data_path)</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>df = df.dropna(subset=['standard_value', 'smiles'])  # Remove rows with missing values in essential columns</p>
+<h1>Convert standard_value to numeric (explicitly)</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value']) #Remove rows that cannot be converted to numeric</p>
+<h1>Handle duplicate Smiles.  Keep the one with the lowest IC50 value</h1>
+<p>df = df.sort_values('standard_value').drop_duplicates(subset='smiles', keep='first')</p>
+<h1>RDKit Feature Generation</h1>
+<p>from rdkit import Chem
+from rdkit.Chem import Descriptors
+def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None  # Handle invalid SMILES
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    return descriptors</p>
+<h1>Apply descriptor calculation to each molecule</h1>
+<p>df['descriptors'] = df['smiles'].apply(calculate_descriptors)</p>
+<h1>Remove rows where descriptor calculation failed</h1>
+<p>df = df.dropna(subset=['descriptors'])</p>
+<h1>Expand the descriptors column into individual columns</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Prepare data for modeling</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']]
+y = np.log10(df['standard_value'])</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Model Training (Random Forest Regression)</h1>
+<p>rf_model = RandomForestRegressor(n_estimators=100, random_state=42)  # Same model as before
+rf_model.fit(X_train, y_train)</p>
+<h1>Feature Importance</h1>
+<p>importances = rf_model.feature_importances_
+feature_names = X.columns
+indices = np.argsort(importances)</p>
+<p>plt.figure(figsize=(10, 6))
+plt.title('Feature Importances (Random Forest)')
+plt.barh(range(len(indices)), importances[indices], align='center')
+plt.yticks(range(len(indices)), [feature_names[i] for i in indices])
+plt.xlabel('Relative Importance')
+plt.show()
+```</p>
+<p><strong>Example 4: Topic_CheMBL_35_66_5_Model_Evaluation_and_Comparison.ipynb</strong></p>
+<p>```python</p>
+<h1>Model Evaluation and Comparison</h1>
+<p>import os
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt</p>
+<h1>Load data from CSV</h1>
+<p>base_path = ".."
+data_path = os.path.join(base_path, "data", "chembl_35_66.csv")
+df = pd.read_csv(data_path)</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>df = df.dropna(subset=['standard_value', 'smiles'])  # Remove rows with missing values in essential columns</p>
+<h1>Convert standard_value to numeric (explicitly)</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value']) #Remove rows that cannot be converted to numeric</p>
+<h1>Handle duplicate Smiles.  Keep the one with the lowest IC50 value</h1>
+<p>df = df.sort_values('standard_value').drop_duplicates(subset='smiles', keep='first')</p>
+<h1>RDKit Feature Generation</h1>
+<p>from rdkit import Chem
+from rdkit.Chem import Descriptors
+def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None  # Handle invalid SMILES
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    return descriptors</p>
+<h1>Apply descriptor calculation to each molecule</h1>
+<p>df['descriptors'] = df['smiles'].apply(calculate_descriptors)</p>
+<h1>Remove rows where descriptor calculation failed</h1>
+<p>df = df.dropna(subset=['descriptors'])</p>
+<h1>Expand the descriptors column into individual columns</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Prepare data for modeling</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']]
+y = np.log10(df['standard_value'])</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Linear Regression</h1>
+<p>lr_model = LinearRegression()
+lr_model.fit(X_train, y_train)
+lr_pred = lr_model.predict(X_test)
+lr_mse = mean_squared_error(y_test, lr_pred)
+lr_r2 = r2_score(y_test, lr_pred)</p>
+<h1>Random Forest Regression</h1>
+<p>rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+rf_model.fit(X_train, y_train)
+rf_pred = rf_model.predict(X_test)
+rf_mse = mean_squared_error(y_test, rf_pred)
+rf_r2 = r2_score(y_test, rf_pred)</p>
+<p>print("Linear Regression:")
+print(f"  Mean Squared Error: {lr_mse}")
+print(f"  R-squared: {lr_r2}")</p>
+<p>print("\nRandom Forest Regression:")
+print(f"  Mean Squared Error: {rf_mse}")
+print(f"  R-squared: {rf_r2}")</p>
+<h1>Visualize predictions</h1>
+<p>plt.figure(figsize=(12, 6))
+plt.subplot(1, 2, 1)
+plt.scatter(y_test, lr_pred)
+plt.xlabel("Actual Log10(IC50)")
+plt.ylabel("Predicted Log10(IC50)")
+plt.title("Linear Regression: Actual vs. Predicted")</p>
+<p>plt.subplot(1, 2, 2)
+plt.scatter(y_test, rf_pred)
+plt.xlabel("Actual Log10(IC50)")
+plt.ylabel("Predicted Log10(IC50)")
+plt.title("Random Forest: Actual vs. Predicted")</p>
+<p>plt.tight_layout()
+plt.show()
+```</p>
+<p><strong>Example 5: Topic_CheMBL_35_66_6_Outlier_Analysis.ipynb</strong></p>
+<p>```python</p>
+<h1>Outlier Analysis</h1>
+<p>import os
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<h1>Load data from CSV</h1>
+<p>base_path = ".."
+data_path = os.path.join(base_path, "data", "chembl_35_66.csv")
+df = pd.read_csv(data_path)</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>df = df.dropna(subset=['standard_value', 'smiles'])  # Remove rows with missing values in essential columns</p>
+<h1>Convert standard_value to numeric (explicitly)</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value']) #Remove rows that cannot be converted to numeric</p>
+<h1>Handle duplicate Smiles.  Keep the one with the lowest IC50 value</h1>
+<p>df = df.sort_values('standard_value').drop_duplicates(subset='smiles', keep='first')</p>
+<h1>RDKit Feature Generation</h1>
+<p>from rdkit import Chem
+from rdkit.Chem import Descriptors
+def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None  # Handle invalid SMILES
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    return descriptors</p>
+<h1>Apply descriptor calculation to each molecule</h1>
+<p>df['descriptors'] = df['smiles'].apply(calculate_descriptors)</p>
+<h1>Remove rows where descriptor calculation failed</h1>
+<p>df = df.dropna(subset=['descriptors'])</p>
+<h1>Expand the descriptors column into individual columns</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Prepare data for modeling</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']]
+y = np.log10(df['standard_value'])</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a Linear Regression model (or any model)</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)</p>
+<h1>Calculate residuals</h1>
+<p>residuals = y_test - y_pred</p>
+<h1>Visualize residuals</h1>
+<p>plt.figure(figsize=(10, 6))
+sns.scatterplot(x=y_pred, y=residuals)
+plt.axhline(y=0, color='red', linestyle='--')
+plt.xlabel("Predicted Values")
+plt.ylabel("Residuals")
+plt.title("Residual Plot")
+plt.show()</p>
+<h1>Identify potential outliers based on residuals (e.g., beyond 2 standard deviations)</h1>
+<p>residual_std = residuals.std()
+outlier_threshold = 2 * residual_std
+outlier_indices = residuals[abs(residuals) &gt; outlier_threshold].index</p>
+<p>print(f"Number of potential outliers: {len(outlier_indices)}")
+print(df.loc[outlier_indices])  # Display the outlier data points</p>
+<p>```</p>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>Install RDKit:</strong>  <code>conda install -c conda-forge rdkit</code> or <code>pip install rdkit</code></li>
+<li><strong>File Paths:</strong> Double-check that the file paths in your code are correct relative to your project structure.</li>
+<li><strong>Error Handling:</strong> Add more robust error handling (e.g., using <code>try...except</code> blocks) to handle potential issues with SMILES parsing or descriptor calculation.</li>
+<li><strong>Hyperparameter Tuning:</strong>  Experiment with different hyperparameters for your models (e.g., <code>n_estimators</code> in Random Forest) to optimize performance.</li>
+<li><strong>Data Scaling:</strong>  Consider scaling your features (e.g., using <code>StandardScaler</code> or <code>MinMaxScaler</code>) before training your models, especially for algorithms sensitive to feature scaling like Linear Regression or Support Vector Machines.</li>
+</ul>
+        </body>
+        </html>
+        

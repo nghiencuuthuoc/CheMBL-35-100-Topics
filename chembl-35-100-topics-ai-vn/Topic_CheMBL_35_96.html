@@ -1,0 +1,597 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_96</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Học đa nhiệm cho ức chế toàn đích</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 này. Với vai trò là một chuyên gia nghiên cứu và phát triển dược học, tôi hiểu rõ tầm quan trọng của việc khai thác dữ liệu ChEMBL để tìm kiếm và phát triển các hợp chất tiềm năng. Dựa trên thông tin bạn cung cấp, tôi sẽ hướng dẫn bạn từng bước, từ phân tích mô hình, viết code SQL và Python, đến xử lý các lỗi thường gặp.</p>
+<p><strong>1. Phân tích mô hình phân tích (Analysis of the Analysis Model)</strong></p>
+<p>Dự án của bạn tập trung vào việc kết hợp dữ liệu từ ChEMBL 35 với các công cụ tin sinh học như RDKit để phục vụ cho nghiên cứu và phát triển thuốc. Dưới đây là một số phân tích và hướng dẫn để bạn có thể triển khai mô hình một cách hiệu quả:</p>
+<ul>
+<li><strong>Mục tiêu (Objective):</strong> Xác định các hợp chất có hoạt tính sinh học cao đối với một mục tiêu cụ thể (ví dụ: một protein liên quan đến bệnh). Bạn có thể muốn xây dựng một mô hình dự đoán hoạt tính, tìm kiếm các hợp chất tương tự, hoặc phân tích mối quan hệ cấu trúc-hoạt tính (SAR).</li>
+<li><strong>Nguồn dữ liệu (Data Source):</strong> ChEMBL 35 là một cơ sở dữ liệu lớn chứa thông tin về các hợp chất hóa học và hoạt tính sinh học của chúng. Bạn sẽ sử dụng dữ liệu này làm nguồn chính.</li>
+<li><strong>Công cụ (Tools):</strong><ul>
+<li><strong>PostgreSQL (psql):</strong> Hệ quản trị cơ sở dữ liệu để lưu trữ và truy vấn dữ liệu ChEMBL.</li>
+<li><strong>RDKit:</strong> Thư viện Python để phân tích và thao tác với cấu trúc hóa học.</li>
+<li><strong>Jupyter Notebook:</strong> Môi trường phát triển tích hợp để viết và chạy code Python.</li>
+<li><strong>Scikit-learn:</strong> Thư viện Python cho các thuật toán học máy.</li>
+</ul>
+</li>
+<li><strong>Các bước chính (Main Steps):</strong><ol>
+<li><strong>Truy vấn dữ liệu (Data Querying):</strong> Sử dụng SQL để trích xuất dữ liệu từ ChEMBL, bao gồm thông tin về hợp chất (ví dụ: SMILES, InChI), hoạt tính sinh học (ví dụ: IC50, Ki), và mục tiêu.</li>
+<li><strong>Tiền xử lý dữ liệu (Data Preprocessing):</strong> Làm sạch và chuẩn hóa dữ liệu, loại bỏ các giá trị ngoại lệ hoặc không hợp lệ.</li>
+<li><strong>Tính toán descriptor (Descriptor Calculation):</strong> Sử dụng RDKit để tính toán các descriptor phân tử từ cấu trúc hóa học (ví dụ: trọng lượng phân tử, logP, số lượng liên kết).</li>
+<li><strong>Phân tích dữ liệu (Data Analysis):</strong> Sử dụng các kỹ thuật thống kê và học máy để phân tích dữ liệu, ví dụ:<ul>
+<li><strong>Mô hình hóa QSAR/QSPR (QSAR/QSPR Modeling):</strong> Xây dựng mô hình dự đoán hoạt tính sinh học dựa trên các descriptor phân tử.</li>
+<li><strong>Tìm kiếm tương đồng (Similarity Search):</strong> Tìm kiếm các hợp chất tương tự với một hợp chất mục tiêu dựa trên cấu trúc hoặc descriptor.</li>
+<li><strong>Phân cụm (Clustering):</strong> Phân nhóm các hợp chất dựa trên tính chất hóa học và hoạt tính sinh học.</li>
+</ul>
+</li>
+<li><strong>Trực quan hóa dữ liệu (Data Visualization):</strong> Sử dụng các công cụ như Matplotlib hoặc Seaborn để trực quan hóa dữ liệu và kết quả phân tích.</li>
+</ol>
+</li>
+</ul>
+<p><strong>2. Hướng dẫn song ngữ (Bilingual Instructions)</strong></p>
+<p>Tôi sẽ cung cấp hướng dẫn bằng cả tiếng Anh và tiếng Việt để bạn dễ dàng theo dõi.</p>
+<p><strong>3. Code SQL và Python (SQL and Python Code)</strong></p>
+<p><strong>3.1 Code SQL</strong></p>
+<ul>
+<li><strong>Mục tiêu:</strong> Trích xuất dữ liệu về các hợp chất và hoạt tính sinh học của chúng từ cơ sở dữ liệu ChEMBL.</li>
+<li><strong>Ví dụ 1:</strong> Lấy 100 hợp chất có hoạt tính IC50 đối với một mục tiêu cụ thể (ví dụ: CHEMBL205).</li>
+</ul>
+<p>```sql
+-- English
+-- Retrieve 100 compounds with IC50 activity against a specific target (e.g., CHEMBL205)
+SELECT DISTINCT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.chembl_id = 'CHEMBL205'  -- Replace with your target of interest
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0
+ORDER BY
+    act.standard_value
+LIMIT 100;</p>
+<p>-- Vietnamese
+-- Lấy 100 hợp chất có hoạt tính IC50 đối với một mục tiêu cụ thể (ví dụ: CHEMBL205)
+SELECT DISTINCT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.chembl_id = 'CHEMBL205'  -- Thay thế bằng mục tiêu bạn quan tâm
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0
+ORDER BY
+    act.standard_value
+LIMIT 100;
+```</p>
+<ul>
+<li><strong>Ví dụ 2:</strong> Lấy 100 hợp chất và thông tin cơ bản của chúng.</li>
+</ul>
+<p>```sql
+-- English
+-- Retrieve 100 compounds and their basic information
+SELECT md.chembl_id, cs.canonical_smiles
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+LIMIT 100;</p>
+<p>-- Vietnamese
+-- Lấy 100 hợp chất và thông tin cơ bản của chúng
+SELECT md.chembl_id, cs.canonical_smiles
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+LIMIT 100;
+```</p>
+<ul>
+<li><strong>Ví dụ 3:</strong> Lấy 100 hợp chất có hoạt tính Ki.</li>
+</ul>
+<p>```sql
+-- English
+-- Retrieve 100 compounds with Ki activity
+SELECT DISTINCT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type = 'Ki'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0
+ORDER BY
+    act.standard_value
+LIMIT 100;</p>
+<p>-- Vietnamese
+-- Lấy 100 hợp chất có hoạt tính Ki
+SELECT DISTINCT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type = 'Ki'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0
+ORDER BY
+    act.standard_value
+LIMIT 100;
+```</p>
+<ul>
+<li><strong>Ví dụ 4:</strong> Lấy các mục tiêu liên quan đến một bệnh cụ thể (ví dụ: ung thư).</li>
+</ul>
+<p>```sql
+-- English
+-- Retrieve targets associated with a specific disease (e.g., cancer)
+SELECT DISTINCT
+    td.chembl_id,
+    td.pref_name
+FROM
+    target_dictionary td
+JOIN
+    target_components tc ON td.tid = tc.tid
+JOIN
+    component_sequences cs ON tc.component_id = cs.component_id
+WHERE
+    td.target_type = 'SINGLE PROTEIN'
+    AND td.organism = 'Homo sapiens'
+    AND td.pref_name LIKE '%cancer%';</p>
+<p>-- Vietnamese
+-- Lấy các mục tiêu liên quan đến một bệnh cụ thể (ví dụ: ung thư)
+SELECT DISTINCT
+    td.chembl_id,
+    td.pref_name
+FROM
+    target_dictionary td
+JOIN
+    target_components tc ON td.tid = tc.tid
+JOIN
+    component_sequences cs ON tc.component_id = cs.component_id
+WHERE
+    td.target_type = 'SINGLE PROTEIN'
+    AND td.organism = 'Homo sapiens'
+    AND td.pref_name LIKE '%ung thư%';
+```</p>
+<ul>
+<li><strong>Ví dụ 5:</strong> Lấy các hợp chất có hoạt tính trên một mục tiêu cụ thể và có trọng lượng phân tử nằm trong một khoảng nhất định.</li>
+</ul>
+<p>```sql
+-- English
+-- Retrieve compounds with activity on a specific target and molecular weight within a certain range
+SELECT DISTINCT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.chembl_id = 'CHEMBL205'  -- Replace with your target of interest
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0
+    AND md.mw_freebase BETWEEN 200 AND 500; -- Molecular weight range</p>
+<p>-- Vietnamese
+-- Lấy các hợp chất có hoạt tính trên một mục tiêu cụ thể và có trọng lượng phân tử nằm trong một khoảng nhất định
+SELECT DISTINCT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.chembl_id = 'CHEMBL205'  -- Thay thế bằng mục tiêu bạn quan tâm
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0
+    AND md.mw_freebase BETWEEN 200 AND 500; -- Khoảng trọng lượng phân tử
+```</p>
+<p><strong>Lưu ý:</strong></p>
+<ul>
+<li>Thay thế <code>'CHEMBL205'</code> bằng ID mục tiêu thực tế bạn quan tâm.</li>
+<li>Bạn có thể tùy chỉnh các điều kiện <code>WHERE</code> để lọc dữ liệu theo nhu cầu của bạn.</li>
+<li>Chạy các truy vấn này trên pgAdmin và lưu kết quả vào file CSV.</li>
+</ul>
+<p><strong>3.2 Code Python</strong></p>
+<ul>
+<li><strong>Mục tiêu:</strong> Đọc dữ liệu từ file CSV, tính toán descriptor phân tử bằng RDKit, và thực hiện phân tích cơ bản.</li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np</p>
+<h1>Define the base path</h1>
+<p>base_path = ".."  # Adjust if needed</p>
+<h1>Define the path to the CSV file</h1>
+<p>csv_file_path = os.path.join(base_path, "data", "your_data.csv")  # Replace "your_data.csv"</p>
+<h1>Read the CSV file into a pandas DataFrame</h1>
+<p>try:
+    df = pd.read_csv(csv_file_path)
+    print("Data loaded successfully!")
+except FileNotFoundError:
+    print(f"Error: File not found at {csv_file_path}")
+    exit()</p>
+<h1>Function to calculate molecular weight using RDKit</h1>
+<p>def calculate_molecular_weight(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            return Descriptors.MolWt(mol)
+        else:
+            return np.nan  # Return NaN if the SMILES is invalid
+    except:
+        return np.nan</p>
+<h1>Apply the function to create a new column 'molecular_weight'</h1>
+<p>df['molecular_weight'] = df['canonical_smiles'].apply(calculate_molecular_weight)</p>
+<h1>Display the first few rows with the new column</h1>
+<p>print(df.head())</p>
+<h1>Basic analysis: Calculate the mean molecular weight</h1>
+<p>mean_molecular_weight = df['molecular_weight'].mean()
+print(f"Mean Molecular Weight: {mean_molecular_weight}")</p>
+<h1>Vietnamese</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np</p>
+<h1>Định nghĩa đường dẫn gốc</h1>
+<p>base_path = ".."  # Điều chỉnh nếu cần</p>
+<h1>Định nghĩa đường dẫn đến file CSV</h1>
+<p>csv_file_path = os.path.join(base_path, "data", "your_data.csv")  # Thay thế "your_data.csv"</p>
+<h1>Đọc file CSV vào một DataFrame của pandas</h1>
+<p>try:
+    df = pd.read_csv(csv_file_path)
+    print("Dữ liệu đã được tải thành công!")
+except FileNotFoundError:
+    print(f"Lỗi: Không tìm thấy file tại {csv_file_path}")
+    exit()</p>
+<h1>Hàm tính toán trọng lượng phân tử sử dụng RDKit</h1>
+<p>def calculate_molecular_weight(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            return Descriptors.MolWt(mol)
+        else:
+            return np.nan  # Trả về NaN nếu SMILES không hợp lệ
+    except:
+        return np.nan</p>
+<h1>Áp dụng hàm để tạo một cột mới 'molecular_weight'</h1>
+<p>df['molecular_weight'] = df['canonical_smiles'].apply(calculate_molecular_weight)</p>
+<h1>Hiển thị một vài hàng đầu tiên với cột mới</h1>
+<p>print(df.head())</p>
+<h1>Phân tích cơ bản: Tính trọng lượng phân tử trung bình</h1>
+<p>mean_molecular_weight = df['molecular_weight'].mean()
+print(f"Trọng lượng phân tử trung bình: {mean_molecular_weight}")
+```</p>
+<p><strong>Lưu ý:</strong></p>
+<ul>
+<li>Thay thế <code>"your_data.csv"</code> bằng tên file CSV thực tế của bạn.</li>
+<li>Đảm bảo rằng bạn đã cài đặt RDKit (<code>pip install rdkit</code>).</li>
+<li>Đoạn code trên chỉ là một ví dụ đơn giản. Bạn có thể mở rộng nó để tính toán các descriptor khác, thực hiện phân tích thống kê, hoặc xây dựng mô hình học máy.</li>
+</ul>
+<p><strong>Ví dụ 1: Tính LogP</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>from rdkit.Chem import Crippen</p>
+<p>def calculate_logp(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            return Crippen.MolLogP(mol)
+        else:
+            return np.nan
+    except:
+        return np.nan</p>
+<p>df['logp'] = df['canonical_smiles'].apply(calculate_logp)
+print(df.head())</p>
+<h1>Vietnamese</h1>
+<p>from rdkit.Chem import Crippen</p>
+<p>def tinh_logp(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            return Crippen.MolLogP(mol)
+        else:
+            return np.nan
+    except:
+        return np.nan</p>
+<p>df['logp'] = df['canonical_smiles'].apply(tinh_logp)
+print(df.head())
+```</p>
+<p><strong>Ví dụ 2: Tính số lượng vòng</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>from rdkit.Chem import Rings</p>
+<p>def calculate_num_rings(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            return Rings.NumRings(mol)
+        else:
+            return np.nan
+    except:
+        return np.nan</p>
+<p>df['num_rings'] = df['canonical_smiles'].apply(calculate_num_rings)
+print(df.head())</p>
+<h1>Vietnamese</h1>
+<p>from rdkit.Chem import Rings</p>
+<p>def tinh_so_vong(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            return Rings.NumRings(mol)
+        else:
+            return np.nan
+    except:
+        return np.nan</p>
+<p>df['num_rings'] = df['canonical_smiles'].apply(tinh_so_vong)
+print(df.head())
+```</p>
+<p><strong>Ví dụ 3: Vẽ cấu trúc phân tử</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>from rdkit.Chem.Draw import MolToImage</p>
+<p>def draw_molecule(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            return MolToImage(mol)
+        else:
+            return None
+    except:
+        return None</p>
+<h1>Draw the first molecule</h1>
+<p>image = draw_molecule(df['canonical_smiles'][0])
+if image:
+    image.show()</p>
+<h1>Vietnamese</h1>
+<p>from rdkit.Chem.Draw import MolToImage</p>
+<p>def ve_phan_tu(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            return MolToImage(mol)
+        else:
+            return None
+    except:
+        return None</p>
+<h1>Vẽ phân tử đầu tiên</h1>
+<p>image = ve_phan_tu(df['canonical_smiles'][0])
+if image:
+    image.show()
+```</p>
+<p><strong>Ví dụ 4: Lọc các hợp chất tuân theo quy tắc Lipinski</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>from rdkit.Chem import Lipinski</p>
+<p>def lipinski_rules(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            mw = Descriptors.MolWt(mol)
+            logp = Crippen.MolLogP(mol)
+            hbd = Lipinski.NumHDonors(mol)
+            hba = Lipinski.NumHAcceptors(mol)
+            if mw &lt;= 500 and logp &lt;= 5 and hbd &lt;= 5 and hba &lt;= 10:
+                return True
+            else:
+                return False
+        else:
+            return False
+    except:
+        return False</p>
+<p>df['lipinski'] = df['canonical_smiles'].apply(lipinski_rules)
+print(df[df['lipinski'] == True].head())</p>
+<h1>Vietnamese</h1>
+<p>from rdkit.Chem import Lipinski</p>
+<p>def quy_tac_lipinski(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            mw = Descriptors.MolWt(mol)
+            logp = Crippen.MolLogP(mol)
+            hbd = Lipinski.NumHDonors(mol)
+            hba = Lipinski.NumHAcceptors(mol)
+            if mw &lt;= 500 and logp &lt;= 5 and hbd &lt;= 5 and hba &lt;= 10:
+                return True
+            else:
+                return False
+        else:
+            return False
+    except:
+        return False</p>
+<p>df['lipinski'] = df['canonical_smiles'].apply(quy_tac_lipinski)
+print(df[df['lipinski'] == True].head())
+```</p>
+<p><strong>Ví dụ 5: Tính TPSA (Diện tích bề mặt cực)</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>from rdkit.Chem import TPSA</p>
+<p>def calculate_tpsa(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            return TPSA.TPSA(mol)
+        else:
+            return np.nan
+    except:
+        return np.nan</p>
+<p>df['tpsa'] = df['canonical_smiles'].apply(calculate_tpsa)
+print(df.head())</p>
+<h1>Vietnamese</h1>
+<p>from rdkit.Chem import TPSA</p>
+<p>def tinh_tpsa(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            return TPSA.TPSA(mol)
+        else:
+            return np.nan
+    except:
+        return np.nan</p>
+<p>df['tpsa'] = df['canonical_smiles'].apply(tinh_tpsa)
+print(df.head())
+```</p>
+<p><strong>4. Xử lý lỗi (Error Handling)</strong></p>
+<ul>
+<li>
+<p><strong>Lỗi a: <code>ERROR:  operator does not exist: numeric ~ unknown</code></strong></p>
+<p>Lỗi này xảy ra khi bạn sử dụng toán tử <code>~</code> (regex match) trên một cột kiểu số (numeric). Để khắc phục, bạn cần đảm bảo rằng cột <code>act.standard_value</code> là kiểu text trước khi sử dụng regex.</p>
+<p>```sql
+-- English
+-- Corrected SQL query
+SELECT DISTINCT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9.]+$'  -- Cast to text before regex match
+LIMIT 100;</p>
+<p>-- Vietnamese
+-- Truy vấn SQL đã sửa
+SELECT DISTINCT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9.]+$'  -- Chuyển đổi sang text trước khi so khớp regex
+LIMIT 100;
+```</p>
+<p>Ở đây, <code>act.standard_value::text</code> chuyển đổi cột <code>act.standard_value</code> sang kiểu text trước khi thực hiện so khớp regex.</p>
+</li>
+<li>
+<p><strong>Lỗi b: Phiên bản scikit-learn cũ không hỗ trợ <code>squared=False</code></strong></p>
+<p>Nếu bạn đang sử dụng phiên bản scikit-learn cũ, hãy bỏ tham số <code>squared=False</code> hoặc nâng cấp lên phiên bản mới hơn.</p>
+<p>```python</p>
+<h1>English</h1>
+<h1>For older versions of scikit-learn</h1>
+<p>from sklearn.metrics import mean_squared_error
+mse = mean_squared_error(y_true, y_pred)
+rmse = mse**0.5  # Calculate RMSE manually</p>
+<h1>Vietnamese</h1>
+<h1>Đối với các phiên bản scikit-learn cũ</h1>
+<p>from sklearn.metrics import mean_squared_error
+mse = mean_squared_error(y_true, y_pred)
+rmse = mse**0.5  # Tính RMSE thủ công
+```</p>
+</li>
+</ul>
+<p><strong>5. Cấu trúc thư mục (Folder Structure)</strong></p>
+<p>Bạn đã đề cập đến cấu trúc thư mục theo chuẩn AIMLOps Template. Hãy đảm bảo rằng bạn tuân thủ cấu trúc này để dễ dàng quản lý và tái sử dụng code.</p>
+<p><strong>Lời khuyên (Advice)</strong></p>
+<ul>
+<li><strong>Bắt đầu từ những bước nhỏ:</strong> Đừng cố gắng làm mọi thứ cùng một lúc. Bắt đầu với việc trích xuất dữ liệu cơ bản, tính toán một vài descriptor, và thực hiện một phân tích đơn giản.</li>
+<li><strong>Tài liệu hóa code:</strong> Viết comment rõ ràng để giải thích code của bạn. Điều này sẽ giúp bạn và người khác hiểu và bảo trì code dễ dàng hơn.</li>
+<li><strong>Sử dụng hệ thống quản lý phiên bản:</strong> Sử dụng Git để quản lý code của bạn.</li>
+<li><strong>Tham khảo tài liệu:</strong> Đọc kỹ tài liệu của ChEMBL, RDKit, và scikit-learn để hiểu rõ hơn về các công cụ này.</li>
+</ul>
+<p>Tôi hy vọng hướng dẫn này sẽ giúp bạn bắt đầu dự án của mình một cách suôn sẻ. Nếu bạn có bất kỳ câu hỏi nào, đừng ngần ngại hỏi. Chúc bạn thành công!</p>
+        </body>
+        </html>
+        

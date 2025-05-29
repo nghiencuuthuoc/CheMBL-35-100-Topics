@@ -1,0 +1,262 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_79</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Radar chart of drug-likeness scores</h1>
+<hr />
+<p>Okay, I understand. You're working with ChEMBL 35 data, using RDKit, and following an AIMLops-like directory structure. You need guidance on running your SQL and Python code, handling errors, and creating examples.  Let's break this down.</p>
+<p><strong>Analysis of the Analysis Model (Assuming a Regression Task)</strong></p>
+<p>Based on the context of ChEMBL data (bioactivity data), the <code>standard_value</code> field, and common use cases, I'm going to assume you're building a <em>regression model</em> to predict bioactivity. The specific bioactivity being predicted (e.g., IC50, Ki) would depend on the filtering in your SQL query.</p>
+<p><strong>The general workflow will be:</strong></p>
+<ol>
+<li><strong>Data Extraction (SQL):</strong> Retrieve relevant data from the ChEMBL database, focusing on specific targets or assays. The SQL query will filter for data where the <code>standard_value</code> is a numerical value and limit the results to 100 rows to avoid overwhelming your system.  The query will save the output to a CSV file.</li>
+<li><strong>Data Preprocessing (Python/RDKit):</strong> Load the data from the CSV file.  Use RDKit to generate molecular descriptors (e.g., fingerprints, physicochemical properties) from the SMILES strings in the ChEMBL database.</li>
+<li><strong>Model Building and Evaluation (Python/Scikit-learn):</strong> Split the data into training and testing sets.  Train a regression model (e.g., Random Forest, linear regression) using the molecular descriptors as features and the <code>standard_value</code> as the target variable.  Evaluate the model's performance using metrics like Mean Squared Error (MSE) or R-squared.</li>
+</ol>
+<p><strong>Addressing Errors</strong></p>
+<ul>
+<li>
+<p><strong>Error a: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p>This error occurs because you are trying to use a regular expression operator <code>~</code> on a numeric column (<code>act.standard_value</code>). PostgreSQL doesn't allow this directly. You need to cast the numeric column to a text column before applying the regular expression.</p>
+</li>
+<li>
+<p><strong>Error b: <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<p>This means you're using an older version of scikit-learn (likely pre 0.20). There are two solutions:
+*   <strong>Upgrade scikit-learn:</strong>  This is the preferred solution: <code>pip install -U scikit-learn</code>
+*   <strong>Remove <code>squared=False</code>:</strong> If upgrading isn't feasible, calculate the Root Mean Squared Error (RMSE) manually by taking the square root of the MSE: <code>rmse = np.sqrt(mean_squared_error(y_test, y_pred))</code></p>
+</li>
+</ul>
+<p><strong>Directory Structure (Following AIMLops)</strong></p>
+<p>Let's assume the following base path:</p>
+<p><code>base_path = "/path/to/your/project"  # Replace with your actual path</code></p>
+<p>Then, we have:</p>
+<ul>
+<li><code>data/</code>: Contains the extracted CSV file.</li>
+<li><code>notebooks/</code>: Contains the Jupyter Notebooks.</li>
+<li><code>models/</code>:  (Will contain saved models later).</li>
+<li><code>src/</code>: (Optional; could contain reusable Python modules).</li>
+<li><code>config/</code>: (Optional; could contain configuration files).</li>
+</ul>
+<p><strong>1. SQL Code (to extract data)</strong></p>
+<p>```sql
+-- File: Topic_CheMBL_35_79_extract.sql
+-- Saved in: ../data/Topic_CheMBL_35_79_data.csv</p>
+<p>COPY (
+    SELECT
+        act.molregno,
+        act.standard_value,
+        md.chembl_id,
+        cs.canonical_smiles
+    FROM
+        activities act
+    JOIN
+        molecule_dictionary md ON act.molregno = md.molregno
+    JOIN
+        compound_structures cs ON md.molregno = cs.molregno
+    WHERE
+        act.standard_type = 'IC50'  -- Example: Filter for IC50 values
+        AND act.standard_units = 'nM' -- Ensure units are consistent
+        AND act.standard_value IS NOT NULL
+        AND act.standard_value::text ~ '^[0-9.]+$'  -- Corrected: Cast to text for regex
+    LIMIT 100  -- Limit to 100 rows
+) TO '/path/to/your/project/data/Topic_CheMBL_35_79_data.csv' WITH CSV HEADER;</p>
+<p>-- Change '/path/to/your/project/data/Topic_CheMBL_35_79_data.csv' to actual folder
+```</p>
+<p><strong>Important Considerations for SQL:</strong></p>
+<ul>
+<li><strong>Adjust the path in the COPY command:</strong>  Make sure the path <code>/path/to/your/project/data/Topic_CheMBL_35_79_data.csv</code> is accessible to the PostgreSQL server (it needs write permissions).  If you have issues, consider using <code>\COPY</code> from <code>psql</code> instead, which writes to the client's filesystem.</li>
+<li><strong><code>standard_type</code>:</strong>  Critically, choose the correct <code>standard_type</code> (e.g., 'IC50', 'Ki', 'EC50'). This determines what kind of bioactivity you are predicting.</li>
+<li><strong>Units:</strong> Standardize the units (<code>standard_units</code>).  'nM' is common, but verify in your data.</li>
+<li><strong>Bioactivity Range:</strong> Consider adding filtering for a reasonable range of <code>standard_value</code>. Extremely high or low values can be outliers.  For example: <code>AND act.standard_value BETWEEN 0 AND 100000</code> (adjust range as needed).</li>
+<li><strong>Target Specificity:</strong>  Ideally, filter for a specific target (e.g., a specific protein). This makes the model more relevant. You'll need to join with the <code>target_dictionary</code> table and use <code>target_components</code> and <code>component_sequences</code> tables to find your target.  This is a more advanced query.</li>
+</ul>
+<p><strong>Running the SQL (in pgAdmin):</strong></p>
+<ol>
+<li>Open pgAdmin and connect to your <code>chembl_35</code> database (ip: 192.168.206.136, user: rd, pass: rd).</li>
+<li>Open a query window.</li>
+<li>Paste the SQL code into the query window.</li>
+<li><strong>Important:</strong>  Edit the <code>/path/to/your/project/data/Topic_CheMBL_35_79_data.csv</code> part to reflect the <em>actual</em> path on the <em>server</em> where PostgreSQL is running.</li>
+<li>Execute the query.</li>
+</ol>
+<p><strong>2. Python Code (Jupyter Notebook)</strong></p>
+<p>```python</p>
+<h1>File: notebooks/Topic_CheMBL_35_79_1_data_prep.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+import joblib # For saving the model</p>
+<h1>Define the base path</h1>
+<p>base_path = "/path/to/your/project"  # Replace with your actual path
+data_path = os.path.join(base_path, "data", "Topic_CheMBL_35_79_data.csv")
+model_path = os.path.join(base_path, "models", "Topic_CheMBL_35_79_model.joblib")</p>
+<h1>1. Load the data</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}.  Make sure you ran the SQL query and that the path is correct.")
+    exit()</p>
+<h1>2. Data Cleaning and Preparation</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])  # Drop rows with missing SMILES or values
+df = df[df['standard_value'] &gt; 0]  # Remove non-positive standard values</p>
+<h1>3. RDKit Feature Generation (Molecular Descriptors)</h1>
+<p>def generate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None  # Handle invalid SMILES</p>
+<pre><code># Calculate Descriptors (Example: Molecular Weight, LogP)
+mw = Descriptors.MolWt(mol)
+logp = Descriptors.MolLogP(mol)
+
+# Calculate Morgan Fingerprint (ECFP4)
+fingerprint = AllChem.GetMorganFingerprintAsBitVect(mol, radius=2, nBits=2048)
+fingerprint_array = np.array(list(fingerprint.ToBitString()), dtype=int)
+
+return pd.Series([mw, logp, *fingerprint_array]) # Combine into a single series
+</code></pre>
+<h1>Apply descriptor generation to each SMILES string</h1>
+<p>descriptors = df['canonical_smiles'].apply(generate_descriptors)</p>
+<h1>Handle cases where descriptor generation failed (invalid SMILES)</h1>
+<p>df = df.join(descriptors).dropna()</p>
+<h1>Separate features (X) and target (y)</h1>
+<p>X = df.iloc[:, 5:] # Select columns from position 5 to the end because first 5 columns were about ID, SMILE, etc.
+y = df['standard_value']</p>
+<h1>4. Data Splitting</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>5. Model Training</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)  # Example: Random Forest
+model.fit(X_train, y_train)</p>
+<h1>6. Model Evaluation</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+rmse = np.sqrt(mse)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+print(f"Root Mean Squared Error: {rmse}")</p>
+<h1>7. Save the Model</h1>
+<p>joblib.dump(model, model_path)
+print(f"Model saved to {model_path}")
+```</p>
+<p><strong>File: notebooks/Topic_CheMBL_35_79_2_model_inference.ipynb</strong></p>
+<p>```python</p>
+<h1>File: notebooks/Topic_CheMBL_35_79_2_model_inference.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors
+import numpy as np
+import joblib # For loading the model</p>
+<h1>Define the base path</h1>
+<p>base_path = "/path/to/your/project"  # Replace with your actual path
+data_path = os.path.join(base_path, "data", "Topic_CheMBL_35_79_data.csv")
+model_path = os.path.join(base_path, "models", "Topic_CheMBL_35_79_model.joblib")</p>
+<h1>1. Load the Model</h1>
+<p>try:
+    model = joblib.load(model_path)
+    print("Model loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: Model file not found at {model_path}.  Make sure you ran the training notebook first.")
+    exit()</p>
+<h1>2. Load New Data (or a subset of the original data)</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}.  Make sure you ran the SQL query and that the path is correct.")
+    exit()</p>
+<h1>3. Data Cleaning and Preparation</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])  # Drop rows with missing SMILES or values
+df = df[df['standard_value'] &gt; 0]  # Remove non-positive standard values</p>
+<h1>4. RDKit Feature Generation (Molecular Descriptors)</h1>
+<p>def generate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None  # Handle invalid SMILES</p>
+<pre><code># Calculate Descriptors (Example: Molecular Weight, LogP)
+mw = Descriptors.MolWt(mol)
+logp = Descriptors.MolLogP(mol)
+
+# Calculate Morgan Fingerprint (ECFP4)
+fingerprint = AllChem.GetMorganFingerprintAsBitVect(mol, radius=2, nBits=2048)
+fingerprint_array = np.array(list(fingerprint.ToBitString()), dtype=int)
+
+return pd.Series([mw, logp, *fingerprint_array]) # Combine into a single series
+</code></pre>
+<h1>Apply descriptor generation to each SMILES string</h1>
+<p>descriptors = df['canonical_smiles'].apply(generate_descriptors)</p>
+<h1>Handle cases where descriptor generation failed (invalid SMILES)</h1>
+<p>df = df.join(descriptors).dropna()</p>
+<h1>Separate features (X) and target (y)</h1>
+<p>X = df.iloc[:, 5:] # Select columns from position 5 to the end because first 5 columns were about ID, SMILE, etc.</p>
+<h1>5. Make Predictions</h1>
+<p>predictions = model.predict(X)</p>
+<h1>6. Add Predictions to the DataFrame</h1>
+<p>df['predicted_value'] = predictions</p>
+<h1>7. Display Results (First 10 rows)</h1>
+<p>print(df[['chembl_id', 'standard_value', 'predicted_value']].head(10))
+```</p>
+<p><strong>Key Points for Python Code:</strong></p>
+<ul>
+<li><strong>Error Handling:</strong>  The <code>try...except</code> block handles the <code>FileNotFoundError</code> when loading the CSV.  Add more error handling, especially around the RDKit descriptor generation (invalid SMILES strings are common).</li>
+<li><strong>RDKit Descriptor Generation:</strong>  This is a <em>critical</em> step. The code provides a basic example (molecular weight and LogP), and Morgan fingerprints.  Experiment with other descriptors.  Consider using the <code>rdkit.Chem.Descriptors</code> module for more physicochemical properties. Be consistent with number of fingerprints with the number of columns you select.</li>
+<li><strong>Model Choice:</strong> Random Forest is a good starting point.  Experiment with other regression models like linear regression, Support Vector Regression (SVR), or Gradient Boosting.</li>
+<li><strong>Hyperparameter Tuning:</strong>  Optimize the hyperparameters of your chosen model (e.g., <code>n_estimators</code>, <code>max_depth</code> for Random Forest).  Use techniques like cross-validation and grid search.</li>
+<li><strong>Feature Selection:</strong> Not all descriptors will be equally important.  Use feature selection techniques to reduce the dimensionality of the data and improve model performance.  The model's <code>feature_importances_</code> attribute can help with this.</li>
+<li><strong>Logging:</strong> Use the <code>logging</code> module for more robust logging than just <code>print</code> statements.</li>
+</ul>
+<p><strong>3. Examples</strong></p>
+<p>Here are 5 examples of what you can do with this setup:</p>
+<ol>
+<li><strong>Predict IC50 for a specific target:</strong> Modify the SQL query to filter for a specific target (e.g., a specific protein or enzyme) using <code>target_dictionary</code> and related tables. Train a model to predict IC50 values for inhibitors of that target.</li>
+<li><strong>Compare different descriptor sets:</strong>  Experiment with different sets of RDKit descriptors (e.g., physicochemical properties, topological indices, fingerprints).  Train separate models with each descriptor set and compare their performance.</li>
+<li><strong>Evaluate different machine learning models:</strong> Compare the performance of different regression models (e.g., Random Forest, linear regression, SVR) on the same dataset and feature set.</li>
+<li><strong>Build a QSAR model for a series of compounds:</strong>  If you have a set of related compounds (e.g., analogs) with known activities, build a QSAR (Quantitative Structure-Activity Relationship) model to predict the activity of new compounds in the series.</li>
+<li><strong>Implement cross-validation:</strong>  Use cross-validation to get a more robust estimate of your model's performance.  This will help you avoid overfitting to the training data.</li>
+</ol>
+<p><strong>English Explanation</strong></p>
+<p>This setup allows you to extract bioactivity data from the ChEMBL database, generate molecular descriptors using RDKit, and build machine learning models to predict bioactivity. By modifying the SQL query and experimenting with different descriptors and models, you can explore the relationships between chemical structure and biological activity, which is essential for drug discovery. The AIMLops-style directory structure helps you organize your code and data. Remember to handle errors carefully and use best practices for model building and evaluation.</p>
+<p><strong>Explanation in Indonesian</strong></p>
+<p>Pengaturan ini memungkinkan Anda untuk mengekstrak data bioaktivitas dari database ChEMBL, menghasilkan deskriptor molekul menggunakan RDKit, dan membangun model machine learning untuk memprediksi bioaktivitas. Dengan memodifikasi query SQL dan bereksperimen dengan deskriptor dan model yang berbeda, Anda dapat menjelajahi hubungan antara struktur kimia dan aktivitas biologis, yang penting untuk penemuan obat. Struktur direktori ala AIMLops membantu Anda mengatur kode dan data Anda. Ingatlah untuk menangani kesalahan dengan hati-hati dan menggunakan praktik terbaik untuk membangun dan mengevaluasi model.</p>
+        </body>
+        </html>
+        

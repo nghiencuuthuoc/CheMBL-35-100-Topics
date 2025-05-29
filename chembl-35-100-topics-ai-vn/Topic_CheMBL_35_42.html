@@ -1,0 +1,412 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_42</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Thuốc có nhiều dữ liệu hoạt tính nhất</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu Chembl 35 này. Với vai trò là chuyên gia nghiên cứu và phát triển dược học, tôi sẽ cung cấp hướng dẫn chi tiết, code mẫu SQL và Python, cùng với các ví dụ để bạn có thể triển khai dự án một cách hiệu quả.</p>
+<p><strong>Tổng quan dự án:</strong></p>
+<p>Dự án của bạn tập trung vào việc khai thác dữ liệu từ Chembl 35 kết hợp với RDKit để hỗ trợ nghiên cứu và phát triển thuốc. Bạn đã thiết lập cơ sở dữ liệu PostgreSQL (psql) và sử dụng Jupyter Notebook để phân tích dữ liệu.</p>
+<p><strong>Phân tích và Hướng dẫn:</strong></p>
+<ol>
+<li>
+<p><strong>Mô hình Phân tích:</strong></p>
+<ul>
+<li><strong>Mục tiêu:</strong> Phân tích dữ liệu Chembl 35 để xác định các hợp chất có hoạt tính sinh học tiềm năng.</li>
+<li><strong>Phương pháp:</strong><ul>
+<li><strong>Lọc và Chuẩn bị Dữ liệu:</strong> Sử dụng SQL để truy vấn và lọc dữ liệu từ cơ sở dữ liệu Chembl 35, tập trung vào các thông tin quan trọng như cấu trúc hóa học (SMILES), giá trị hoạt tính (IC50, Ki, Kd), và mục tiêu tác động (targets).</li>
+<li><strong>Tính Toán Đặc Trưng Phân Tử:</strong> Sử dụng RDKit để tính toán các đặc trưng phân tử (molecular descriptors) từ cấu trúc SMILES, ví dụ: trọng lượng phân tử, logP, số lượng vòng, v.v.</li>
+<li><strong>Phân Tích Thống Kê và Học Máy:</strong><ul>
+<li><strong>Phân tích tương quan:</strong> Tìm hiểu mối quan hệ giữa các đặc trưng phân tử và giá trị hoạt tính.</li>
+<li><strong>Mô hình hóa QSAR/QSPR:</strong> Xây dựng mô hình dự đoán hoạt tính dựa trên các đặc trưng phân tử. Có thể sử dụng các thuật toán như Linear Regression, Random Forest, Support Vector Machines (SVM).</li>
+<li><strong>Phân cụm (Clustering):</strong> Nhóm các hợp chất có đặc trưng tương đồng để xác định các "scaffold" tiềm năng.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Đánh giá mô hình:</strong> Sử dụng các chỉ số như R-squared, RMSE, MAE để đánh giá hiệu suất của mô hình.</li>
+</ul>
+<p><strong>English Translation:</strong></p>
+<ul>
+<li><strong>Goal:</strong> Analyze Chembl 35 data to identify compounds with potential biological activity.</li>
+<li><strong>Methods:</strong><ul>
+<li><strong>Data Filtering and Preparation:</strong> Use SQL to query and filter data from the Chembl 35 database, focusing on key information such as chemical structures (SMILES), activity values (IC50, Ki, Kd), and targets.</li>
+<li><strong>Molecular Descriptor Calculation:</strong> Use RDKit to calculate molecular descriptors from SMILES structures, e.g., molecular weight, logP, number of rings, etc.</li>
+<li><strong>Statistical Analysis and Machine Learning:</strong><ul>
+<li><strong>Correlation analysis:</strong> Explore the relationship between molecular descriptors and activity values.</li>
+<li><strong>QSAR/QSPR modeling:</strong> Build models to predict activity based on molecular descriptors. Algorithms like Linear Regression, Random Forest, and Support Vector Machines (SVM) can be used.</li>
+<li><strong>Clustering:</strong> Group compounds with similar features to identify potential scaffolds.</li>
+</ul>
+</li>
+<li><strong>Model evaluation:</strong> Use metrics like R-squared, RMSE, MAE to evaluate model performance.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Hướng dẫn Song ngữ:</strong></p>
+<ul>
+<li><strong>SQL:</strong><ul>
+<li>Sử dụng các câu lệnh <code>SELECT</code>, <code>FROM</code>, <code>WHERE</code> để truy vấn dữ liệu.</li>
+<li>Sử dụng <code>LIKE</code> hoặc <code>~</code> để lọc dữ liệu dựa trên chuỗi (lưu ý lỗi bạn gặp phải).</li>
+<li>Sử dụng <code>LIMIT</code> để giới hạn số lượng bản ghi trả về.</li>
+</ul>
+</li>
+<li><strong>Python:</strong><ul>
+<li>Sử dụng thư viện <code>psycopg2</code> để kết nối với cơ sở dữ liệu PostgreSQL.</li>
+<li>Sử dụng <code>pandas</code> để đọc dữ liệu từ file CSV và xử lý dữ liệu.</li>
+<li>Sử dụng <code>RDKit</code> để tính toán đặc trưng phân tử.</li>
+<li>Sử dụng <code>scikit-learn</code> để xây dựng và đánh giá mô hình học máy.</li>
+</ul>
+</li>
+</ul>
+<p><strong>English Translation:</strong></p>
+<ul>
+<li><strong>SQL:</strong><ul>
+<li>Use <code>SELECT</code>, <code>FROM</code>, <code>WHERE</code> statements to query data.</li>
+<li>Use <code>LIKE</code> or <code>~</code> to filter data based on strings (note the error you encountered).</li>
+<li>Use <code>LIMIT</code> to limit the number of records returned.</li>
+</ul>
+</li>
+<li><strong>Python:</strong><ul>
+<li>Use the <code>psycopg2</code> library to connect to the PostgreSQL database.</li>
+<li>Use <code>pandas</code> to read data from CSV files and process the data.</li>
+<li>Use <code>RDKit</code> to calculate molecular descriptors.</li>
+<li>Use <code>scikit-learn</code> to build and evaluate machine learning models.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Code SQL và Python (100 dòng dữ liệu):</strong></p>
+<p><strong>SQL (query_chembl.sql):</strong></p>
+<p><code>sql
+-- Select 100 compounds with IC50 values against a specific target (e.g., CHEMBL205)
+SELECT DISTINCT ON (mol.molregno)
+    mol.molregno,
+    mol.smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    compound_structures mol
+JOIN
+    activities act ON mol.molregno = act.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.chembl_id = 'CHEMBL205'  -- Replace with your target of interest
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0
+LIMIT 100;</code></p>
+<p><strong>Python (notebook/Topic_CheMBL_35_42_1_data_extraction.ipynb):</strong></p>
+<p>```python
+import os
+import psycopg2
+import pandas as pd</p>
+<h1>Database connection details</h1>
+<p>db_host = "192.168.206.136"
+db_name = "chembl_35"
+db_user = "rd"
+db_pass = "rd"</p>
+<h1>Base path for the project</h1>
+<p>base_path = os.getcwd()  # Assuming you're running this from the project's root directory</p>
+<h1>Output file path</h1>
+<p>output_file = os.path.join(base_path, 'data', 'chembl_ic50_data.csv')</p>
+<h1>SQL query (replace with your actual query)</h1>
+<p>sql_query = """
+SELECT DISTINCT ON (mol.molregno)
+    mol.molregno,
+    mol.smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    compound_structures mol
+JOIN
+    activities act ON mol.molregno = act.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.chembl_id = 'CHEMBL205'  -- Replace with your target of interest
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0
+LIMIT 100;
+"""</p>
+<h1>Establish connection to the database</h1>
+<p>try:
+    conn = psycopg2.connect(host=db_host, database=db_name, user=db_user, password=db_pass)
+    print("Connected to the database successfully!")
+except psycopg2.Error as e:
+    print(f"Unable to connect to the database: {e}")
+    exit()</p>
+<h1>Execute the query and fetch the data into a Pandas DataFrame</h1>
+<p>try:
+    df = pd.read_sql_query(sql_query, conn)
+    print("Data fetched successfully!")
+except Exception as e:
+    print(f"Error fetching data: {e}")
+    conn.close()
+    exit()</p>
+<h1>Close the database connection</h1>
+<p>conn.close()</p>
+<h1>Save the DataFrame to a CSV file</h1>
+<p>try:
+    df.to_csv(output_file, index=False)
+    print(f"Data saved to {output_file}")
+except Exception as e:
+    print(f"Error saving data to CSV: {e}")</p>
+<p>print(df.head())
+```</p>
+<p><strong>Giải thích:</strong></p>
+<ul>
+<li>Đoạn code Python này kết nối đến cơ sở dữ liệu PostgreSQL, thực hiện câu truy vấn SQL và lưu kết quả vào file CSV.</li>
+<li>Bạn cần thay thế <code>'CHEMBL205'</code> bằng mã CHEMBL ID của mục tiêu bạn quan tâm.</li>
+<li>Đảm bảo thư viện <code>psycopg2</code> đã được cài đặt (<code>pip install psycopg2-binary</code>).</li>
+</ul>
+<p><strong>English Explanation:</strong></p>
+<ul>
+<li>This Python code connects to the PostgreSQL database, executes the SQL query, and saves the results to a CSV file.</li>
+<li>You need to replace <code>'CHEMBL205'</code> with the CHEMBL ID of your target of interest.</li>
+<li>Ensure the <code>psycopg2</code> library is installed (<code>pip install psycopg2-binary</code>).</li>
+</ul>
+</li>
+<li>
+<p><strong>Sửa lỗi:</strong></p>
+<ul>
+<li>
+<p><strong>Lỗi <code>operator does not exist: numeric ~ unknown</code>:</strong> Lỗi này xảy ra khi bạn sử dụng toán tử <code>~</code> (regex match) với kiểu dữ liệu số.  Thay vì sử dụng regex, hãy chuyển đổi cột <code>act.standard_value</code> sang kiểu text và sử dụng <code>LIKE</code> để so sánh:</p>
+<p><code>sql
+AND CAST(act.standard_value AS TEXT) LIKE '%.%'  -- Check if it contains a decimal point
+AND CAST(act.standard_value AS TEXT) NOT LIKE '%[^0-9.]%' --Check if contains just number and '.'</code></p>
+</li>
+<li>
+<p><strong>Lỗi <code>squared=False</code> trong <code>mean_squared_error</code>:</strong> Nâng cấp phiên bản <code>scikit-learn</code> lên phiên bản mới nhất (<code>pip install scikit-learn --upgrade</code>) hoặc loại bỏ tham số <code>squared=False</code> nếu bạn không cần tính RMSE (căn bậc hai của MSE).</p>
+</li>
+</ul>
+</li>
+</ol>
+<p><strong>5. Ví dụ Code SQL và Python Mẫu:</strong></p>
+<p><strong>Ví dụ 1: Lọc các hợp chất có IC50 &lt; 100 nM cho một mục tiêu cụ thể.</strong></p>
+<p><strong>SQL:</strong></p>
+<p><code>sql
+SELECT
+    mol.molregno,
+    mol.smiles,
+    act.standard_value
+FROM
+    compound_structures mol
+JOIN
+    activities act ON mol.molregno = act.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.chembl_id = 'CHEMBL205'
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value &lt; 100
+LIMIT 10;</code></p>
+<p><strong>Python:</strong></p>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors</p>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolLogP(mol)
+    else:
+        return None</p>
+<p>df = pd.read_csv('data/chembl_ic50_data.csv')
+df['logP'] = df['smiles'].apply(calculate_logp)
+print(df.head())
+```</p>
+<p><strong>Ví dụ 2: Tính trọng lượng phân tử cho các hợp chất.</strong></p>
+<p><strong>SQL:</strong>
+Không cần thiết, có thể thực hiện trực tiếp trong Python.</p>
+<p><strong>Python:</strong></p>
+<p>```python
+from rdkit import Chem
+from rdkit.Chem import Descriptors</p>
+<p>def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<p>df = pd.read_csv('data/chembl_ic50_data.csv')
+df['mol_weight'] = df['smiles'].apply(calculate_mw)
+print(df.head())
+```</p>
+<p><strong>Ví dụ 3: Tìm các hợp chất có chứa một motif cụ thể.</strong></p>
+<p><strong>SQL:</strong></p>
+<p><code>sql
+SELECT
+    mol.molregno,
+    mol.smiles
+FROM
+    compound_structures mol
+WHERE
+    mol.smiles LIKE '%[Cl]c1ccccc1%';  -- Tìm các hợp chất có vòng benzene chứa clo</code></p>
+<p><strong>Python:</strong></p>
+<p>```python
+import pandas as pd</p>
+<p>df = pd.read_csv('data/chembl_ic50_data.csv')
+df_filtered = df[df['smiles'].str.contains(r'[Cl]c1ccccc1')]
+print(df_filtered.head())
+```</p>
+<p><strong>Ví dụ 4: Phân tích cơ bản về giá trị IC50.</strong></p>
+<p><strong>SQL:</strong>
+Không cần thiết, có thể thực hiện trực tiếp trong Python.</p>
+<p><strong>Python:</strong></p>
+<p>```python
+import pandas as pd</p>
+<p>df = pd.read_csv('data/chembl_ic50_data.csv')
+print(df['standard_value'].describe())
+```</p>
+<p><strong>Ví dụ 5: Chuẩn hóa dữ liệu hoạt tính (ví dụ pIC50).</strong></p>
+<p><strong>SQL:</strong>
+Không cần thiết, có thể thực hiện trực tiếp trong Python.</p>
+<p><strong>Python:</strong></p>
+<p>```python
+import pandas as pd
+import numpy as np</p>
+<p>df = pd.read_csv('data/chembl_ic50_data.csv')
+df = df.dropna(subset=['standard_value'])
+df['pIC50'] = -np.log10(df['standard_value'] / 1e9)  # Convert IC50 (nM) to pIC50
+print(df.head())
+```</p>
+<p><strong>English Translation of Examples:</strong></p>
+<p><strong>Example 1: Filter compounds with IC50 &lt; 100 nM for a specific target.</strong></p>
+<p><strong>SQL:</strong></p>
+<p><code>sql
+SELECT
+    mol.molregno,
+    mol.smiles,
+    act.standard_value
+FROM
+    compound_structures mol
+JOIN
+    activities act ON mol.molregno = act.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.chembl_id = 'CHEMBL205'
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value &lt; 100
+LIMIT 10;</code></p>
+<p><strong>Python:</strong></p>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors</p>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolLogP(mol)
+    else:
+        return None</p>
+<p>df = pd.read_csv('data/chembl_ic50_data.csv')
+df['logP'] = df['smiles'].apply(calculate_logp)
+print(df.head())
+```</p>
+<p><strong>Example 2: Calculate the molecular weight for compounds.</strong></p>
+<p><strong>SQL:</strong>
+Not needed, can be done directly in Python.</p>
+<p><strong>Python:</strong></p>
+<p>```python
+from rdkit import Chem
+from rdkit.Chem import Descriptors</p>
+<p>def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<p>df = pd.read_csv('data/chembl_ic50_data.csv')
+df['mol_weight'] = df['smiles'].apply(calculate_mw)
+print(df.head())
+```</p>
+<p><strong>Example 3: Find compounds containing a specific motif.</strong></p>
+<p><strong>SQL:</strong></p>
+<p><code>sql
+SELECT
+    mol.molregno,
+    mol.smiles
+FROM
+    compound_structures mol
+WHERE
+    mol.smiles LIKE '%[Cl]c1ccccc1%';  -- Find compounds with a benzene ring containing chlorine</code></p>
+<p><strong>Python:</strong></p>
+<p>```python
+import pandas as pd</p>
+<p>df = pd.read_csv('data/chembl_ic50_data.csv')
+df_filtered = df[df['smiles'].str.contains(r'[Cl]c1ccccc1')]
+print(df_filtered.head())
+```</p>
+<p><strong>Example 4: Basic analysis of IC50 values.</strong></p>
+<p><strong>SQL:</strong>
+Not needed, can be done directly in Python.</p>
+<p><strong>Python:</strong></p>
+<p>```python
+import pandas as pd</p>
+<p>df = pd.read_csv('data/chembl_ic50_data.csv')
+print(df['standard_value'].describe())
+```</p>
+<p><strong>Example 5: Normalize activity data (e.g., pIC50).</strong></p>
+<p><strong>SQL:</strong>
+Not needed, can be done directly in Python.</p>
+<p><strong>Python:</strong></p>
+<p>```python
+import pandas as pd
+import numpy as np</p>
+<p>df = pd.read_csv('data/chembl_ic50_data.csv')
+df = df.dropna(subset=['standard_value'])
+df['pIC50'] = -np.log10(df['standard_value'] / 1e9)  # Convert IC50 (nM) to pIC50
+print(df.head())
+```</p>
+<p><strong>Lưu ý quan trọng:</strong></p>
+<ul>
+<li>Hãy điều chỉnh các câu truy vấn SQL và đoạn code Python cho phù hợp với mục tiêu nghiên cứu cụ thể của bạn.</li>
+<li>Kiểm tra kỹ dữ liệu sau khi trích xuất và làm sạch để đảm bảo tính chính xác.</li>
+<li>Sử dụng các công cụ trực quan hóa dữ liệu (ví dụ: Matplotlib, Seaborn) để khám phá dữ liệu và trình bày kết quả.</li>
+</ul>
+<p>Chúc bạn thành công với dự án của mình! Nếu bạn có bất kỳ câu hỏi nào, đừng ngần ngại hỏi.</p>
+        </body>
+        </html>
+        

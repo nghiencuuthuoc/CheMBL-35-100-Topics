@@ -1,0 +1,335 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_40</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Top viral/bacterial targets in ChEMBL</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project using RDKit and facing a few challenges. You want to follow an AIMLops template, use Jupyter notebooks, and address the specific errors you're encountering. You also need guidance on building SQL queries and Python code for data filtering and analysis, aiming for a sample size of 100 rows. Let's break this down:</p>
+<p><strong>1. Analysis and Model Explanation</strong></p>
+<p>The project involves analyzing chemical data from ChEMBL 35 to support drug research and development. A typical analysis model would involve the following steps:</p>
+<ul>
+<li><strong>Data Extraction:</strong> Extract relevant data from the ChEMBL database using SQL queries. This will involve selecting specific tables (e.g., activities, molecules, targets) and filtering the data based on criteria such as activity types, standard values, and target organism.</li>
+<li><strong>Data Cleaning and Preprocessing:</strong> Clean the data to handle missing values, remove duplicates, and standardize units. This may also involve converting data types and formatting the data for analysis.</li>
+<li><strong>Feature Engineering:</strong> Generate relevant features from the chemical structures using RDKit. These features can include molecular weight, logP, topological polar surface area (TPSA), number of hydrogen bond donors/acceptors, and various other descriptors.</li>
+<li><strong>Exploratory Data Analysis (EDA):</strong> Explore the data to identify patterns and relationships. This may involve generating histograms, scatter plots, and correlation matrices to visualize the data and identify potential predictors of activity.</li>
+<li><strong>Model Building:</strong> Build predictive models to predict the activity of compounds based on their chemical features. Common machine learning algorithms used for this purpose include linear regression, random forests, support vector machines, and neural networks.</li>
+<li><strong>Model Evaluation:</strong> Evaluate the performance of the models using appropriate metrics such as R-squared, mean squared error, and area under the ROC curve (AUC).</li>
+<li><strong>Interpretation and Validation:</strong> Interpret the results of the models and validate them using external data or experimental results.</li>
+</ul>
+<p><strong>Addressing specific error</strong></p>
+<ul>
+<li><strong>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9.]+$'</strong><ul>
+<li>This error occurs because the <code>~</code> operator is being used for regular expression matching on a numeric column (<code>act.standard_value</code>). PostgreSQL doesn't directly support this.  You need to cast the numeric column to text or use a different approach.</li>
+</ul>
+</li>
+<li><strong>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</strong><ul>
+<li>This means you're using an older version of scikit-learn.  You have two options:<ol>
+<li><strong>Upgrade scikit-learn:</strong>  The easiest solution is to upgrade to a newer version.  Run <code>pip install --upgrade scikit-learn</code>.</li>
+<li><strong>Remove <code>squared=False</code>:</strong> If upgrading isn't possible, calculate the RMSE manually by taking the square root of the MSE.</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>2. Code Examples (SQL and Python)</strong></p>
+<p><strong>English:</strong></p>
+<p><strong>SQL (Extracting data and addressing the first error)</strong></p>
+<p>```sql
+-- SQL query to extract data from ChEMBL, addressing the numeric ~ unknown error.
+-- Limiting to 100 rows for demonstration purposes.</p>
+<p>SELECT
+    mol.molregno,
+    mol.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.assay_chembl_id,
+    cs.canonical_smiles
+FROM
+    activities act
+JOIN
+    molecule_dictionary mol ON act.molregno = mol.molregno
+JOIN
+    compound_structures cs ON mol.molregno = cs.molregno
+WHERE
+    act.standard_type IN ('IC50', 'Ki', 'EC50')  -- Common activity types
+    AND act.standard_units = 'nM'  -- Focus on nanomolar activities
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::TEXT ~ '^[0-9.]+$'  -- Cast to text for regex matching, ensuring numeric values
+    AND act.standard_value &lt; 100000 --activity value &lt; 100000
+LIMIT 100;
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><code>SELECT</code>:  Specifies the columns you want to retrieve.</li>
+<li><code>FROM</code>:  Specifies the tables to retrieve data from (<code>activities</code>, <code>molecule_dictionary</code>, <code>compound_structures</code>).</li>
+<li><code>JOIN</code>:  Connects the tables based on the <code>molregno</code> (molecule registration number).</li>
+<li><code>WHERE</code>:  Filters the data based on the following criteria:<ul>
+<li><code>act.standard_type IN ('IC50', 'Ki', 'EC50')</code>:  Selects only activity types that are commonly used in drug discovery.</li>
+<li><code>act.standard_units = 'nM'</code>:  Selects only activities that are measured in nanomolars.</li>
+<li><code>act.standard_value IS NOT NULL</code>: Ensures that only activities with a value are kept.</li>
+<li><code>act.standard_value::TEXT ~ '^[0-9\.]+$'</code>: This is the key part for fixing your error.  It casts <code>act.standard_value</code> to <code>TEXT</code> before applying the regular expression <code>^[0-9\.]+$</code>, which checks if the value consists only of digits and periods.  This effectively filters out non-numeric values.</li>
+<li><code>act.standard_value &lt; 100000</code>: add this condiction to get appropriate activity values</li>
+</ul>
+</li>
+<li><code>LIMIT 100</code>: Limits the result set to 100 rows.</li>
+</ul>
+<p><strong>Python (Jupyter Notebook: <code>Topic_CheMBL_35_40_1_Data_Loading_and_Preprocessing.ipynb</code>)</strong></p>
+<p>```python
+import os
+import pandas as pd
+import numpy as np
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error</p>
+<h1>Define the base path for your project</h1>
+<p>base_path = "."  # Assuming the notebook is in the root of your project directory
+data_path = os.path.join(base_path, "data")</p>
+<h1>Ensure the data directory exists</h1>
+<p>if not os.path.exists(data_path):
+    os.makedirs(data_path)</p>
+<h1>CSV file name (adjust if needed)</h1>
+<p>csv_file = os.path.join(data_path, "chembl_data.csv")</p>
+<h1>Function to calculate molecular descriptors using RDKit</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None</p>
+<pre><code>descriptors = {}
+descriptors['MolWt'] = Descriptors.MolWt(mol)
+descriptors['LogP'] = Chem.Crippen.MolLogP(mol)
+descriptors['HBD'] = Chem.Lipinski.NumHDonors(mol)
+descriptors['HBA'] = Chem.Lipinski.NumHAcceptors(mol)
+descriptors['TPSA'] = Chem.rdMolDescriptors.CalcTPSA(mol)
+return descriptors
+</code></pre>
+<h1>Load the data from the CSV file</h1>
+<p>try:
+    df = pd.read_csv(csv_file)
+except FileNotFoundError:
+    print(f"Error: File not found at {csv_file}.  Make sure you've run the SQL query and saved the data.")
+    exit()  # Exit the script if the file is not found</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])  # Drop rows with missing SMILES or activity values
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce') #convert standard_value to numeric
+df = df.dropna(subset=['standard_value']) #drop if standard_value can not convert to numeric
+df = df[df['standard_value'] &gt; 0] #remove activities &lt; 0
+df = df[df['standard_value'] &lt; 100000] #remove activities &gt; 100000, filter data a second time to avoid the string errors</p>
+<h1>Feature Engineering using RDKit</h1>
+<p>descriptors_list = []
+for smiles in df['canonical_smiles']:
+    descriptors = calculate_descriptors(smiles)
+    descriptors_list.append(descriptors)</p>
+<p>descriptors_df = pd.DataFrame(descriptors_list)</p>
+<h1>Merge descriptors with the main DataFrame</h1>
+<p>df = pd.concat([df.reset_index(drop=True), descriptors_df.reset_index(drop=True)], axis=1)
+df = df.dropna()  # Remove rows where RDKit failed to calculate descriptors</p>
+<h1>Prepare data for modeling</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']]
+y = np.log10(df['standard_value'])  # Log transform the activity values</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Model Building (Linear Regression)</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Model Evaluation</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Calculate MSE and RMSE</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)  # Calculate RMSE manually</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"Root Mean Squared Error: {rmse}")
+```</p>
+<p><strong>Explanation:</strong></p>
+<ol>
+<li><strong>Imports:</strong> Imports necessary libraries (pandas, RDKit, scikit-learn).</li>
+<li><strong>Path Definition:</strong> Defines the base path for the project and constructs the path to the CSV file using <code>os.path.join</code>.  This makes the code more portable.</li>
+<li><strong>Data Loading:</strong> Loads the data from the CSV file into a pandas DataFrame.  Includes error handling to gracefully exit if the file isn't found.</li>
+<li><strong>Data Cleaning:</strong><ul>
+<li>Removes rows with missing <code>canonical_smiles</code> or <code>standard_value</code>.</li>
+<li>Converts <code>standard_value</code> to numeric, coercing errors to NaN and removing them.</li>
+</ul>
+</li>
+<li><strong>Feature Engineering:</strong><ul>
+<li>Defines a function <code>calculate_descriptors</code> to calculate molecular descriptors using RDKit. It handles cases where RDKit fails to process a SMILES string by returning <code>None</code>.</li>
+<li>Iterates through the SMILES strings in the DataFrame, calculates the descriptors, and stores them in a list.</li>
+<li>Creates a new DataFrame from the list of descriptors and merges it with the original DataFrame.</li>
+<li>Removes rows where RDKit failed to calculate descriptors.</li>
+</ul>
+</li>
+<li><strong>Data Preparation for Modeling:</strong><ul>
+<li>Selects the features (descriptors) and the target variable (activity).</li>
+<li>Log-transforms the activity values.  This is a common practice in drug discovery as activity data is often log-normally distributed.</li>
+<li>Splits the data into training and testing sets.</li>
+</ul>
+</li>
+<li><strong>Model Building:</strong><ul>
+<li>Creates a Linear Regression model.</li>
+<li>Trains the model on the training data.</li>
+</ul>
+</li>
+<li><strong>Model Evaluation:</strong><ul>
+<li>Makes predictions on the test data.</li>
+<li>Calculates the Mean Squared Error (MSE) and Root Mean Squared Error (RMSE).  The RMSE is calculated manually to avoid the <code>squared=False</code> error if you're using an older version of scikit-learn.</li>
+</ul>
+</li>
+</ol>
+<p><strong>3. Examples</strong></p>
+<p>Here are 5 examples illustrating potential analyses you could perform using this data, each fitting a different notebook. Assume that the initial data loading and preprocessing (from <code>Topic_CheMBL_35_40_1_Data_Loading_and_Preprocessing.ipynb</code>) are done and the DataFrame <code>df</code> is available.</p>
+<ul>
+<li>
+<p><strong>Example 1: <code>Topic_CheMBL_35_40_2_Activity_Distribution.ipynb</code> (Activity Distribution Analysis)</strong></p>
+<p>```python
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<p>plt.figure(figsize=(10, 6))
+sns.histplot(df['standard_value'], bins=50, kde=True)
+plt.title('Distribution of Standard Values')
+plt.xlabel('Standard Value (nM)')
+plt.ylabel('Frequency')
+plt.xscale('log')  # Use a logarithmic scale for better visualization
+plt.show()</p>
+<p>print(df['standard_value'].describe())
+```</p>
+<p>This notebook analyzes the distribution of the <code>standard_value</code> (activity) data. It generates a histogram and provides descriptive statistics. The logarithmic scale is helpful for visualizing the distribution when the data spans several orders of magnitude.</p>
+</li>
+<li>
+<p><strong>Example 2: <code>Topic_CheMBL_35_40_3_Descriptor_Correlation.ipynb</code> (Descriptor Correlation Analysis)</strong></p>
+<p>```python
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<h1>Select descriptor columns</h1>
+<p>descriptor_cols = ['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']
+correlation_matrix = df[descriptor_cols].corr()</p>
+<p>plt.figure(figsize=(8, 6))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', center=0)
+plt.title('Correlation Matrix of Molecular Descriptors')
+plt.show()
+```</p>
+<p>This notebook calculates and visualizes the correlation matrix between the molecular descriptors.  This helps identify multicollinearity, which can affect model performance.</p>
+</li>
+<li>
+<p><strong>Example 3: <code>Topic_CheMBL_35_40_4_Activity_vs_Descriptors.ipynb</code> (Activity vs. Descriptors Scatter Plots)</strong></p>
+<p>```python
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<p>descriptor_cols = ['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']</p>
+<p>for descriptor in descriptor_cols:
+    plt.figure(figsize=(8, 6))
+    sns.scatterplot(x=df[descriptor], y=np.log10(df['standard_value']))
+    plt.title(f'Log10(Standard Value) vs. {descriptor}')
+    plt.xlabel(descriptor)
+    plt.ylabel('Log10(Standard Value)')
+    plt.show()
+```</p>
+<p>This notebook generates scatter plots of each descriptor against the log-transformed activity. This helps visualize the relationship between the descriptors and activity and can inform feature selection.</p>
+</li>
+<li>
+<p><strong>Example 4: <code>Topic_CheMBL_35_40_5_Target_Activity_Analysis.ipynb</code> (Target Activity Analysis)</strong></p>
+<p>```python
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<h1>Assuming you have target information in a column named 'target_chembl_id'</h1>
+<p>if 'target_chembl_id' in df.columns:
+    top_targets = df['target_chembl_id'].value_counts().head(10)
+    df_top_targets = df[df['target_chembl_id'].isin(top_targets.index)]</p>
+<pre><code>plt.figure(figsize=(12, 6))
+sns.boxplot(x='target_chembl_id', y=np.log10(df_top_targets['standard_value']))
+plt.title('Activity Distribution for Top 10 Targets')
+plt.xlabel('Target ChEMBL ID')
+plt.ylabel('Log10(Standard Value)')
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+plt.show()
+</code></pre>
+<p>else:
+    print("No 'target_chembl_id' column found.  This example requires target information.")
+```</p>
+<p>This notebook analyzes the activity distribution for different targets. It identifies the top 10 targets with the most activity data and generates box plots to compare their activity distributions.  You need to make sure your SQL query includes the <code>target_chembl_id</code> for this to work.</p>
+</li>
+<li>
+<p><strong>Example 5: <code>Topic_CheMBL_35_40_6_Advanced_Modeling.ipynb</code> (Advanced Modeling)</strong></p>
+<p>```python
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import GridSearchCV</p>
+<h1>Assuming X_train, X_test, y_train, y_test are already defined</h1>
+<h1>Define a grid of hyperparameters to search</h1>
+<p>param_grid = {
+    'n_estimators': [100, 200, 300],
+    'max_depth': [4, 6, 8],
+    'min_samples_split': [2, 4],
+    'min_samples_leaf': [1, 2]
+}</p>
+<h1>Create a Random Forest Regressor</h1>
+<p>rf = RandomForestRegressor(random_state=42)</p>
+<h1>Use GridSearchCV to find the best hyperparameters</h1>
+<p>grid_search = GridSearchCV(estimator=rf, param_grid=param_grid, cv=3, scoring='neg_mean_squared_error')
+grid_search.fit(X_train, y_train)</p>
+<h1>Print the best hyperparameters</h1>
+<p>print("Best Hyperparameters:", grid_search.best_params_)</p>
+<h1>Get the best model</h1>
+<p>best_rf = grid_search.best_estimator_</p>
+<h1>Evaluate the best model on the test set</h1>
+<p>y_pred = best_rf.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)</p>
+<p>print(f"Mean Squared Error on Test Set: {mse}")
+print(f"Root Mean Squared Error on Test Set: {rmse}")
+```</p>
+<p>This notebook demonstrates advanced modeling using a Random Forest Regressor and GridSearchCV for hyperparameter tuning. It searches for the best combination of hyperparameters to optimize model performance.</p>
+</li>
+</ul>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>Error Handling:</strong> Add more robust error handling to your code, especially when dealing with external data sources and RDKit calculations.</li>
+<li><strong>Data Validation:</strong> Validate your data and results throughout the process. Check for inconsistencies and outliers.</li>
+<li><strong>Model Selection:</strong> Experiment with different machine learning algorithms to find the best model for your data.</li>
+<li><strong>Feature Selection:</strong> Consider using feature selection techniques to reduce the number of features and improve model performance.</li>
+<li><strong>Hyperparameter Tuning:</strong> Optimize the hyperparameters of your models using techniques like GridSearchCV or RandomizedSearchCV.</li>
+<li><strong>Documentation:</strong> Document your code and analysis thoroughly.</li>
+</ul>
+<p><strong>In summary:</strong></p>
+<ol>
+<li>Correct your SQL query to handle the numeric column and regex matching problem.</li>
+<li>Update or adjust your <code>mean_squared_error</code> call in Python based on your scikit-learn version.</li>
+<li>Follow the AIMLops structure for organizing your project.</li>
+<li>Use the provided code examples as a starting point and expand them to perform more in-depth analyses.</li>
+</ol>
+<p>Let me know if you have any more specific questions or need further assistance with any of these steps.</p>
+        </body>
+        </html>
+        

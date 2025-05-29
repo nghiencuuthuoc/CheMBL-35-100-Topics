@@ -1,0 +1,610 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_21</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Top 50 protein targets by activity count</h1>
+<hr />
+<p>Okay, I understand. You're working with ChEMBL 35 data, using RDKit for analysis, and facing some errors while running SQL and Python code within an AIMLops folder structure. Let's break down the problem, provide solutions, and craft the necessary code.</p>
+<p><strong>1. Analysis of the Analysis Model &amp; Approach</strong></p>
+<p>Your project seems to be centered around analyzing ChEMBL data. A typical drug R&amp;D analysis model would involve:</p>
+<ul>
+<li><strong>Data Extraction and Cleaning:</strong> Retrieving relevant data from the ChEMBL database and addressing issues like missing values, incorrect data types, and inconsistent units. This is where your SQL scripts come in.</li>
+<li><strong>Feature Engineering:</strong> Generating molecular descriptors using RDKit. These descriptors represent various physicochemical properties of the molecules (e.g., molecular weight, logP, hydrogen bond donors/acceptors).</li>
+<li><strong>Exploratory Data Analysis (EDA):</strong> Understanding the data distribution, identifying potential correlations between features, and visualizing the data.</li>
+<li><strong>Model Building (Optional):</strong> If your goal is predictive, you might build models to predict activity based on the molecular descriptors. Common models include linear regression, random forests, or neural networks. However, let's focus on simpler descriptive analysis for this demonstration.</li>
+<li><strong>Interpretation and Reporting:</strong>  Drawing conclusions from the analysis and presenting them in a clear and concise manner.</li>
+</ul>
+<p><strong>2. Addressing Errors</strong></p>
+<ul>
+<li>
+<p><strong>Error a: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p>This error indicates that you're trying to use a regular expression (<code>~</code>) on a <code>numeric</code> column (<code>act.standard_value</code>) in PostgreSQL. The <code>~</code> operator in PostgreSQL is used for pattern matching on strings, not numbers.</p>
+<p><strong>Solution:</strong> Instead of using a regular expression, use numeric comparison operators (&gt;, &lt;, =, etc.) or cast the value to text if you absolutely need regex matching.</p>
+</li>
+<li>
+<p><strong>Error b: <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<p>This means you're using an older version of scikit-learn.</p>
+<p><strong>Solution:</strong>
+*   <strong>Option 1 (Recommended):</strong> Update your scikit-learn version to the latest stable release using <code>pip install -U scikit-learn</code>.
+*   <strong>Option 2 (If updating is not possible):</strong> Remove the <code>squared=False</code> argument from the <code>mean_squared_error</code> function call.  This will return the Mean Squared Error (MSE) instead of the Root Mean Squared Error (RMSE). If you need RMSE, calculate it manually by taking the square root of the MSE.</p>
+</li>
+</ul>
+<p><strong>3. AIMLops Folder Structure &amp; Code Execution</strong></p>
+<p>Assuming a basic AIMLops structure like this:</p>
+<p><code>project_root/
+├── data/
+├── notebooks/
+│   ├── Topic_CheMBL_35_21_1_data_extraction.ipynb
+│   ├── Topic_CheMBL_35_21_2_data_analysis.ipynb
+├── scripts/
+├── models/
+├── README.md</code></p>
+<p><strong>4. Code (SQL &amp; Python)</strong></p>
+<ul>
+<li><strong>SQL (data/chembl_35_21_activity_data.csv)</strong></li>
+</ul>
+<p>```sql
+-- File: data/chembl_35_21_activity_data.sql</p>
+<p>SELECT
+    cmp.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.assay_chembl_id
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+WHERE
+    act.standard_type = 'IC50'  -- Focus on IC50 values
+    AND act.standard_units = 'nM' -- Focus on nM units
+    AND act.standard_value &gt; 0   -- Ensure positive values
+    AND act.standard_value &lt; 100000 --Filter out extremely high values
+LIMIT 100;
+COPY (
+SELECT
+    cmp.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.assay_chembl_id
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+WHERE
+    act.standard_type = 'IC50'  -- Focus on IC50 values
+    AND act.standard_units = 'nM' -- Focus on nM units
+    AND act.standard_value &gt; 0   -- Ensure positive values
+    AND act.standard_value &lt; 100000 --Filter out extremely high values
+LIMIT 100
+) TO '/tmp/chembl_35_21_activity_data.csv' WITH CSV HEADER;
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li>This SQL script retrieves activity data (specifically IC50 values in nM) along with the ChEMBL ID of the compound.</li>
+<li>It joins the <code>activities</code> and <code>molecule_dictionary</code> tables.</li>
+<li>It filters for positive <code>standard_value</code> and values less than 100000 to exclude unreasonably high values that are often errors or inactive compounds.</li>
+<li><code>LIMIT 100</code> ensures only 100 rows are retrieved.</li>
+<li>The <code>COPY</code> command saves the result to a CSV file. <strong>Important:</strong> Adjust the path (<code>/tmp/chembl_35_21_activity_data.csv</code>) to a location accessible by your PostgreSQL server user.  You might need to grant permissions to the PostgreSQL user to write to that directory.  Also, ensure the directory exists.  After the file is created, move it to the <code>data/</code> directory within your project.</li>
+</ul>
+<p><strong>Steps to run the .sql script:</strong></p>
+<ol>
+<li>Open pgAdmin and connect to your <code>chembl_35</code> database on <code>192.168.206.136</code>.</li>
+<li>Open a new query window.</li>
+<li>Copy and paste the SQL script into the query window.</li>
+<li>Execute the query.</li>
+<li>
+<p>Move the generated <code>/tmp/chembl_35_21_activity_data.csv</code> file (or the location you specified in the <code>COPY</code> command) to your <code>data/</code> directory.</p>
+</li>
+<li>
+<p><strong>Python (notebooks/Topic_CheMBL_35_21_1_data_extraction.ipynb)</strong></p>
+</li>
+</ol>
+<p>This notebook is responsible for reading the SQL output.</p>
+<p>```python</p>
+<h1>File: notebooks/Topic_CheMBL_35_21_1_data_extraction.ipynb</h1>
+<p>import os
+import pandas as pd</p>
+<h1>Define the base path</h1>
+<p>base_path = os.getcwd()  # Assuming the notebook is run from the project root.
+data_path = os.path.join(base_path, 'data')
+csv_file_path = os.path.join(data_path, 'chembl_35_21_activity_data.csv')</p>
+<h1>Read the CSV file into a Pandas DataFrame</h1>
+<p>try:
+    df = pd.read_csv(csv_file_path)
+    print("Data loaded successfully!")
+    print(df.head())  # Display the first few rows
+except FileNotFoundError:
+    print(f"Error: CSV file not found at {csv_file_path}")
+except Exception as e:
+    print(f"An error occurred: {e}")
+```</p>
+<ul>
+<li><strong>Python (notebooks/Topic_CheMBL_35_21_2_data_analysis.ipynb)</strong></li>
+</ul>
+<p>This notebook performs the analysis.</p>
+<p>```python</p>
+<h1>File: notebooks/Topic_CheMBL_35_21_2_data_analysis.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<h1>Define the base path</h1>
+<p>base_path = os.getcwd()  # Assuming the notebook is run from the project root.
+data_path = os.path.join(base_path, 'data')
+csv_file_path = os.path.join(data_path, 'chembl_35_21_activity_data.csv')</p>
+<h1>Load data</h1>
+<p>try:
+    df = pd.read_csv(csv_file_path)
+except FileNotFoundError:
+    print(f"Error: CSV file not found at {csv_file_path}")
+    exit()  # Stop execution if the file is not found</p>
+<h1>Convert IC50 to pIC50</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value']/(10**9)) # Standard value is in nM, convert to Molar.</p>
+<h1>RDKit Functions</h1>
+<p>def smiles_from_chembl_id(chembl_id):
+  """Fetch SMILES from ChEMBL ID"""
+  try:
+    from chembl_webresource_client.new_client import new_client
+    molecule = new_client.molecule
+    res = molecule.get(chembl_id).to_dict()
+    return res['molecule_structures']['canonical_smiles']
+  except:
+    return None</p>
+<p>def generate_descriptors(smiles):
+    """Generate molecular descriptors using RDKit."""
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        descriptors = {
+            "MolWt": Descriptors.MolWt(mol),
+            "LogP": Descriptors.MolLogP(mol),
+            "HBD": Descriptors.NumHDonors(mol),
+            "HBA": Descriptors.NumHAcceptors(mol),
+            "TPSA": Descriptors.TPSA(mol),
+        }
+        return descriptors
+    else:
+        return None</p>
+<h1>Get SMILES and generate descriptors</h1>
+<p>df['SMILES'] = df['chembl_id'].apply(smiles_from_chembl_id)
+df = df.dropna(subset=['SMILES']) #drop rows with no SMILES</p>
+<p>df['descriptors'] = df['SMILES'].apply(generate_descriptors)
+df = df.dropna(subset=['descriptors']) #drop rows with no descriptors calculated</p>
+<h1>Expand the descriptors dictionary into individual columns.</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Basic EDA:</h1>
+<p>print(df.describe()) #Statistical description</p>
+<h1>Visualization (example: pIC50 vs. Molecular Weight)</h1>
+<p>plt.figure(figsize=(8, 6))
+sns.scatterplot(x='MolWt', y='pIC50', data=df)
+plt.title('pIC50 vs. Molecular Weight')
+plt.xlabel('Molecular Weight')
+plt.ylabel('pIC50')
+plt.show()</p>
+<h1>Correlation Heatmap (Example)</h1>
+<p>correlation_matrix = df[['pIC50', 'MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']].corr()
+plt.figure(figsize=(10, 8))
+sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm")
+plt.title("Correlation Heatmap")
+plt.show()
+```</p>
+<p><strong>Explanation:</strong></p>
+<ol>
+<li><strong>Import Libraries:</strong> Imports necessary libraries (pandas, RDKit, matplotlib, seaborn).</li>
+<li><strong>File Path:</strong> Defines the path to the CSV file using <code>os.path.join</code>.</li>
+<li><strong>Load Data:</strong> Loads the data from the CSV file using <code>pd.read_csv</code>.</li>
+<li><strong>Convert IC50 to pIC50</strong>: Transforms the IC50 into pIC50 as a measure of potency.</li>
+<li><strong>Fetch SMILES and Generate Descriptors:</strong><ul>
+<li>Defines functions to fetch SMILES strings from ChEMBL IDs using <code>chembl_webresource_client</code>.  <strong>You'll need to install this: <code>pip install chembl_webresource_client</code></strong>.</li>
+<li>Defines a function <code>generate_descriptors</code> that takes a SMILES string as input and calculates molecular descriptors using RDKit.</li>
+<li>Applies these functions to create new columns in the DataFrame.</li>
+</ul>
+</li>
+<li><strong>Data Cleaning</strong>: Removes rows where the smiles string could not be found</li>
+<li><strong>Expand Descriptors</strong>: Expand the descriptors dictionary into separate columns</li>
+<li><strong>Basic EDA and Visualization:</strong><ul>
+<li>Calculates descriptive statistics using <code>df.describe()</code>.</li>
+<li>Creates a scatter plot of pIC50 vs. Molecular Weight using Seaborn.</li>
+<li>Calculates and visualizes a correlation heatmap.</li>
+</ul>
+</li>
+</ol>
+<p><strong>5. Running the Code</strong></p>
+<ol>
+<li>
+<p><strong>Install Dependencies:</strong>  Make sure you have all the necessary libraries installed:</p>
+<p><code>bash
+pip install pandas rdkit matplotlib seaborn chembl_webresource_client</code></p>
+</li>
+<li>
+<p><strong>Execute SQL:</strong> Run the SQL script in pgAdmin and move the resulting CSV file to the <code>data/</code> directory.  Remember to adjust the path in the <code>COPY</code> command if needed.</p>
+</li>
+<li>
+<p><strong>Run Notebooks:</strong> Open the <code>notebooks/Topic_CheMBL_35_21_1_data_extraction.ipynb</code> and <code>notebooks/Topic_CheMBL_35_21_2_data_analysis.ipynb</code> notebooks in Jupyter Notebook and execute the cells.</p>
+</li>
+</ol>
+<p><strong>6. Example Analysis and Output</strong></p>
+<p>The <code>Topic_CheMBL_35_21_2_data_analysis.ipynb</code> notebook, when run, will output:</p>
+<ul>
+<li><strong>Descriptive Statistics:</strong> A table showing the mean, standard deviation, min, max, etc., for each numerical column (pIC50, MolWt, LogP, etc.).</li>
+<li><strong>Scatter Plot:</strong> A scatter plot showing the relationship between pIC50 and Molecular Weight.</li>
+<li><strong>Correlation Heatmap:</strong>  A visualization of the correlation between different molecular descriptors and pIC50.</li>
+</ul>
+<p><strong>7. Five Examples</strong></p>
+<p>Here are five examples of analyses you can perform using the code and data:</p>
+<ol>
+<li>
+<p><strong>Distribution of pIC50 Values:</strong>  Create a histogram of the <code>pIC50</code> column to visualize the distribution of activity values.  This helps understand the potency range of the compounds in your dataset.</p>
+<p><code>python
+plt.figure(figsize=(8, 6))
+sns.histplot(df['pIC50'], kde=True)  # kde=True adds a kernel density estimate
+plt.title('Distribution of pIC50 Values')
+plt.xlabel('pIC50')
+plt.ylabel('Frequency')
+plt.show()</code></p>
+</li>
+<li>
+<p><strong>Relationship Between LogP and pIC50:</strong>  Generate a scatter plot of <code>LogP</code> (octanol-water partition coefficient, a measure of lipophilicity) vs. <code>pIC50</code>. This can reveal whether more lipophilic compounds tend to be more or less active.</p>
+<p><code>python
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x='LogP', y='pIC50', data=df)
+plt.title('pIC50 vs. LogP')
+plt.xlabel('LogP')
+plt.ylabel('pIC50')
+plt.show()</code></p>
+</li>
+<li>
+<p><strong>Box Plots of pIC50 for Different Assay Types:</strong> If your data contains different <code>assay_chembl_id</code>, you can create box plots to compare the distribution of <code>pIC50</code> values across different assays. This can help identify assays where compounds tend to be more potent.  (You'll need to keep the <code>assay_chembl_id</code> column in your SQL query and load it into the DataFrame.)</p>
+<p><code>python
+plt.figure(figsize=(12, 6))
+sns.boxplot(x='assay_chembl_id', y='pIC50', data=df)
+plt.title('pIC50 Distribution by Assay')
+plt.xlabel('Assay ChEMBL ID')
+plt.ylabel('pIC50')
+plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels for readability
+plt.tight_layout() #Adjusts plot parameters for a tight layout
+plt.show()</code></p>
+</li>
+<li>
+<p><strong>Calculate and Display Summary Statistics for Key Descriptors:</strong> Calculate the mean, median, and standard deviation for descriptors like Molecular Weight, LogP, HBD, and HBA.  This provides a concise summary of the physicochemical properties of the compounds in your dataset.</p>
+<p><code>python
+descriptor_stats = df[['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']].describe().loc[['mean', 'std', '50%']]  # 50% is the median
+print(descriptor_stats)</code></p>
+</li>
+<li>
+<p><strong>Correlation Analysis with Visual Annotations:</strong>  Extend the correlation heatmap by adding annotations to show the actual correlation values and highlighting statistically significant correlations.</p>
+<p>```python
+import numpy as np
+from scipy.stats import pearsonr</p>
+<p>def calculate_p_values(df):
+    df = df.dropna()._get_numeric_data()
+    dfcols = pd.DataFrame(columns=df.columns)
+    pvalues = dfcols.transpose().join(dfcols, how='outer')
+    for r in df.columns:
+        for c in df.columns:
+            if r == c:
+                pvalues[r][c] = np.nan
+            else:
+                pvalues[r][c] = pearsonr(df[r], df[c])[1]
+    return pvalues</p>
+<p>correlation_matrix = df[['pIC50', 'MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']].corr()
+p_values = calculate_p_values(df[['pIC50', 'MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']])</p>
+<p>plt.figure(figsize=(12, 10))
+sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap="coolwarm", mask=np.triu(np.ones_like(correlation_matrix, dtype=bool)))</p>
+<p>for text in plt.gca().texts:
+  value = float(text.get_text())
+  if abs(value) &gt;= 0.5:
+    text.set_fontsize(12)  #Increase font size for strong correlations
+  else:
+    text.set_fontsize(8) # Decrease font size for weak correlations</p>
+<p>plt.title("Correlation Heatmap with Annotations")
+plt.show()
+```</p>
+</li>
+</ol>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>ChEMBL Web Services:</strong>  The <code>chembl_webresource_client</code> relies on the ChEMBL web services. Ensure these services are available and that your network configuration allows access.</li>
+<li><strong>Error Handling:</strong>  The code includes basic error handling (e.g., checking for file existence). Add more robust error handling as needed.</li>
+<li><strong>Data Cleaning:</strong> The data cleaning steps in the SQL script are minimal.  You might need to add more cleaning steps depending on the nature of your data (e.g., handling missing values, converting units).</li>
+<li><strong>RDKit Installation:</strong>  Make sure RDKit is installed correctly and accessible in your Jupyter Notebook environment.</li>
+<li><strong>Performance:</strong> For larger datasets, consider using more efficient data processing techniques (e.g., using Dask or Spark for parallel processing).</li>
+<li><strong>Security:</strong> Be mindful of security best practices when handling database credentials.  Avoid hardcoding passwords directly in your code.  Use environment variables or a configuration file to store sensitive information.</li>
+<li><strong>Units</strong>: Pay special attention to units in ChEMBL. Always confirm that you are operating on the correct scale. The code converts nM to Molar during pIC50 calculation, but ensure the units are consistent throughout your analysis.</li>
+</ul>
+<p><strong>Traducción al español:</strong></p>
+<p>Entiendo. Estás trabajando con datos de ChEMBL 35, usando RDKit para el análisis y enfrentando algunos errores al ejecutar código SQL y Python dentro de una estructura de carpetas AIMLops. Analicemos el problema, proporcionemos soluciones y creemos el código necesario.</p>
+<p><strong>1. Análisis del modelo de análisis y enfoque</strong></p>
+<p>Tu proyecto parece centrarse en el análisis de datos de ChEMBL. Un modelo típico de análisis de I+D de fármacos implicaría:</p>
+<ul>
+<li><strong>Extracción y limpieza de datos:</strong> Recuperar datos relevantes de la base de datos ChEMBL y abordar problemas como valores faltantes, tipos de datos incorrectos y unidades inconsistentes. Aquí es donde entran en juego tus scripts SQL.</li>
+<li><strong>Ingeniería de características:</strong> Generar descriptores moleculares utilizando RDKit. Estos descriptores representan varias propiedades fisicoquímicas de las moléculas (por ejemplo, peso molecular, logP, donantes/aceptores de enlaces de hidrógeno).</li>
+<li><strong>Análisis exploratorio de datos (EDA):</strong> Comprender la distribución de los datos, identificar posibles correlaciones entre las características y visualizar los datos.</li>
+<li><strong>Construcción de modelos (opcional):</strong> Si tu objetivo es predictivo, podrías construir modelos para predecir la actividad basándote en los descriptores moleculares. Los modelos comunes incluyen la regresión lineal, los bosques aleatorios o las redes neuronales. Sin embargo, centrémonos en un análisis descriptivo más sencillo para esta demostración.</li>
+<li><strong>Interpretación e informes:</strong> Sacar conclusiones del análisis y presentarlas de forma clara y concisa.</li>
+</ul>
+<p><strong>2. Abordar los errores</strong></p>
+<ul>
+<li>
+<p><strong>Error a: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p>Este error indica que estás intentando utilizar una expresión regular (<code>~</code>) en una columna <code>numeric</code> (<code>act.standard_value</code>) en PostgreSQL. El operador <code>~</code> en PostgreSQL se utiliza para la coincidencia de patrones en cadenas, no en números.</p>
+<p><strong>Solución:</strong> En lugar de utilizar una expresión regular, utiliza operadores de comparación numérica (&gt;, &lt;, =, etc.) o convierte el valor a texto si realmente necesitas la coincidencia regex.</p>
+</li>
+<li>
+<p><strong>Error b: <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<p>Esto significa que estás utilizando una versión anterior de scikit-learn.</p>
+<p><strong>Solución:</strong>
+*   <strong>Opción 1 (Recomendada):</strong> Actualiza tu versión de scikit-learn a la última versión estable utilizando <code>pip install -U scikit-learn</code>.
+*   <strong>Opción 2 (Si la actualización no es posible):</strong> Elimina el argumento <code>squared=False</code> de la llamada a la función <code>mean_squared_error</code>. Esto devolverá el Error Cuadrático Medio (MSE) en lugar de la Raíz del Error Cuadrático Medio (RMSE). Si necesitas RMSE, calcúlalo manualmente tomando la raíz cuadrada del MSE.</p>
+</li>
+</ul>
+<p><strong>3. Estructura de carpetas AIMLops y ejecución de código</strong></p>
+<p>Suponiendo una estructura AIMLops básica como esta:</p>
+<p><code>project_root/
+├── data/
+├── notebooks/
+│   ├── Topic_CheMBL_35_21_1_data_extraction.ipynb
+│   ├── Topic_CheMBL_35_21_2_data_analysis.ipynb
+├── scripts/
+├── models/
+├── README.md</code></p>
+<p><strong>4. Código (SQL y Python)</strong></p>
+<ul>
+<li><strong>SQL (data/chembl_35_21_activity_data.csv)</strong></li>
+</ul>
+<p>```sql
+-- Archivo: data/chembl_35_21_activity_data.sql</p>
+<p>SELECT
+    cmp.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.assay_chembl_id
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+WHERE
+    act.standard_type = 'IC50'  -- Centrarse en los valores de IC50
+    AND act.standard_units = 'nM' -- Centrarse en las unidades de nM
+    AND act.standard_value &gt; 0   -- Asegurarse de que los valores sean positivos
+    AND act.standard_value &lt; 100000 --Filtrar los valores extremadamente altos
+LIMIT 100;</p>
+<p>COPY (
+SELECT
+    cmp.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.assay_chembl_id
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+WHERE
+    act.standard_type = 'IC50'  -- Centrarse en los valores de IC50
+    AND act.standard_units = 'nM' -- Centrarse en las unidades de nM
+    AND act.standard_value &gt; 0   -- Asegurarse de que los valores sean positivos
+    AND act.standard_value &lt; 100000 --Filtrar los valores extremadamente altos
+LIMIT 100
+) TO '/tmp/chembl_35_21_activity_data.csv' WITH CSV HEADER;
+```</p>
+<p><strong>Explicación:</strong></p>
+<ul>
+<li>Este script SQL recupera datos de actividad (específicamente valores de IC50 en nM) junto con el ID de ChEMBL del compuesto.</li>
+<li>Une las tablas <code>activities</code> y <code>molecule_dictionary</code>.</li>
+<li>Filtra por <code>standard_value</code> positivos y valores menores de 100000 para excluir valores irrazonablemente altos que a menudo son errores o compuestos inactivos.</li>
+<li><code>LIMIT 100</code> garantiza que solo se recuperen 100 filas.</li>
+<li>El comando <code>COPY</code> guarda el resultado en un archivo CSV. <strong>Importante:</strong> Ajusta la ruta (<code>/tmp/chembl_35_21_activity_data.csv</code>) a una ubicación accesible para el usuario de tu servidor PostgreSQL. Es posible que debas otorgar permisos al usuario de PostgreSQL para escribir en ese directorio. Además, asegúrate de que el directorio exista. Después de crear el archivo, muévelo al directorio <code>data/</code> dentro de tu proyecto.</li>
+</ul>
+<p><strong>Pasos para ejecutar el script .sql:</strong></p>
+<ol>
+<li>Abre pgAdmin y conéctate a tu base de datos <code>chembl_35</code> en <code>192.168.206.136</code>.</li>
+<li>Abre una nueva ventana de consulta.</li>
+<li>Copia y pega el script SQL en la ventana de consulta.</li>
+<li>Ejecuta la consulta.</li>
+<li>
+<p>Mueve el archivo generado <code>/tmp/chembl_35_21_activity_data.csv</code> (o la ubicación que especificaste en el comando <code>COPY</code>) a tu directorio <code>data/</code>.</p>
+</li>
+<li>
+<p><strong>Python (notebooks/Topic_CheMBL_35_21_1_data_extraction.ipynb)</strong></p>
+</li>
+</ol>
+<p>Este notebook es responsable de leer la salida de SQL.</p>
+<p>```python</p>
+<h1>Archivo: notebooks/Topic_CheMBL_35_21_1_data_extraction.ipynb</h1>
+<p>import os
+import pandas as pd</p>
+<h1>Define la ruta base</h1>
+<p>base_path = os.getcwd()  # Suponiendo que el notebook se ejecuta desde la raíz del proyecto.
+data_path = os.path.join(base_path, 'data')
+csv_file_path = os.path.join(data_path, 'chembl_35_21_activity_data.csv')</p>
+<h1>Lee el archivo CSV en un DataFrame de Pandas</h1>
+<p>try:
+    df = pd.read_csv(csv_file_path)
+    print("¡Datos cargados correctamente!")
+    print(df.head())  # Muestra las primeras filas
+except FileNotFoundError:
+    print(f"Error: No se encontró el archivo CSV en {csv_file_path}")
+except Exception as e:
+    print(f"Se produjo un error: {e}")
+```</p>
+<ul>
+<li><strong>Python (notebooks/Topic_CheMBL_35_21_2_data_analysis.ipynb)</strong></li>
+</ul>
+<p>Este notebook realiza el análisis.</p>
+<p>```python</p>
+<h1>Archivo: notebooks/Topic_CheMBL_35_21_2_data_analysis.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np #Import numpy</p>
+<h1>Define la ruta base</h1>
+<p>base_path = os.getcwd()  # Suponiendo que el notebook se ejecuta desde la raíz del proyecto.
+data_path = os.path.join(base_path, 'data')
+csv_file_path = os.path.join(data_path, 'chembl_35_21_activity_data.csv')</p>
+<h1>Carga los datos</h1>
+<p>try:
+    df = pd.read_csv(csv_file_path)
+except FileNotFoundError:
+    print(f"Error: No se encontró el archivo CSV en {csv_file_path}")
+    exit()  # Detiene la ejecución si no se encuentra el archivo</p>
+<h1>Convierte IC50 a pIC50</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value']/(10**9)) # El valor estándar está en nM, se convierte a Molar.</p>
+<h1>Funciones de RDKit</h1>
+<p>def smiles_from_chembl_id(chembl_id):
+  """Obtener SMILES del ID de ChEMBL"""
+  try:
+    from chembl_webresource_client.new_client import new_client
+    molecule = new_client.molecule
+    res = molecule.get(chembl_id).to_dict()
+    return res['molecule_structures']['canonical_smiles']
+  except:
+    return None</p>
+<p>def generate_descriptors(smiles):
+    """Genera descriptores moleculares utilizando RDKit."""
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        descriptors = {
+            "MolWt": Descriptors.MolWt(mol),
+            "LogP": Descriptors.MolLogP(mol),
+            "HBD": Descriptors.NumHDonors(mol),
+            "HBA": Descriptors.NumHAcceptors(mol),
+            "TPSA": Descriptors.TPSA(mol),
+        }
+        return descriptors
+    else:
+        return None</p>
+<h1>Obtiene SMILES y genera descriptores</h1>
+<p>df['SMILES'] = df['chembl_id'].apply(smiles_from_chembl_id)
+df = df.dropna(subset=['SMILES']) #Elimina las filas sin SMILES</p>
+<p>df['descriptors'] = df['SMILES'].apply(generate_descriptors)
+df = df.dropna(subset=['descriptors']) #Elimina las filas sin descriptores calculados</p>
+<h1>Expande el diccionario de descriptores en columnas individuales.</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>EDA básico:</h1>
+<p>print(df.describe())  # Descripción estadística</p>
+<h1>Visualización (ejemplo: pIC50 vs. Peso Molecular)</h1>
+<p>plt.figure(figsize=(8, 6))
+sns.scatterplot(x='MolWt', y='pIC50', data=df)
+plt.title('pIC50 vs. Peso Molecular')
+plt.xlabel('Peso Molecular')
+plt.ylabel('pIC50')
+plt.show()</p>
+<h1>Mapa de calor de correlación (Ejemplo)</h1>
+<p>correlation_matrix = df[['pIC50', 'MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']].corr()
+plt.figure(figsize=(10, 8))
+sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm")
+plt.title("Mapa de calor de correlación")
+plt.show()
+```</p>
+<p><strong>Explicación:</strong></p>
+<ol>
+<li><strong>Importa bibliotecas:</strong> Importa las bibliotecas necesarias (pandas, RDKit, matplotlib, seaborn).</li>
+<li><strong>Ruta del archivo:</strong> Define la ruta al archivo CSV utilizando <code>os.path.join</code>.</li>
+<li><strong>Carga datos:</strong> Carga los datos desde el archivo CSV utilizando <code>pd.read_csv</code>.</li>
+<li><strong>Convierte IC50 a pIC50:</strong> Transforma el IC50 en pIC50 como una medida de la potencia.</li>
+<li><strong>Obtiene SMILES y genera descriptores:</strong><ul>
+<li>Define funciones para obtener cadenas SMILES de los ID de ChEMBL utilizando <code>chembl_webresource_client</code>. <strong>Deberás instalar esto: <code>pip install chembl_webresource_client</code></strong>.</li>
+<li>Define una función <code>generate_descriptors</code> que toma una cadena SMILES como entrada y calcula descriptores moleculares utilizando RDKit.</li>
+<li>Aplica estas funciones para crear nuevas columnas en el DataFrame.</li>
+</ul>
+</li>
+<li><strong>Limpieza de datos</strong>: Elimina las filas donde no se pudo encontrar la cadena SMILES</li>
+<li><strong>Expande descriptores</strong>: Expande el diccionario de descriptores en columnas separadas.</li>
+<li><strong>EDA básico y visualización:</strong><ul>
+<li>Calcula estadísticas descriptivas utilizando <code>df.describe()</code>.</li>
+<li>Crea un diagrama de dispersión de pIC50 vs. Peso Molecular utilizando Seaborn.</li>
+<li>Calcula y visualiza un mapa de calor de correlación.</li>
+</ul>
+</li>
+</ol>
+<p><strong>5. Ejecutar el código</strong></p>
+<ol>
+<li>
+<p><strong>Instala dependencias:</strong> Asegúrate de tener todas las bibliotecas necesarias instaladas:</p>
+<p><code>bash
+pip install pandas rdkit matplotlib seaborn chembl_webresource_client</code></p>
+</li>
+<li>
+<p><strong>Ejecuta SQL:</strong> Ejecuta el script SQL en pgAdmin y mueve el archivo CSV resultante al directorio <code>data/</code>. Recuerda ajustar la ruta en el comando <code>COPY</code> si es necesario.</p>
+</li>
+<li>
+<p><strong>Ejecuta los notebooks:</strong> Abre los notebooks <code>notebooks/Topic_CheMBL_35_21_1_data_extraction.ipynb</code> y <code>notebooks/Topic_CheMBL_35_21_2_data_analysis.ipynb</code> en Jupyter Notebook y ejecuta las celdas.</p>
+</li>
+</ol>
+<p><strong>6. Ejemplo de análisis y salida</strong></p>
+<p>El notebook <code>Topic_CheMBL_35_21_2_data_analysis.ipynb</code>, cuando se ejecuta, mostrará:</p>
+<ul>
+<li><strong>Estadísticas descriptivas:</strong> Una tabla que muestra la media, la desviación estándar, el mínimo, el máximo, etc., para cada columna numérica (pIC50, MolWt, LogP, etc.).</li>
+<li><strong>Diagrama de dispersión:</strong> Un diagrama de dispersión que muestra la relación entre pIC50 y el peso molecular.</li>
+<li><strong>Mapa de calor de correlación:</strong> Una visualización de la correlación entre diferentes descriptores moleculares y pIC50.</li>
+</ul>
+<p><strong>7. Cinco ejemplos</strong></p>
+<p>Aquí hay cinco ejemplos de análisis que puedes realizar utilizando el código y los datos:</p>
+<ol>
+<li>
+<p><strong>Distribución de valores de pIC50:</strong> Crea un histograma de la columna <code>pIC50</code> para visualizar la distribución de los valores de actividad. Esto ayuda a comprender el rango de potencia de los compuestos en tu conjunto de datos.</p>
+<p><code>python
+plt.figure(figsize=(8, 6))
+sns.histplot(df['pIC50'], kde=True)  # kde=True añade una estimación de densidad del núcleo
+plt.title('Distribución de los valores de pIC50')
+plt.xlabel('pIC50')
+plt.ylabel('Frecuencia')
+plt.show()</code></p>
+</li>
+<li>
+<p><strong>Relación entre LogP y pIC50:</strong> Genera un diagrama de dispersión de <code>LogP</code> (coeficiente de partición octanol-agua, una medida de la lipofilicidad) vs. <code>pIC50</code>. Esto puede revelar si los compuestos más lipofílicos tienden a ser más o menos activos.</p>
+<p><code>python
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x='LogP', y='pIC50', data=df)
+plt.title('pIC50 vs. LogP')
+plt.xlabel('LogP')
+plt.ylabel('pIC50')
+plt.show()</code></p>
+</li>
+<li>
+<p><strong>Diagramas de caja de pIC50 para diferentes tipos de ensayo:</strong> Si tus datos contienen</p>
+</li>
+</ol>
+        </body>
+        </html>
+        

@@ -1,0 +1,418 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_10</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Bản đồ không gian hóa học của các phân tử ChEMBL</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu Chembl 35 này. Với vai trò là Chuyên gia R&amp;D Dược học, tôi sẽ cung cấp hướng dẫn chi tiết, code mẫu và giải thích rõ ràng để bạn có thể triển khai dự án một cách hiệu quả.</p>
+<p><strong>1. Phân Tích Mô Hình Phân Tích (Analysis of the Analysis Model)</strong></p>
+<p>Dựa trên yêu cầu của bạn, chúng ta sẽ xây dựng một quy trình phân tích dữ liệu Chembl 35 kết hợp RDKit để hỗ trợ nghiên cứu và phát triển thuốc. Mô hình này bao gồm các bước chính sau:</p>
+<ul>
+<li><strong>Thu thập và Chuẩn bị Dữ liệu (Data Acquisition and Preparation):</strong><ul>
+<li>Sử dụng SQL để truy vấn dữ liệu từ database Chembl 35 (trên PostgreSQL).</li>
+<li>Lọc và tiền xử lý dữ liệu (ví dụ: loại bỏ các giá trị không hợp lệ, chuẩn hóa dữ liệu).</li>
+<li>Lưu dữ liệu đã xử lý vào file CSV.</li>
+</ul>
+</li>
+<li><strong>Tính Toán Đặc Trưng Phân Tử (Molecular Feature Calculation):</strong><ul>
+<li>Sử dụng RDKit để tính toán các đặc trưng phân tử (molecular descriptors) từ SMILES strings. Các đặc trưng này có thể bao gồm:<ul>
+<li>Tính chất vật lý hóa học (physicochemical properties): LogP, Molecular Weight, Topological Polar Surface Area (TPSA).</li>
+<li>Đặc trưng cấu trúc (structural features): số lượng vòng, số lượng nguyên tử, số lượng liên kết.</li>
+<li>Fingerprints: Morgan fingerprints, MACCS keys.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Phân Tích Thống Kê và Trực Quan Hóa (Statistical Analysis and Visualization):</strong><ul>
+<li>Sử dụng Python (với các thư viện như pandas, numpy, matplotlib, seaborn) để thực hiện phân tích thống kê mô tả (descriptive statistics) và trực quan hóa dữ liệu.</li>
+<li>Ví dụ: vẽ biểu đồ phân phối của các đặc trưng phân tử, biểu đồ scatter để tìm mối tương quan giữa các đặc trưng và hoạt tính sinh học.</li>
+</ul>
+</li>
+<li><strong>Xây Dựng Mô Hình Học Máy (Machine Learning Model Building):</strong><ul>
+<li>Sử dụng scikit-learn để xây dựng các mô hình học máy dự đoán hoạt tính sinh học (ví dụ: hồi quy tuyến tính, random forest, support vector machines).</li>
+<li>Sử dụng các đặc trưng phân tử làm đầu vào cho mô hình.</li>
+<li>Đánh giá hiệu suất mô hình bằng các metrics phù hợp (ví dụ: R-squared, RMSE, AUC).</li>
+</ul>
+</li>
+</ul>
+<p><strong>2. Hướng Dẫn Song Ngữ (Bilingual Instructions)</strong></p>
+<p><strong>2.1. Kết Nối Cơ Sở Dữ Liệu và Truy Vấn SQL (Database Connection and SQL Queries)</strong></p>
+<p><strong>Tiếng Việt:</strong></p>
+<ol>
+<li>Sử dụng pgAdmin để kết nối đến cơ sở dữ liệu PostgreSQL của bạn.</li>
+<li>Tạo một query mới và viết các câu lệnh SQL để truy vấn dữ liệu mong muốn từ Chembl 35.</li>
+<li>Lưu kết quả truy vấn vào file CSV (ví dụ: <code>../data/chembl_data.csv</code>).</li>
+</ol>
+<p><strong>English:</strong></p>
+<ol>
+<li>Use pgAdmin to connect to your PostgreSQL database.</li>
+<li>Create a new query and write SQL statements to retrieve the desired data from Chembl 35.</li>
+<li>Save the query results to a CSV file (e.g., <code>../data/chembl_data.csv</code>).</li>
+</ol>
+<p><strong>2.2. Tính Toán Đặc Trưng Phân Tử với RDKit (Molecular Feature Calculation with RDKit)</strong></p>
+<p><strong>Tiếng Việt:</strong></p>
+<ol>
+<li>Trong Jupyter Notebook, import thư viện RDKit.</li>
+<li>Đọc file CSV chứa dữ liệu Chembl.</li>
+<li>Sử dụng RDKit để chuyển đổi SMILES strings thành các đối tượng phân tử.</li>
+<li>Tính toán các đặc trưng phân tử mong muốn (ví dụ: LogP, Molecular Weight).</li>
+<li>Lưu các đặc trưng này vào DataFrame.</li>
+</ol>
+<p><strong>English:</strong></p>
+<ol>
+<li>In a Jupyter Notebook, import the RDKit library.</li>
+<li>Read the CSV file containing Chembl data.</li>
+<li>Use RDKit to convert SMILES strings into molecule objects.</li>
+<li>Calculate the desired molecular features (e.g., LogP, Molecular Weight).</li>
+<li>Store these features in a DataFrame.</li>
+</ol>
+<p><strong>2.3. Xây Dựng Mô Hình Học Máy (Machine Learning Model Building)</strong></p>
+<p><strong>Tiếng Việt:</strong></p>
+<ol>
+<li>Chuẩn bị dữ liệu: tách features (đặc trưng) và target (biến mục tiêu).</li>
+<li>Chia dữ liệu thành tập huấn luyện và tập kiểm tra.</li>
+<li>Chọn một mô hình học máy (ví dụ: Random Forest).</li>
+<li>Huấn luyện mô hình trên tập huấn luyện.</li>
+<li>Đánh giá mô hình trên tập kiểm tra.</li>
+</ol>
+<p><strong>English:</strong></p>
+<ol>
+<li>Prepare the data: separate features and target.</li>
+<li>Split the data into training and test sets.</li>
+<li>Choose a machine learning model (e.g., Random Forest).</li>
+<li>Train the model on the training set.</li>
+<li>Evaluate the model on the test set.</li>
+</ol>
+<p><strong>3. Code SQL và Python (SQL and Python Code)</strong></p>
+<p><strong>3.1. Code SQL</strong></p>
+<p><code>sql
+-- English: Select 100 rows from the activities table with specific conditions
+-- Vietnamese: Chọn 100 dòng từ bảng activities với các điều kiện cụ thể
+SELECT
+    act.molregno,
+    act.standard_type,
+    act.standard_relation,
+    act.standard_value,
+    act.standard_units,
+    cmp.chembl_id,
+    cmp.smiles
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_units = 'nM'
+    --AND act.standard_value ~ '^[0-9\.]+$' -- This line might cause an error
+LIMIT 100;</code></p>
+<p><strong>Lưu ý:</strong> Dòng <code>AND act.standard_value ~ '^[0-9\.]+$'</code> có thể gây ra lỗi vì kiểu dữ liệu của <code>standard_value</code> là numeric. Bạn có thể bỏ qua dòng này hoặc chuyển đổi <code>standard_value</code> sang kiểu text để so sánh.</p>
+<p><strong>3.2. Code Python</strong></p>
+<p>```python
+import pandas as pd
+import numpy as np
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score</p>
+<h1>Define the base path for your project</h1>
+<p>base_path = "."  # Assuming the notebook is in the root directory</p>
+<h1>Read the CSV file containing Chembl data</h1>
+<p>data_path = os.path.join(base_path, 'data', 'chembl_data.csv') # Assuming the CSV is stored in a 'data' folder
+df = pd.read_csv(data_path)</p>
+<h1>Function to calculate molecular weight using RDKit</h1>
+<p>def calculate_molecular_weight(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            return Descriptors.MolWt(mol)
+        else:
+            return None
+    except:
+        return None</p>
+<h1>Apply the function to calculate molecular weight for each SMILES string</h1>
+<p>df['molecular_weight'] = df['smiles'].apply(calculate_molecular_weight)</p>
+<h1>Convert standard_value to numeric, handling errors</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')</p>
+<h1>Drop rows with missing values (NaN)</h1>
+<p>df = df.dropna()</p>
+<h1>Define features (X) and target (y)</h1>
+<p>X = df[['molecular_weight']]
+y = df['standard_value']</p>
+<h1>Split the data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Create a Random Forest Regressor model</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)</p>
+<h1>Train the model</h1>
+<p>model.fit(X_train, y_train)</p>
+<h1>Make predictions on the test set</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>4. Ví Dụ Code SQL và Python (SQL and Python Code Examples)</strong></p>
+<p>Dưới đây là 5 ví dụ code SQL và Python mẫu để bạn tham khảo:</p>
+<p><strong>Ví dụ 1: Truy vấn thông tin cơ bản về các hợp chất (Basic Compound Information Query)</strong></p>
+<p><strong>SQL:</strong></p>
+<p><code>sql
+-- English: Select chembl_id and smiles for the first 100 compounds
+-- Vietnamese: Chọn chembl_id và smiles của 100 hợp chất đầu tiên
+SELECT chembl_id, smiles FROM molecule_dictionary LIMIT 100;</code></p>
+<p><strong>Python:</strong></p>
+<p>```python</p>
+<h1>English: Read the first 100 rows from the molecule_dictionary table into a Pandas DataFrame</h1>
+<h1>Vietnamese: Đọc 100 dòng đầu tiên từ bảng molecule_dictionary vào DataFrame Pandas</h1>
+<p>import pandas as pd
+import psycopg2</p>
+<h1>Database credentials</h1>
+<p>db_params = {
+    'host': '192.168.206.136',
+    'user': 'rd',
+    'password': 'rd',
+    'database': 'chembl_35'
+}</p>
+<h1>Connect to the database</h1>
+<p>conn = psycopg2.connect(**db_params)</p>
+<h1>SQL query to retrieve the first 100 rows from molecule_dictionary</h1>
+<p>sql_query = "SELECT chembl_id, smiles FROM molecule_dictionary LIMIT 100;"</p>
+<h1>Read the data into a Pandas DataFrame</h1>
+<p>df = pd.read_sql(sql_query, conn)</p>
+<h1>Close the database connection</h1>
+<p>conn.close()</p>
+<h1>Print the DataFrame</h1>
+<p>print(df.head())
+```</p>
+<p><strong>Ví dụ 2: Tính LogP sử dụng RDKit (Calculate LogP using RDKit)</strong></p>
+<p><strong>Python:</strong></p>
+<p>```python</p>
+<h1>English: Calculate LogP for a list of SMILES strings</h1>
+<h1>Vietnamese: Tính LogP cho một danh sách các chuỗi SMILES</h1>
+<p>from rdkit import Chem
+from rdkit.Chem import Crippen</p>
+<p>smiles_list = ['CC(=O)Oc1ccccc1C(=O)O', 'c1ccccc1', 'CCO']</p>
+<p>logp_values = []
+for smiles in smiles_list:
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        logp = Crippen.MolLogP(mol)
+        logp_values.append(logp)
+    else:
+        logp_values.append(None)</p>
+<p>print(logp_values)
+```</p>
+<p><strong>Ví dụ 3: Lọc các hợp chất có trọng lượng phân tử nhất định (Filter Compounds by Molecular Weight)</strong></p>
+<p><strong>SQL:</strong></p>
+<p>```sql
+-- English: This SQL query is not directly possible as molecular weight is not stored in the database.
+-- You would need to calculate it in Python using RDKit after fetching SMILES.
+-- Vietnamese: Truy vấn SQL này không thể thực hiện trực tiếp vì trọng lượng phân tử không được lưu trữ trong cơ sở dữ liệu.
+-- Bạn cần tính toán nó trong Python bằng RDKit sau khi lấy SMILES.</p>
+<p>-- Example: Select chembl_id and smiles for compounds, then calculate molecular weight in Python
+-- Ví dụ: Chọn chembl_id và smiles cho các hợp chất, sau đó tính trọng lượng phân tử trong Python
+SELECT chembl_id, smiles FROM molecule_dictionary LIMIT 100;
+```</p>
+<p><strong>Python:</strong></p>
+<p>```python</p>
+<h1>English: Filter compounds by molecular weight after fetching data</h1>
+<h1>Vietnamese: Lọc các hợp chất theo trọng lượng phân tử sau khi lấy dữ liệu</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import psycopg2</p>
+<h1>Database credentials</h1>
+<p>db_params = {
+    'host': '192.168.206.136',
+    'user': 'rd',
+    'password': 'rd',
+    'database': 'chembl_35'
+}</p>
+<h1>Connect to the database</h1>
+<p>conn = psycopg2.connect(**db_params)</p>
+<h1>SQL query to retrieve chembl_id and smiles</h1>
+<p>sql_query = "SELECT chembl_id, smiles FROM molecule_dictionary LIMIT 100;"</p>
+<h1>Read the data into a Pandas DataFrame</h1>
+<p>df = pd.read_sql(sql_query, conn)</p>
+<h1>Close the database connection</h1>
+<p>conn.close()</p>
+<h1>Function to calculate molecular weight</h1>
+<p>def calculate_molecular_weight(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            return Descriptors.MolWt(mol)
+        else:
+            return None
+    except:
+        return None</p>
+<h1>Apply the function to calculate molecular weight for each SMILES string</h1>
+<p>df['molecular_weight'] = df['smiles'].apply(calculate_molecular_weight)</p>
+<h1>Filter compounds with molecular weight between 200 and 400</h1>
+<p>filtered_df = df[(df['molecular_weight'] &gt;= 200) &amp; (df['molecular_weight'] &lt;= 400)]</p>
+<p>print(filtered_df)
+```</p>
+<p><strong>Ví dụ 4: Phân tích hoạt tính sinh học (Activity Analysis)</strong></p>
+<p><strong>SQL:</strong></p>
+<p><code>sql
+-- English: Select IC50 values for a specific target
+-- Vietnamese: Chọn giá trị IC50 cho một target cụ thể
+SELECT act.standard_value
+FROM activities act
+JOIN target_dictionary tgt ON act.tid = tgt.tid
+WHERE tgt.chembl_id = 'CHEMBL205'  -- Replace with the desired target CHEMBL ID
+AND act.standard_type = 'IC50'
+AND act.standard_relation = '='
+LIMIT 100;</code></p>
+<p><strong>Python:</strong></p>
+<p>```python</p>
+<h1>English: Analyze IC50 values fetched from the database</h1>
+<h1>Vietnamese: Phân tích các giá trị IC50 được lấy từ cơ sở dữ liệu</h1>
+<p>import pandas as pd
+import matplotlib.pyplot as plt
+import psycopg2</p>
+<h1>Database credentials</h1>
+<p>db_params = {
+    'host': '192.168.206.136',
+    'user': 'rd',
+    'password': 'rd',
+    'database': 'chembl_35'
+}</p>
+<h1>Connect to the database</h1>
+<p>conn = psycopg2.connect(**db_params)</p>
+<h1>SQL query to retrieve IC50 values for a specific target</h1>
+<p>sql_query = """
+SELECT act.standard_value
+FROM activities act
+JOIN target_dictionary tgt ON act.tid = tgt.tid
+WHERE tgt.chembl_id = 'CHEMBL205'  -- Replace with the desired target CHEMBL ID
+AND act.standard_type = 'IC50'
+AND act.standard_relation = '='
+LIMIT 100;
+"""</p>
+<h1>Read the data into a Pandas DataFrame</h1>
+<p>df = pd.read_sql(sql_query, conn)</p>
+<h1>Close the database connection</h1>
+<p>conn.close()</p>
+<h1>Convert standard_value to numeric, handling errors</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')</p>
+<h1>Drop rows with missing values (NaN)</h1>
+<p>df = df.dropna()</p>
+<h1>Plot a histogram of IC50 values</h1>
+<p>plt.hist(df['standard_value'], bins=20)
+plt.xlabel('IC50 Value')
+plt.ylabel('Frequency')
+plt.title('Distribution of IC50 Values')
+plt.show()
+```</p>
+<p><strong>Ví dụ 5: Xây dựng mô hình dự đoán hoạt tính (Activity Prediction Model)</strong></p>
+<p><strong>Python:</strong></p>
+<p>```python</p>
+<h1>English: Build a simple activity prediction model using molecular weight</h1>
+<h1>Vietnamese: Xây dựng mô hình dự đoán hoạt tính đơn giản sử dụng trọng lượng phân tử</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+import psycopg2</p>
+<h1>Database credentials</h1>
+<p>db_params = {
+    'host': '192.168.206.136',
+    'user': 'rd',
+    'password': 'rd',
+    'database': 'chembl_35'
+}</p>
+<h1>Connect to the database</h1>
+<p>conn = psycopg2.connect(**db_params)</p>
+<h1>SQL query to retrieve data for activity prediction</h1>
+<p>sql_query = """
+SELECT act.standard_value, cmp.smiles
+FROM activities act
+JOIN molecule_dictionary cmp ON act.molregno = cmp.molregno
+WHERE act.standard_type = 'IC50'
+AND act.standard_relation = '='
+AND act.standard_value IS NOT NULL
+LIMIT 100;
+"""</p>
+<h1>Read the data into a Pandas DataFrame</h1>
+<p>df = pd.read_sql(sql_query, conn)</p>
+<h1>Close the database connection</h1>
+<p>conn.close()</p>
+<h1>Function to calculate molecular weight</h1>
+<p>def calculate_molecular_weight(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            return Descriptors.MolWt(mol)
+        else:
+            return None
+    except:
+        return None</p>
+<h1>Apply the function to calculate molecular weight for each SMILES string</h1>
+<p>df['molecular_weight'] = df['smiles'].apply(calculate_molecular_weight)</p>
+<h1>Convert standard_value to numeric, handling errors</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')</p>
+<h1>Drop rows with missing values (NaN)</h1>
+<p>df = df.dropna()</p>
+<h1>Prepare data for modeling</h1>
+<p>X = df[['molecular_weight']]
+y = df['standard_value']</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Create a linear regression model</h1>
+<p>model = LinearRegression()</p>
+<h1>Train the model</h1>
+<p>model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+print(f"Mean Squared Error: {mse}")
+```</p>
+<p><strong>Lưu ý quan trọng:</strong></p>
+<ul>
+<li><strong>Sửa lỗi SQL:</strong> Trong truy vấn SQL, hãy đảm bảo xử lý đúng kiểu dữ liệu của cột <code>standard_value</code>. Nếu cần, bạn có thể bỏ qua việc lọc theo regular expression hoặc chuyển đổi kiểu dữ liệu trước khi so sánh.</li>
+<li><strong>Phiên bản Scikit-learn:</strong> Nếu bạn gặp lỗi về tham số <code>squared=False</code> trong <code>mean_squared_error</code>, hãy cập nhật scikit-learn lên phiên bản mới nhất hoặc bỏ tham số này (phiên bản cũ mặc định <code>squared=True</code>).</li>
+<li><strong>Đường dẫn:</strong> Sử dụng <code>os.path.join(base_path, ...)</code> để đảm bảo tính di động của code khi di chuyển giữa các môi trường.</li>
+</ul>
+<p>Chúc bạn thành công với dự án của mình! Nếu bạn có bất kỳ câu hỏi nào khác, đừng ngần ngại hỏi.</p>
+        </body>
+        </html>
+        

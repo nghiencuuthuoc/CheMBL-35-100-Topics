@@ -1,0 +1,382 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_43</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Predicting clinical success from early bioactivity</h1>
+<hr />
+<p>Okay, I understand. You're working on a ChEMBL 35 data analysis project using RDKit, following an AIMLops template, and you're encountering some errors. Let's break down the task and address the issues. I will provide SQL and Python code snippets in both English and Indonesian, along with explanations, focusing on getting a manageable dataset (100 rows) and fixing the errors you're encountering.</p>
+<p><strong>1. Analysis Model:</strong></p>
+<p>The core idea is to extract relevant chemical and bioactivity data from the ChEMBL database, perform data cleaning and transformation, and then use RDKit to calculate molecular descriptors. These descriptors can then be used for various downstream tasks like building predictive models for activity, analyzing structure-activity relationships (SAR), or simply understanding the chemical space represented in your dataset.</p>
+<p>Your current model appears to be focusing on filtering bioactivity data based on standard values and calculating some basic descriptors.</p>
+<p><strong>2. Addressing the Errors:</strong></p>
+<ul>
+<li>
+<p><strong>Error a: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p>This error arises because you're trying to use a regular expression (<code>~</code>) on a numeric column (<code>act.standard_value</code>). PostgreSQL doesn't allow direct regex matching on numeric types. Instead, we can cast the value to text or use alternative methods to check if it's a valid number.</p>
+</li>
+<li>
+<p><strong>Error b: <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<p>This error indicates that your <code>scikit-learn</code> version is outdated. You can either upgrade <code>scikit-learn</code> (<code>pip install scikit-learn --upgrade</code>) or remove the <code>squared=False</code> argument from your <code>mean_squared_error</code> function call if you're not using the root mean squared error.</p>
+</li>
+</ul>
+<p><strong>3. Code and Explanation:</strong></p>
+<p><strong>English:</strong></p>
+<p><strong>Folder Structure (Based on AIMLops):</strong></p>
+<p><code>project_root/
+├── data/
+│   └── chembl_activities_100.csv   # Your extracted data will be saved here
+├── notebooks/
+│   └── Topic_CheMBL_35_43_1_data_extraction.ipynb
+│   └── Topic_CheMBL_35_43_2_data_analysis.ipynb
+├── scripts/
+│   └── (Optional: Any standalone scripts)
+├── models/
+│   └── (Placeholder for model saving later)
+└── README.md</code></p>
+<p><strong>SQL Code (to be run in pgAdmin and save the output to <code>data/chembl_activities_100.csv</code>):</strong></p>
+<p><code>sql
+-- Save as: ../data/chembl_activities_100.csv
+COPY (
+    SELECT
+        act.molregno,
+        act.standard_type,
+        act.standard_value,
+        act.standard_units,
+        act.assay_id,
+        cmp.chembl_id,
+        cmp.canonical_smiles
+    FROM
+        activities act
+    JOIN
+        assays ass ON act.assay_id = ass.assay_id
+    JOIN
+        target_dictionary td ON ass.tid = td.tid
+    JOIN
+        molecule_dictionary md ON act.molregno = md.molregno
+    JOIN
+        compound_structures cmp ON md.molregno = cmp.molregno
+    WHERE
+        td.target_type = 'SINGLE PROTEIN'
+        AND act.standard_type = 'IC50'
+        AND act.standard_units = 'nM'
+        AND act.standard_value IS NOT NULL
+        AND act.standard_value::text ~ '^[0-9\.]+$' -- Safe numeric check
+    LIMIT 100
+) TO '/tmp/chembl_activities_100.csv' WITH CSV HEADER;</code></p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong><code>COPY ... TO '/tmp/chembl_activities_100.csv' WITH CSV HEADER;</code></strong>: This copies the result of the SQL query to a CSV file. Make sure PostgreSQL user has permissions to write to this directory.  Adjust <code>/tmp/chembl_activities_100.csv</code> if necessary. Remember to move the created file from <code>/tmp/chembl_activities_100.csv</code> to <code>./data/</code> folder after execution.</li>
+<li><strong><code>SELECT ... FROM ... JOIN ...</code></strong>:  This selects the desired columns and joins the relevant tables (activities, assays, target_dictionary, molecule_dictionary, compound_structures) to gather the data.</li>
+<li><strong><code>WHERE ...</code></strong>: This filters the data based on:<ul>
+<li><code>td.target_type = 'SINGLE PROTEIN'</code>:  Targets a specific type (single protein).</li>
+<li><code>act.standard_type = 'IC50'</code>: Filters for IC50 values.</li>
+<li><code>act.standard_units = 'nM'</code>: Filters for nanomolar units.</li>
+<li><code>act.standard_value IS NOT NULL</code>: Excludes missing values.</li>
+<li><code>act.standard_value::text ~ '^[0-9\.]+$'</code>: This ensures that the <code>standard_value</code> can be safely converted to a number by casting it to text and checking that it only contains digits and periods. This fixes your regex error.</li>
+</ul>
+</li>
+<li><strong><code>LIMIT 100</code></strong>: This limits the result to 100 rows.</li>
+</ul>
+<p><strong>Python Code (<code>notebooks/Topic_CheMBL_35_43_2_data_analysis.ipynb</code>):</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.metrics import mean_squared_error</p>
+<h1>Define base path</h1>
+<p>base_path = os.getcwd()  # Current working directory where the notebook is
+data_path = os.path.join(base_path, 'data', 'chembl_activities_100.csv')</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+except FileNotFoundError:
+    print(f"Error: The file {data_path} was not found. Please ensure it exists and the path is correct.")
+    exit()</p>
+<h1>Handle missing values (more robust)</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value']) #Dropping NA on both columns.</p>
+<h1>Convert standard_value to numeric (after cleaning)</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value']) # Drop NaN produced by numeric conversion</p>
+<h1>RDKit Molecular Descriptor Calculation</h1>
+<p>def calculate_descriptors(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            return None
+        descriptors = {desc[0]: desc<a href="mol">1</a> for desc in Descriptors.descList}
+        return descriptors
+    except:
+        return None</p>
+<p>df['descriptors'] = df['canonical_smiles'].apply(calculate_descriptors)
+df = df.dropna(subset=['descriptors'])  # Remove rows where descriptor calculation failed</p>
+<h1>Expand the descriptor column into separate columns</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Example: Calculate LogP and Molecular Weight</h1>
+<p>df['LogP'] = df['canonical_smiles'].apply(lambda x: Chem.MolFromSmiles(x).GetMolWt() if Chem.MolFromSmiles(x) else None)
+df['MolWt'] = df['canonical_smiles'].apply(lambda x: Descriptors.MolLogP(Chem.MolFromSmiles(x)) if Chem.MolFromSmiles(x) else None)</p>
+<h1>Simple Example of using the molecular descriptors</h1>
+<p>X = df[['LogP', 'MolWt']].fillna(0) #Fills nan values with 0s
+y = np.log10(df['standard_value']) #Transforming standard value</p>
+<h1>Basic model (for demonstration)</h1>
+<p>from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression</p>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Calculate MSE (fix the scikit-learn error)</h1>
+<p>mse = mean_squared_error(y_test, y_pred) # Remove squared=False if needed for old scikit-learn
+print(f"Mean Squared Error: {mse}")</p>
+<h1>Print the first 5 rows of the dataframe with calculated features</h1>
+<p>print(df.head())
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Import Libraries:</strong> Imports necessary libraries like <code>os</code>, <code>pandas</code>, <code>rdkit</code>, <code>numpy</code>, and <code>sklearn</code>.</li>
+<li><strong>Define Paths:</strong>  Uses <code>os.path.join</code> to construct the correct file path to your CSV data, making it robust to different environments.</li>
+<li><strong>Load Data:</strong> Loads the CSV data into a Pandas DataFrame. Includes error handling for the case where the file is not found.</li>
+<li><strong>Data Cleaning:</strong> Drops rows with missing <code>canonical_smiles</code> or <code>standard_value</code>. Converts <code>standard_value</code> to numeric type and handles potential conversion errors.  Crucially, missing values can cause the whole thing to blow up.</li>
+<li><strong>RDKit Descriptor Calculation:</strong> Defines a function <code>calculate_descriptors</code> to compute molecular descriptors from SMILES strings using RDKit.  Handles cases where SMILES parsing fails by returning <code>None</code>.</li>
+<li><strong>Expand Descriptors:</strong> Expands the dictionary of descriptors into individual columns in the DataFrame.</li>
+<li><strong>Example Descriptors &amp; Model:</strong>  Calculates <code>LogP</code> and <code>MolWt</code> as examples.  Creates a simple linear regression model to predict log-transformed IC50 values using these descriptors. Calculates and prints the Mean Squared Error (MSE). The transformation of <code>standard_value</code> (IC50) via <code>np.log10</code> is a common practice as activity data often follows a log-normal distribution.</li>
+<li><strong>Prints the first 5 rows of the Dataframe</strong> Displays the first five rows of the dataframe, showcasing calculated features and data.</li>
+</ul>
+<p><strong>Indonesian:</strong></p>
+<p><strong>Struktur Folder (Berdasarkan AIMLops):</strong></p>
+<p><code>project_root/
+├── data/
+│   └── chembl_activities_100.csv   # Data hasil ekstraksi Anda akan disimpan di sini
+├── notebooks/
+│   └── Topic_CheMBL_35_43_1_data_extraction.ipynb
+│   └── Topic_CheMBL_35_43_2_data_analysis.ipynb
+├── scripts/
+│   └── (Opsional: Skrip mandiri lainnya)
+├── models/
+│   └── (Placeholder untuk penyimpanan model nanti)
+└── README.md</code></p>
+<p><strong>Kode SQL (dijalankan di pgAdmin dan simpan output ke <code>data/chembl_activities_100.csv</code>):</strong></p>
+<p><code>sql
+-- Simpan sebagai: ../data/chembl_activities_100.csv
+COPY (
+    SELECT
+        act.molregno,
+        act.standard_type,
+        act.standard_value,
+        act.standard_units,
+        act.assay_id,
+        cmp.chembl_id,
+        cmp.canonical_smiles
+    FROM
+        activities act
+    JOIN
+        assays ass ON act.assay_id = ass.assay_id
+    JOIN
+        target_dictionary td ON ass.tid = td.tid
+    JOIN
+        molecule_dictionary md ON act.molregno = md.molregno
+    JOIN
+        compound_structures cmp ON md.molregno = cmp.molregno
+    WHERE
+        td.target_type = 'SINGLE PROTEIN'
+        AND act.standard_type = 'IC50'
+        AND act.standard_units = 'nM'
+        AND act.standard_value IS NOT NULL
+        AND act.standard_value::text ~ '^[0-9\.]+$' -- Pemeriksaan numerik yang aman
+    LIMIT 100
+) TO '/tmp/chembl_activities_100.csv' WITH CSV HEADER;</code></p>
+<p><strong>Penjelasan:</strong></p>
+<ul>
+<li><strong><code>COPY ... TO '/tmp/chembl_activities_100.csv' WITH CSV HEADER;</code></strong>: Ini menyalin hasil query SQL ke file CSV. Pastikan pengguna PostgreSQL memiliki izin untuk menulis ke direktori ini. Sesuaikan <code>/tmp/chembl_activities_100.csv</code> jika diperlukan. Ingat untuk memindahkan file yang dibuat dari <code>/tmp/chembl_activities_100.csv</code> ke folder <code>./data/</code> setelah eksekusi.</li>
+<li><strong><code>SELECT ... FROM ... JOIN ...</code></strong>: Ini memilih kolom yang diinginkan dan menggabungkan tabel yang relevan (activities, assays, target_dictionary, molecule_dictionary, compound_structures) untuk mengumpulkan data.</li>
+<li><strong><code>WHERE ...</code></strong>: Ini menyaring data berdasarkan:<ul>
+<li><code>td.target_type = 'SINGLE PROTEIN'</code>: Menargetkan tipe tertentu (protein tunggal).</li>
+<li><code>act.standard_type = 'IC50'</code>: Menyaring untuk nilai IC50.</li>
+<li><code>act.standard_units = 'nM'</code>: Menyaring untuk unit nanomolar.</li>
+<li><code>act.standard_value IS NOT NULL</code>: Mengecualikan nilai yang hilang.</li>
+<li><code>act.standard_value::text ~ '^[0-9\.]+$'</code>: Ini memastikan bahwa <code>standard_value</code> dapat dikonversi dengan aman menjadi angka dengan mengubahnya menjadi teks dan memeriksa apakah hanya berisi angka dan titik. Ini memperbaiki kesalahan regex Anda.</li>
+</ul>
+</li>
+<li><strong><code>LIMIT 100</code></strong>: Ini membatasi hasilnya menjadi 100 baris.</li>
+</ul>
+<p><strong>Kode Python (<code>notebooks/Topic_CheMBL_35_43_2_data_analysis.ipynb</code>):</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.metrics import mean_squared_error</p>
+<h1>Definisikan path dasar</h1>
+<p>base_path = os.getcwd()  # Direktori kerja saat ini di mana notebook berada
+data_path = os.path.join(base_path, 'data', 'chembl_activities_100.csv')</p>
+<h1>Muat data</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+except FileNotFoundError:
+    print(f"Error: File {data_path} tidak ditemukan. Pastikan file tersebut ada dan path-nya benar.")
+    exit()</p>
+<h1>Tangani nilai yang hilang (lebih kuat)</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value']) #Menghapus NA di kedua kolom.</p>
+<h1>Konversi standard_value ke numerik (setelah dibersihkan)</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value']) # Menghapus NaN yang dihasilkan oleh konversi numerik</p>
+<h1>Perhitungan Deskriptor Molekuler RDKit</h1>
+<p>def hitung_deskriptor(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            return None
+        descriptors = {desc[0]: desc<a href="mol">1</a> for desc in Descriptors.descList}
+        return descriptors
+    except:
+        return None</p>
+<p>df['descriptors'] = df['canonical_smiles'].apply(hitung_deskriptor)
+df = df.dropna(subset=['descriptors'])  # Hapus baris di mana perhitungan deskriptor gagal</p>
+<h1>Perluas kolom deskriptor menjadi kolom terpisah</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Contoh: Hitung LogP dan Berat Molekul</h1>
+<p>df['LogP'] = df['canonical_smiles'].apply(lambda x: Chem.MolFromSmiles(x).GetMolWt() if Chem.MolFromSmiles(x) else None)
+df['MolWt'] = df['canonical_smiles'].apply(lambda x: Descriptors.MolLogP(Chem.MolFromSmiles(x)) if Chem.MolFromSmiles(x) else None)</p>
+<h1>Contoh Sederhana penggunaan deskriptor molekul</h1>
+<p>X = df[['LogP', 'MolWt']].fillna(0) #Mengisi nilai nan dengan 0
+y = np.log10(df['standard_value']) #Transformasi nilai standar</p>
+<h1>Model dasar (untuk demonstrasi)</h1>
+<p>from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression</p>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Hitung MSE (perbaiki kesalahan scikit-learn)</h1>
+<p>mse = mean_squared_error(y_test, y_pred) # Hapus squared=False jika diperlukan untuk scikit-learn lama
+print(f"Mean Squared Error: {mse}")</p>
+<h1>Cetak 5 baris pertama dari dataframe dengan fitur yang dihitung</h1>
+<p>print(df.head())
+```</p>
+<p><strong>Penjelasan:</strong></p>
+<ul>
+<li><strong>Impor Pustaka:</strong> Mengimpor pustaka yang diperlukan seperti <code>os</code>, <code>pandas</code>, <code>rdkit</code>, <code>numpy</code>, dan <code>sklearn</code>.</li>
+<li><strong>Tentukan Path:</strong> Menggunakan <code>os.path.join</code> untuk membangun path file yang benar ke data CSV Anda, membuatnya kuat terhadap lingkungan yang berbeda.</li>
+<li><strong>Muat Data:</strong> Memuat data CSV ke dalam Pandas DataFrame. Menyertakan penanganan kesalahan untuk kasus di mana file tidak ditemukan.</li>
+<li><strong>Pembersihan Data:</strong> Menghapus baris dengan <code>canonical_smiles</code> atau <code>standard_value</code> yang hilang. Mengonversi <code>standard_value</code> ke tipe numerik dan menangani potensi kesalahan konversi.  Penting, nilai yang hilang dapat menyebabkan semuanya gagal.</li>
+<li><strong>Perhitungan Deskriptor RDKit:</strong> Mendefinisikan fungsi <code>hitung_deskriptor</code> untuk menghitung deskriptor molekuler dari string SMILES menggunakan RDKit. Menangani kasus di mana penguraian SMILES gagal dengan mengembalikan <code>None</code>.</li>
+<li><strong>Perluas Deskriptor:</strong> Memperluas kamus deskriptor menjadi kolom individual dalam DataFrame.</li>
+<li><strong>Contoh Deskriptor &amp; Model:</strong> Menghitung <code>LogP</code> dan <code>MolWt</code> sebagai contoh. Membuat model regresi linier sederhana untuk memprediksi nilai IC50 yang ditransformasikan log menggunakan deskriptor ini. Menghitung dan mencetak Mean Squared Error (MSE). Transformasi <code>standard_value</code> (IC50) melalui <code>np.log10</code> adalah praktik umum karena data aktivitas sering mengikuti distribusi log-normal.</li>
+<li><strong>Mencetak 5 baris pertama dari Dataframe:</strong> Menampilkan lima baris pertama dari dataframe, menampilkan fitur dan data yang dihitung.</li>
+</ul>
+<p><strong>4. Example Usages:</strong></p>
+<p>Here are 5 examples on what else you can do with the code:</p>
+<ol>
+<li>
+<p><strong>Calculate and Visualize Descriptor Correlations:</strong></p>
+<p>```python
+import seaborn as sns
+import matplotlib.pyplot as plt</p>
+<h1>Calculate the correlation matrix for descriptors</h1>
+<p>descriptor_cols = df.columns[df.columns.get_loc('MolWt')+1:]
+corr_matrix = df[descriptor_cols].corr()</p>
+<h1>Visualize the correlation matrix using a heatmap</h1>
+<p>plt.figure(figsize=(12, 10))
+sns.heatmap(corr_matrix, annot=False, cmap='coolwarm')
+plt.title('Descriptor Correlation Matrix')
+plt.show()
+```</p>
+<p>This example calculates the correlation between the various calculated descriptors and visualizes it as a heatmap.  This helps identify highly correlated descriptors, which might be redundant in modeling.</p>
+</li>
+<li>
+<p><strong>Building a more Complex Regression Model:</strong></p>
+<p>```python
+from sklearn.ensemble import RandomForestRegressor</p>
+<h1>Choose descriptors as features</h1>
+<p>X = df[descriptor_cols].fillna(0)
+y = np.log10(df['standard_value'])</p>
+<h1>Split data</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a Random Forest model</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)  # Example parameters
+model.fit(X_train, y_train)</p>
+<h1>Evaluate the model</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+print(f"Random Forest MSE: {mse}")
+```</p>
+<p>This example demonstrates building a more sophisticated regression model (Random Forest) using all the calculated descriptors.</p>
+</li>
+<li>
+<p><strong>Calculate and Visualize Activity Distribution:</strong></p>
+<p>```python
+import matplotlib.pyplot as plt</p>
+<h1>Plot the distribution of log-transformed IC50 values</h1>
+<p>plt.hist(np.log10(df['standard_value']), bins=30)
+plt.xlabel('Log10(IC50)')
+plt.ylabel('Frequency')
+plt.title('Distribution of Log10(IC50) Values')
+plt.show()
+```</p>
+<p>This example creates a histogram showing the distribution of the log-transformed IC50 values, providing insights into the range and distribution of activity values.</p>
+</li>
+<li>
+<p><strong>Filtering Data based on Descriptor Values:</strong></p>
+<p>```python</p>
+<h1>Filter compounds based on a LogP range</h1>
+<p>filtered_df = df[(df['LogP'] &gt;= 2) &amp; (df['LogP'] &lt;= 4)]
+print(f"Number of compounds with LogP between 2 and 4: {len(filtered_df)}")
+```</p>
+<p>This example shows how to filter the DataFrame based on the calculated descriptor values, allowing you to focus on subsets of compounds with specific properties.</p>
+</li>
+<li>
+<p><strong>Saving the Processed Data:</strong></p>
+<p>```python</p>
+<h1>Save the DataFrame with calculated descriptors to a new CSV file</h1>
+<p>output_path = os.path.join(base_path, 'data', 'chembl_activities_processed.csv')
+df.to_csv(output_path, index=False)
+print(f"Processed data saved to: {output_path}")
+```</p>
+<p>This example saves the DataFrame, including all the calculated descriptors, to a new CSV file for later use.</p>
+</li>
+</ol>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>File Paths:</strong> Double-check that the file paths are correct in your environment. Use absolute paths if necessary, especially for the SQL <code>COPY</code> command.</li>
+<li><strong>Permissions:</strong> Ensure that the PostgreSQL user has the necessary permissions to write to the specified file path.</li>
+<li><strong>RDKit Installation:</strong> Make sure RDKit is correctly installed in your Python environment.</li>
+<li><strong>Data Integrity:</strong> Always validate your data after loading and cleaning it. Check for unexpected values or inconsistencies.</li>
+</ul>
+<p>By following these steps and addressing the errors, you should be able to successfully extract, process, and analyze ChEMBL data using RDKit in your AIMLops project. Remember to adapt the code and examples to your specific research questions and data. Good luck!</p>
+        </body>
+        </html>
+        

@@ -1,0 +1,378 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_79</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Biểu đồ radar của các điểm giống thuốc</h1>
+<hr />
+<p>Tuyệt vời! Với vai trò là chuyên gia nghiên cứu và phát triển dược học, tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 kết hợp RDKit. Dựa trên thông tin bạn cung cấp, chúng ta sẽ cùng nhau xây dựng quy trình làm việc hiệu quả và giải quyết các vấn đề phát sinh.</p>
+<p><strong>Tổng quan dự án và kế hoạch thực hiện:</strong></p>
+<p>Dự án của bạn tập trung vào việc khai thác dữ liệu từ cơ sở dữ liệu ChEMBL 35 để hỗ trợ nghiên cứu và phát triển thuốc. Quy trình làm việc tuân theo chuẩn AIMLOps Template, bao gồm:</p>
+<ol>
+<li><strong>Trích xuất dữ liệu từ ChEMBL 35 bằng SQL:</strong> Sử dụng pgAdmin để chạy các truy vấn SQL và lưu kết quả vào các file CSV trong thư mục <code>../data/</code>.</li>
+<li><strong>Phân tích dữ liệu bằng Python và RDKit:</strong> Sử dụng Jupyter Notebook để viết code Python, kết hợp với thư viện RDKit để xử lý và phân tích dữ liệu hóa học.</li>
+<li><strong>Lưu trữ code và kết quả:</strong> Lưu các file Jupyter Notebook trong thư mục <code>notebook/</code> với tên file theo định dạng <code>Topic_CheMBL_35_79_1_*</code> và <code>Topic_CheMBL_35_79_2_*</code>.</li>
+</ol>
+<p><strong>1. Phân tích mô hình (Analysis of the model):</strong></p>
+<p>Mục tiêu chính của bạn là khám phá các mối quan hệ giữa cấu trúc hóa học và hoạt tính sinh học của các hợp chất trong ChEMBL 35. Dưới đây là một số mô hình phân tích bạn có thể áp dụng:</p>
+<ul>
+<li><strong>Phân tích hoạt tính-cấu trúc (Structure-Activity Relationship - SAR):</strong> Xác định các nhóm chức hoặc cấu trúc con (substructure) quan trọng ảnh hưởng đến hoạt tính của hợp chất.</li>
+<li><strong>Mô hình hóa định lượng hoạt tính-cấu trúc (Quantitative Structure-Activity Relationship - QSAR):</strong> Xây dựng mô hình toán học dự đoán hoạt tính của hợp chất dựa trên các thuộc tính hóa học và vật lý của nó.</li>
+<li><strong>Phân cụm (Clustering):</strong> Phân nhóm các hợp chất có cấu trúc tương tự nhau để tìm ra các "scaffold" (khung cấu trúc) tiềm năng.</li>
+<li><strong>Phân tích thành phần chính (Principal Component Analysis - PCA):</strong> Giảm số chiều của dữ liệu bằng cách tìm ra các thành phần chính (principal components) thể hiện sự biến động lớn nhất trong dữ liệu.</li>
+</ul>
+<p><strong>2. Hướng dẫn song ngữ (Bilingual instructions):</strong></p>
+<p>Dưới đây là hướng dẫn chi tiết cho từng bước trong quy trình làm việc, kèm theo code mẫu SQL và Python:</p>
+<p><strong>Bước 1: Trích xuất dữ liệu từ ChEMBL 35 bằng SQL (Step 1: Extract data from ChEMBL 35 using SQL)</strong></p>
+<ul>
+<li>
+<p><strong>Kết nối đến cơ sở dữ liệu ChEMBL 35 (Connect to ChEMBL 35 database):</strong></p>
+<p><code>sql
+-- Connect to the database using pgAdmin with the provided credentials:
+-- Host: 192.168.206.136
+-- User: rd
+-- Password: rd
+-- Database: chembl_35</code></p>
+</li>
+<li>
+<p><strong>Truy vấn dữ liệu và lưu vào file CSV (Query data and save to CSV file):</strong></p>
+<p>Ví dụ, để lấy thông tin về các hợp chất ức chế enzyme EGFR (Epidermal Growth Factor Receptor):</p>
+<p>```sql
+-- Select data for compounds inhibiting EGFR
+SELECT
+    act.molregno,
+    cmp.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.assay_id
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+JOIN
+    assays ass ON act.assay_id = ass.assay_id
+JOIN
+    target_dictionary tgt ON ass.tid = tgt.tid
+WHERE
+    tgt.target_name = 'Epidermal Growth Factor Receptor'
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+LIMIT 100;</p>
+<p>-- Save the result to a CSV file (e.g., egfr_inhibitors.csv)
+-- You can do this directly in pgAdmin by right-clicking on the query result and selecting "Copy with Headers" then pasting into a text file and saving as CSV.
+```</p>
+<p><strong>Giải thích (Explanation):</strong></p>
+<ul>
+<li>Câu truy vấn này kết hợp các bảng <code>activities</code>, <code>molecule_dictionary</code>, <code>assays</code>, và <code>target_dictionary</code> để lấy thông tin về hoạt tính, cấu trúc, assay và mục tiêu của các hợp chất.</li>
+<li>Điều kiện <code>tgt.target_name = 'Epidermal Growth Factor Receptor'</code> lọc ra các hợp chất ức chế enzyme EGFR.</li>
+<li><code>act.standard_type = 'IC50'</code> và <code>act.standard_units = 'nM'</code> đảm bảo rằng chúng ta chỉ lấy các giá trị IC50 được đo bằng nM.</li>
+<li><code>act.standard_value IS NOT NULL</code> loại bỏ các hàng có giá trị IC50 bị thiếu.</li>
+<li><code>LIMIT 100</code> giới hạn số lượng kết quả trả về là 100 dòng.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Bước 2: Phân tích dữ liệu bằng Python và RDKit (Step 2: Analyze data using Python and RDKit)</strong></p>
+<ul>
+<li>
+<p><strong>Đọc dữ liệu từ file CSV (Read data from CSV file):</strong></p>
+<p>```python
+import pandas as pd
+import os</p>
+<p>base_path = "../data"  # Đường dẫn đến thư mục chứa file CSV
+file_name = "egfr_inhibitors.csv"  # Tên file CSV</p>
+<p>file_path = os.path.join(base_path, file_name)</p>
+<p>try:
+    df = pd.read_csv(file_path)
+    print(f"Đã đọc thành công file CSV từ: {file_path}")
+    print(df.head())  # In ra 5 dòng đầu tiên của DataFrame
+except FileNotFoundError:
+    print(f"Lỗi: Không tìm thấy file CSV tại đường dẫn: {file_path}")
+except Exception as e:
+    print(f"Lỗi không xác định: {e}")
+```</p>
+<p><strong>Giải thích (Explanation):</strong></p>
+<ul>
+<li>Đoạn code này sử dụng thư viện <code>pandas</code> để đọc file CSV vào một DataFrame.</li>
+<li>Hàm <code>os.path.join()</code> được sử dụng để tạo đường dẫn đầy đủ đến file CSV.</li>
+<li>Khối <code>try...except</code> được sử dụng để xử lý các lỗi có thể xảy ra trong quá trình đọc file.</li>
+</ul>
+</li>
+<li>
+<p><strong>Sử dụng RDKit để xử lý dữ liệu hóa học (Use RDKit to process chemical data):</strong></p>
+<p>```python
+from rdkit import Chem
+from rdkit.Chem import Descriptors</p>
+<p>def calculate_molecular_weight(smiles):
+    """Calculates the molecular weight of a compound given its SMILES string."""
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<h1>Assuming your DataFrame 'df' has a column named 'smiles'</h1>
+<h1>Example: df['smiles'] = ['CCO', 'c1ccccc1']</h1>
+<h1>You'll need to replace this with the actual column name containing SMILES strings in your data</h1>
+<h1>Create a sample DataFrame if 'df' does not have 'smiles' column</h1>
+<p>if 'canonical_smiles' not in df.columns:
+    df['canonical_smiles'] = ['CCO', 'c1ccccc1', 'C1=CC=CC=C1C=C1C=CC=CC=1']  # Example SMILES</p>
+<h1>Apply the function to create a new column 'molecular_weight'</h1>
+<p>df['molecular_weight'] = df['canonical_smiles'].apply(calculate_molecular_weight)</p>
+<p>print(df[['canonical_smiles', 'molecular_weight']].head())
+```</p>
+<p><strong>Giải thích (Explanation):</strong></p>
+<ul>
+<li>Đoạn code này sử dụng thư viện <code>RDKit</code> để tính toán khối lượng phân tử của các hợp chất dựa trên chuỗi SMILES của chúng.</li>
+<li>Hàm <code>Chem.MolFromSmiles()</code> chuyển đổi chuỗi SMILES thành đối tượng <code>Mol</code> của RDKit.</li>
+<li>Hàm <code>Descriptors.MolWt()</code> tính toán khối lượng phân tử của đối tượng <code>Mol</code>.</li>
+<li>Hàm <code>apply()</code> được sử dụng để áp dụng hàm <code>calculate_molecular_weight()</code> cho từng hàng trong cột 'smiles' của DataFrame.</li>
+</ul>
+</li>
+</ul>
+<p><strong>3. Giải quyết lỗi (Error handling):</strong></p>
+<ul>
+<li>
+<p><strong>Lỗi (Error) a:</strong> <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></p>
+<p>Lỗi này xảy ra do bạn đang cố gắng sử dụng toán tử <code>~</code> (regular expression match) trên một cột kiểu số (<code>numeric</code>). Để khắc phục, bạn cần chuyển đổi cột <code>act.standard_value</code> sang kiểu text trước khi so sánh với regular expression:</p>
+<p><code>sql
+SELECT
+    act.molregno,
+    cmp.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.assay_id
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+JOIN
+    assays ass ON act.assay_id = ass.assay_id
+JOIN
+    target_dictionary tgt ON ass.tid = tgt.tid
+WHERE
+    tgt.target_name = 'Epidermal Growth Factor Receptor'
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND CAST(act.standard_value AS TEXT) ~ '^[0-9\.]+$' -- Convert to TEXT for regex
+LIMIT 100;</code></p>
+<p><strong>Explanation:</strong>
+* We used <code>CAST(act.standard_value AS TEXT)</code> to explicitly convert the numeric column to text before applying the regex.</p>
+</li>
+<li>
+<p><strong>Lỗi (Error) b:</strong> Phiên bản scikit-learn cũ không hỗ trợ tham số <code>squared=False</code> trong hàm <code>mean_squared_error</code></p>
+<p>Nếu bạn đang sử dụng phiên bản scikit-learn cũ, hãy loại bỏ tham số <code>squared=False</code> hoặc nâng cấp lên phiên bản mới hơn:</p>
+<p>```python
+from sklearn.metrics import mean_squared_error</p>
+<h1>Nếu bạn không thể nâng cấp scikit-learn</h1>
+<p>mse = mean_squared_error(y_true, y_pred)
+rmse = mse**0.5  # Tính căn bậc hai để có RMSE</p>
+<h1>Hoặc nếu bạn có thể nâng cấp scikit-learn</h1>
+<h1>rmse = mean_squared_error(y_true, y_pred, squared=False)</h1>
+<p>print(f"Root Mean Squared Error (RMSE): {rmse}")
+```</p>
+</li>
+</ul>
+<p><strong>4. Ví dụ code SQL và Python mẫu (Sample SQL and Python code examples):</strong></p>
+<p>Dưới đây là 5 ví dụ code SQL và Python mẫu để bạn tham khảo:</p>
+<p><strong>Ví dụ 1: Lọc các hợp chất có khối lượng phân tử nằm trong khoảng nhất định (Filter compounds by molecular weight range)</strong></p>
+<ul>
+<li>
+<p><strong>SQL:</strong></p>
+<p><code>sql
+-- Select compounds with molecular weight between 200 and 500
+SELECT
+    cmp.chembl_id,
+    cmp.molecule_structures
+FROM
+    molecule_dictionary cmp
+WHERE
+    cmp.molecule_properties-&gt;&gt;'mw_freebase' BETWEEN '200' AND '500'
+LIMIT 100;</code></p>
+</li>
+<li>
+<p><strong>Python:</strong></p>
+<p>```python
+import pandas as pd
+import os
+from rdkit import Chem
+from rdkit.Chem import Descriptors</p>
+<p>base_path = "../data"
+file_name = "egfr_inhibitors.csv"
+file_path = os.path.join(base_path, file_name)</p>
+<h1>Sample DataFrame, replace with your actual data loading</h1>
+<p>data = {'canonical_smiles': ['CCO', 'c1ccccc1', 'C1=CC=CC=C1C=C1C=CC=CC=1', 'CC(=O)Oc1ccccc1C(=O)O', 'C<a href="O">C@H</a>c1ccccc1']}
+df = pd.DataFrame(data)</p>
+<p>def calculate_molecular_weight(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<p>df['molecular_weight'] = df['canonical_smiles'].apply(calculate_molecular_weight)</p>
+<h1>Filter compounds with molecular weight between 100 and 200</h1>
+<p>filtered_df = df[(df['molecular_weight'] &gt;= 50) &amp; (df['molecular_weight'] &lt;= 200)]</p>
+<p>print(filtered_df)
+```</p>
+</li>
+</ul>
+<p><strong>Ví dụ 2: Tính toán logP (Partition Coefficient) của các hợp chất (Calculate LogP of compounds)</strong></p>
+<ul>
+<li><strong>SQL:</strong> (Không thể tính logP trực tiếp bằng SQL, cần sử dụng Python)</li>
+<li>
+<p><strong>Python:</strong></p>
+<p>```python
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors
+import pandas as pd</p>
+<h1>Sample DataFrame, replace with your actual data loading</h1>
+<p>data = {'canonical_smiles': ['CCO', 'c1ccccc1', 'C1=CC=CC=C1C=C1C=CC=CC=1', 'CC(=O)Oc1ccccc1C(=O)O', 'C<a href="O">C@H</a>c1ccccc1']}
+df = pd.DataFrame(data)</p>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolLogP(mol)
+    else:
+        return None</p>
+<p>df['logp'] = df['canonical_smiles'].apply(calculate_logp)
+print(df[['canonical_smiles', 'logp']])
+```</p>
+</li>
+</ul>
+<p><strong>Ví dụ 3: Tìm các hợp chất tương tự với một hợp chất cho trước (Find compounds similar to a given compound)</strong></p>
+<ul>
+<li><strong>SQL:</strong> (Khó thực hiện trực tiếp bằng SQL, cần sử dụng Python và RDKit)</li>
+<li>
+<p><strong>Python:</strong></p>
+<p>```python
+from rdkit import Chem
+from rdkit.Chem import AllChem
+import pandas as pd
+import numpy as np</p>
+<h1>Sample DataFrame, replace with your actual data loading</h1>
+<p>data = {'canonical_smiles': ['CCO', 'c1ccccc1', 'C1=CC=CC=C1C=C1C=CC=CC=1', 'CC(=O)Oc1ccccc1C(=O)O', 'C<a href="O">C@H</a>c1ccccc1']}
+df = pd.DataFrame(data)</p>
+<p>def calculate_fingerprint(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        fp = AllChem.GetMorganFingerprintAsBitVect(mol, radius=2, nBits=2048)
+        return fp
+    else:
+        return None</p>
+<p>df['fingerprint'] = df['canonical_smiles'].apply(calculate_fingerprint)</p>
+<h1>Define the reference compound (query)</h1>
+<p>reference_smiles = 'c1ccccc1'
+reference_fp = calculate_fingerprint(reference_smiles)</p>
+<h1>Calculate Tanimoto similarity</h1>
+<p>def calculate_tanimoto_similarity(fp):
+    if fp is None or reference_fp is None:
+        return np.nan
+    return Chem.DataStructs.TanimotoSimilarity(fp, reference_fp)</p>
+<p>df['tanimoto_similarity'] = df['fingerprint'].apply(calculate_tanimoto_similarity)</p>
+<h1>Filter compounds with Tanimoto similarity greater than 0.5</h1>
+<p>similar_compounds = df[df['tanimoto_similarity'] &gt; 0.5]</p>
+<p>print(similar_compounds[['canonical_smiles', 'tanimoto_similarity']])
+```</p>
+</li>
+</ul>
+<p><strong>Ví dụ 4: Thống kê số lượng hợp chất cho mỗi loại hoạt tính (Count compounds for each activity type)</strong></p>
+<ul>
+<li>
+<p><strong>SQL:</strong></p>
+<p><code>sql
+-- Count the number of compounds for each standard_type
+SELECT
+    act.standard_type,
+    COUNT(DISTINCT act.molregno) AS compound_count
+FROM
+    activities act
+WHERE
+    act.standard_type IN ('IC50', 'Ki', 'EC50')
+GROUP BY
+    act.standard_type
+ORDER BY
+    compound_count DESC
+LIMIT 100;</code></p>
+</li>
+<li>
+<p><strong>Python:</strong></p>
+<p>```python
+import pandas as pd</p>
+<h1>Sample DataFrame, replace with your actual data loading</h1>
+<p>data = {'standard_type': ['IC50', 'Ki', 'IC50', 'EC50', 'Ki', 'IC50']}
+df = pd.DataFrame(data)</p>
+<h1>Count compounds for each standard type</h1>
+<p>activity_counts = df['standard_type'].value_counts().reset_index()
+activity_counts.columns = ['standard_type', 'compound_count']</p>
+<p>print(activity_counts)
+```</p>
+</li>
+</ul>
+<p><strong>Ví dụ 5: Tìm các mục tiêu (targets) liên quan đến một hợp chất cho trước (Find targets associated with a given compound)</strong></p>
+<ul>
+<li>
+<p><strong>SQL:</strong></p>
+<p><code>sql
+-- Find targets associated with a given compound (replace 'CHEMBL123' with an actual chembl_id)
+SELECT
+    tgt.target_name
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+JOIN
+    assays ass ON act.assay_id = ass.assay_id
+JOIN
+    target_dictionary tgt ON ass.tid = tgt.tid
+WHERE
+    cmp.chembl_id = 'CHEMBL123'
+LIMIT 100;</code></p>
+</li>
+<li>
+<p><strong>Python:</strong> (Tương tự như SQL, chủ yếu là truy vấn dữ liệu)</p>
+</li>
+</ul>
+<p><strong>Lưu ý quan trọng:</strong></p>
+<ul>
+<li>Thay thế các đường dẫn file và tên cột trong code mẫu bằng các giá trị thực tế trong dự án của bạn.</li>
+<li>Điều chỉnh các tham số và điều kiện lọc trong các truy vấn SQL và code Python để phù hợp với mục tiêu nghiên cứu của bạn.</li>
+<li>Sử dụng các thư viện và công cụ phù hợp để trực quan hóa dữ liệu và khám phá các mẫu (patterns) tiềm ẩn.</li>
+</ul>
+<p>Chúc bạn thành công với dự án của mình! Nếu bạn có bất kỳ câu hỏi nào khác, đừng ngần ngại hỏi.</p>
+        </body>
+        </html>
+        

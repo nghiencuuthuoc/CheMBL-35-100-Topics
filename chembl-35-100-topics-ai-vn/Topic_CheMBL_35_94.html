@@ -1,0 +1,291 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_94</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Phân nhóm theo cơ chế tác dụng của thuốc ChEMBL</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 sử dụng RDKit. Với vai trò là một chuyên gia nghiên cứu và phát triển dược học, tôi sẽ cung cấp cho bạn các phân tích, hướng dẫn song ngữ (Việt - Anh), code SQL và Python mẫu, cùng với các lưu ý để giúp bạn vượt qua các lỗi thường gặp.</p>
+<p><strong>1. Phân tích mô hình phân tích (Analysis of Analysis Model)</strong></p>
+<p>Dự án của bạn tập trung vào việc khai thác dữ liệu từ ChEMBL 35, một cơ sở dữ liệu lớn chứa thông tin về các phân tử hoạt tính sinh học. Kết hợp với RDKit, một công cụ mạnh mẽ để tính toán các thuộc tính phân tử, bạn có thể xây dựng các mô hình dự đoán và khám phá các mối quan hệ quan trọng trong quá trình phát triển thuốc.</p>
+<p><strong>Mô hình phân tích đề xuất:</strong></p>
+<ul>
+<li><strong>Phân tích mô tả (Descriptive Analysis):</strong> Thống kê mô tả các thuộc tính hóa lý của các hợp chất (ví dụ: trọng lượng phân tử, LogP, số lượng vòng, v.v.) và hoạt tính sinh học của chúng (ví dụ: IC50, Ki). Phân tích này giúp bạn hiểu rõ hơn về dữ liệu và xác định các xu hướng tiềm năng.</li>
+<li><strong>Phân tích tương quan (Correlation Analysis):</strong> Tìm kiếm mối tương quan giữa các thuộc tính hóa lý và hoạt tính sinh học. Ví dụ, bạn có thể tìm hiểu xem trọng lượng phân tử có tương quan với IC50 hay không.</li>
+<li><strong>Mô hình hóa QSAR/QSPR (QSAR/QSPR Modeling):</strong> Xây dựng các mô hình định lượng mối quan hệ cấu trúc-hoạt tính (QSAR) hoặc cấu trúc-tính chất (QSPR). Các mô hình này có thể dự đoán hoạt tính sinh học hoặc tính chất của các hợp chất mới dựa trên cấu trúc của chúng.</li>
+<li><strong>Phân cụm (Clustering):</strong> Phân loại các hợp chất thành các nhóm dựa trên sự tương đồng về cấu trúc hoặc hoạt tính. Điều này có thể giúp bạn xác định các họ hợp chất tiềm năng hoặc các khung cấu trúc quan trọng.</li>
+</ul>
+<p><strong>2. Hướng dẫn song ngữ (Bilingual Instructions)</strong></p>
+<p><strong>2.1. Chuẩn bị dữ liệu (Data Preparation)</strong></p>
+<ul>
+<li><strong>Tiếng Việt:</strong> Sử dụng pgAdmin để chạy các truy vấn SQL trên cơ sở dữ liệu ChEMBL 35. Lưu kết quả truy vấn vào các file CSV trong thư mục <code>../data/</code>.</li>
+<li><strong>English:</strong> Use pgAdmin to run SQL queries on the ChEMBL 35 database. Save the query results to CSV files in the <code>../data/</code> directory.</li>
+</ul>
+<p><strong>2.2. Phân tích dữ liệu với Python (Data Analysis with Python)</strong></p>
+<ul>
+<li><strong>Tiếng Việt:</strong> Sử dụng Jupyter Notebook để viết code Python. Sử dụng thư viện RDKit để tính toán các thuộc tính phân tử. Sử dụng các thư viện như pandas, numpy, scikit-learn để phân tích dữ liệu và xây dựng mô hình.</li>
+<li><strong>English:</strong> Use Jupyter Notebook to write Python code. Use the RDKit library to calculate molecular properties. Use libraries like pandas, numpy, and scikit-learn to analyze data and build models.</li>
+</ul>
+<p><strong>3. Code SQL và Python (SQL and Python Code)</strong></p>
+<p><strong>3.1. Code SQL (SQL Code)</strong></p>
+<p><code>sql
+-- Lấy 100 dòng dữ liệu từ bảng activities và molecules
+-- Get 100 rows of data from the activities and molecules tables
+SELECT act.activity_id,
+       mol.molecule_chembl_id,
+       act.standard_type,
+       act.standard_relation,
+       act.standard_value,
+       act.standard_units,
+       mol.pref_name
+FROM activities act
+JOIN molecule_dictionary mol ON act.molregno = mol.molregno
+WHERE act.standard_type = 'IC50' -- Lọc theo loại hoạt tính IC50
+  AND act.standard_relation = '='  -- Lọc theo quan hệ '='
+  AND act.standard_value IS NOT NULL -- Loại bỏ giá trị NULL
+  AND act.standard_value &gt; 0      -- Loại bỏ giá trị âm hoặc bằng 0
+  AND act.standard_units = 'nM'    -- Lọc theo đơn vị nM
+LIMIT 100;</code></p>
+<p><strong>3.2. Code Python (Python Code)</strong></p>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+import os
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error</p>
+<h1>Đường dẫn cơ sở của dự án</h1>
+<h1>Base path of the project</h1>
+<p>base_path = ".."</p>
+<h1>Đường dẫn đến file CSV chứa dữ liệu</h1>
+<h1>Path to the CSV file containing the data</h1>
+<p>data_path = os.path.join(base_path, "data", "chembl_ic50_data.csv")</p>
+<h1>Đọc dữ liệu từ file CSV</h1>
+<h1>Read data from CSV file</h1>
+<p>df = pd.read_csv(data_path)</p>
+<h1>Hiển thị thông tin cơ bản về dữ liệu</h1>
+<h1>Display basic information about the data</h1>
+<p>print(df.head())</p>
+<h1>Hàm tính toán các thuộc tính phân tử sử dụng RDKit</h1>
+<h1>Function to calculate molecular properties using RDKit</h1>
+<p>def calculate_properties(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        mw = Descriptors.MolWt(mol)
+        logp = Descriptors.MolLogP(mol)
+        num_hba = Descriptors.NumHAcceptors(mol)
+        num_hbd = Descriptors.NumHDonors(mol)
+        return mw, logp, num_hba, num_hbd
+    else:
+        return None, None, None, None</p>
+<h1>Áp dụng hàm tính toán thuộc tính cho cột 'canonical_smiles'</h1>
+<h1>Apply the property calculation function to the 'canonical_smiles' column</h1>
+<p>df[['mw', 'logp', 'num_hba', 'num_hbd']] = df['canonical_smiles'].apply(lambda x: pd.Series(calculate_properties(x)))</p>
+<h1>Loại bỏ các dòng có giá trị NaN</h1>
+<h1>Remove rows with NaN values</h1>
+<p>df = df.dropna()</p>
+<h1>Chuyển đổi cột 'standard_value' thành kiểu số</h1>
+<h1>Convert the 'standard_value' column to numeric type</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'])</p>
+<h1>Chuẩn bị dữ liệu cho mô hình hóa</h1>
+<h1>Prepare data for modeling</h1>
+<p>X = df[['mw', 'logp', 'num_hba', 'num_hbd']]
+y = df['standard_value']</p>
+<h1>Chia dữ liệu thành tập huấn luyện và tập kiểm tra</h1>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Xây dựng mô hình hồi quy tuyến tính</h1>
+<h1>Build a linear regression model</h1>
+<p>model = LinearRegression()</p>
+<h1>Huấn luyện mô hình trên tập huấn luyện</h1>
+<h1>Train the model on the training set</h1>
+<p>model.fit(X_train, y_train)</p>
+<h1>Dự đoán trên tập kiểm tra</h1>
+<h1>Predict on the test set</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Đánh giá mô hình bằng MSE</h1>
+<h1>Evaluate the model using MSE</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+print(f"Mean Squared Error: {mse}")
+```</p>
+<p><strong>4. Ví dụ code SQL và Python mẫu (Sample SQL and Python Code Examples)</strong></p>
+<p>Dưới đây là 5 ví dụ về code SQL và Python mẫu để bạn tham khảo:</p>
+<p><strong>Ví dụ 1: Lọc các hợp chất có trọng lượng phân tử trong khoảng nhất định (Filtering compounds by molecular weight range)</strong></p>
+<ul>
+<li><strong>SQL:</strong></li>
+</ul>
+<p><code>sql
+SELECT mol.molecule_chembl_id,
+       mol.pref_name,
+       cp.mw_freebase
+FROM molecule_dictionary mol
+JOIN compound_properties cp ON mol.molregno = cp.molregno
+WHERE cp.mw_freebase BETWEEN 200 AND 500
+LIMIT 100;</code></p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python
+import pandas as pd</p>
+<h1>Giả sử dữ liệu đã được đọc vào DataFrame 'df'</h1>
+<h1>Assuming data has been read into DataFrame 'df'</h1>
+<h1>Lọc các hợp chất có trọng lượng phân tử trong khoảng 200-500</h1>
+<h1>Filter compounds with molecular weight between 200-500</h1>
+<p>df_filtered = df[(df['mw'] &gt;= 200) &amp; (df['mw'] &lt;= 500)]</p>
+<p>print(df_filtered.head())
+```</p>
+<p><strong>Ví dụ 2: Tính số lượng hợp chất cho mỗi loại hoạt tính (Counting compounds for each activity type)</strong></p>
+<ul>
+<li><strong>SQL:</strong></li>
+</ul>
+<p><code>sql
+SELECT standard_type,
+       COUNT(*) AS num_compounds
+FROM activities
+GROUP BY standard_type
+ORDER BY num_compounds DESC
+LIMIT 10;</code></p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python</p>
+<h1>Tính số lượng hợp chất cho mỗi loại hoạt tính</h1>
+<h1>Count the number of compounds for each activity type</h1>
+<p>activity_counts = df['standard_type'].value_counts()</p>
+<p>print(activity_counts.head(10))
+```</p>
+<p><strong>Ví dụ 3: Tìm các hợp chất có hoạt tính cao (Finding highly active compounds)</strong></p>
+<ul>
+<li><strong>SQL:</strong></li>
+</ul>
+<p><code>sql
+SELECT act.activity_id,
+       mol.molecule_chembl_id,
+       act.standard_value
+FROM activities act
+JOIN molecule_dictionary mol ON act.molregno = mol.molregno
+WHERE act.standard_type = 'IC50'
+  AND act.standard_relation = '='
+  AND act.standard_value &lt; 100 -- IC50 &lt; 100 nM
+LIMIT 100;</code></p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python</p>
+<h1>Lọc các hợp chất có IC50 &lt; 100 nM</h1>
+<h1>Filter compounds with IC50 &lt; 100 nM</h1>
+<p>df_active = df[(df['standard_type'] == 'IC50') &amp; (df['standard_relation'] == '=') &amp; (df['standard_value'] &lt; 100)]</p>
+<p>print(df_active.head())
+```</p>
+<p><strong>Ví dụ 4: Tính toán các thuộc tính phân tử sử dụng RDKit (Calculating molecular properties using RDKit)</strong></p>
+<ul>
+<li>
+<p><strong>SQL:</strong> (Không áp dụng, vì SQL không thể tính toán các thuộc tính phân tử phức tạp như RDKit)</p>
+</li>
+<li>
+<p><strong>Python:</strong></p>
+</li>
+</ul>
+<p>```python
+from rdkit import Chem
+from rdkit.Chem import Descriptors</p>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Descriptors.MolLogP(mol)
+    else:
+        return None</p>
+<h1>Áp dụng hàm tính toán LogP cho cột 'canonical_smiles'</h1>
+<h1>Apply the LogP calculation function to the 'canonical_smiles' column</h1>
+<p>df['logp'] = df['canonical_smiles'].apply(calculate_logp)
+```</p>
+<p><strong>Ví dụ 5: Xây dựng mô hình hồi quy tuyến tính đơn giản (Building a simple linear regression model)</strong></p>
+<ul>
+<li>
+<p><strong>SQL:</strong> (Không áp dụng, vì SQL không phù hợp cho việc xây dựng mô hình máy học)</p>
+</li>
+<li>
+<p><strong>Python:</strong></p>
+</li>
+</ul>
+<p>```python
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error</p>
+<h1>Chuẩn bị dữ liệu</h1>
+<h1>Prepare data</h1>
+<p>X = df[['mw']]  # Sử dụng trọng lượng phân tử làm biến độc lập
+y = df['standard_value']  # Sử dụng IC50 làm biến phụ thuộc</p>
+<h1>Chia dữ liệu thành tập huấn luyện và tập kiểm tra</h1>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Xây dựng mô hình</h1>
+<h1>Build the model</h1>
+<p>model = LinearRegression()</p>
+<h1>Huấn luyện mô hình</h1>
+<h1>Train the model</h1>
+<p>model.fit(X_train, y_train)</p>
+<h1>Dự đoán</h1>
+<h1>Predict</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Đánh giá</h1>
+<h1>Evaluate</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+print(f"Mean Squared Error: {mse}")
+```</p>
+<p><strong>5. Lưu ý về lỗi (Error Notes)</strong></p>
+<p><strong>5.1. Lỗi liên quan đến kiểu dữ liệu (Data Type Error):</strong></p>
+<ul>
+<li><strong>Lỗi:</strong> <code>ERROR: operator does not exist: numeric ~ unknown LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></li>
+<li><strong>Giải thích:</strong> Lỗi này xảy ra do bạn đang cố gắng sử dụng toán tử <code>~</code> (regular expression matching) trên một cột kiểu số (<code>numeric</code>). Toán tử này chỉ hoạt động trên kiểu dữ liệu chuỗi (<code>text</code>).</li>
+<li><strong>Khắc phục:</strong> Thay vì sử dụng <code>~</code>, hãy sử dụng các hàm hoặc toán tử phù hợp để kiểm tra xem giá trị có phải là số hay không.  Trong trường hợp này, bạn có thể bỏ qua điều kiện này vì bạn đã lọc <code>act.standard_value IS NOT NULL</code> và <code>act.standard_value &gt; 0</code>.</li>
+<li><strong>English:</strong> This error occurs because you are trying to use the <code>~</code> operator (regular expression matching) on a numeric column. This operator only works on string data types. To fix this, use appropriate functions or operators to check if the value is a number. In this case, you can skip this condition because you already filtered <code>act.standard_value IS NOT NULL</code> and <code>act.standard_value &gt; 0</code>.</li>
+</ul>
+<p><strong>5.2. Lỗi liên quan đến phiên bản scikit-learn (scikit-learn Version Error):</strong></p>
+<ul>
+<li><strong>Lỗi:</strong> Phiên bản scikit-learn cũ không hỗ trợ tham số <code>squared=False</code> trong hàm <code>mean_squared_error</code>.</li>
+<li><strong>Giải thích:</strong> Tham số <code>squared=False</code> được thêm vào hàm <code>mean_squared_error</code> trong các phiên bản scikit-learn mới hơn để trả về Root Mean Squared Error (RMSE) thay vì MSE.</li>
+<li><strong>Khắc phục:</strong> Có hai cách:<ol>
+<li><strong>Nâng cấp scikit-learn:</strong> Cập nhật phiên bản scikit-learn của bạn lên phiên bản mới nhất bằng lệnh <code>pip install --upgrade scikit-learn</code>.</li>
+<li><strong>Tính RMSE thủ công:</strong> Nếu bạn không thể nâng cấp scikit-learn, bạn có thể tính RMSE bằng cách lấy căn bậc hai của MSE: <code>rmse = np.sqrt(mse)</code>.</li>
+</ol>
+</li>
+<li><strong>English:</strong> The <code>squared=False</code> parameter was added to the <code>mean_squared_error</code> function in newer scikit-learn versions to return Root Mean Squared Error (RMSE) instead of MSE. To fix this, either upgrade your scikit-learn version using <code>pip install --upgrade scikit-learn</code>, or calculate RMSE manually by taking the square root of MSE: <code>rmse = np.sqrt(mse)</code>.</li>
+</ul>
+<p>Tôi hy vọng những hướng dẫn và ví dụ này sẽ giúp bạn tiến xa hơn trong dự án của mình. Nếu bạn có bất kỳ câu hỏi nào khác, đừng ngần ngại hỏi!</p>
+        </body>
+        </html>
+        

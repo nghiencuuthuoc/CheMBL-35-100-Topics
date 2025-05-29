@@ -1,0 +1,368 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_5</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Analyzing drug-likeness using RDKit</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project within an AIMLops framework, focusing on a specific topic (Topic_CheMBL_35_5) using PostgreSQL, RDKit, and Jupyter Notebook. You're encountering errors related to SQL operator compatibility and scikit-learn versioning.  Let's break down the analysis, provide corrected code snippets, and address the errors.</p>
+<p><strong>1. Analysis of the Analysis Model</strong></p>
+<p>The project aims to leverage Chembl 35 data for drug research and development.  The specific focus (Topic_CheMBL_35_5) isn't defined, so I'll assume it relates to identifying potent inhibitors for a specific target. The model will likely involve:</p>
+<ul>
+<li>
+<p><strong>Data Extraction (SQL):</strong>  Querying the Chembl 35 database to retrieve relevant bioactivity data (e.g., IC50, Ki, EC50 values) for compounds against a specific target of interest.  This requires filtering based on assay type, target ID, and data quality (e.g., confidence scores). Crucially, the SQL must be robust to handle variations in data formatting. The extracted data will be saved as CSV files.</p>
+</li>
+<li>
+<p><strong>Data Preprocessing (Python/RDKit):</strong></p>
+<ul>
+<li>Loading the data from the CSV files.</li>
+<li>Filtering and cleaning the data (e.g., removing entries with missing values or incorrect units).</li>
+<li>Generating molecular descriptors using RDKit. These descriptors represent the physicochemical properties of the molecules and are essential for building predictive models. Common descriptors include:<ul>
+<li>Molecular Weight</li>
+<li>LogP (octanol-water partition coefficient)</li>
+<li>Hydrogen Bond Donors/Acceptors</li>
+<li>Topological Polar Surface Area (TPSA)</li>
+<li>Number of Rotatable Bonds</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Model Building (Python/Scikit-learn):</strong>  Using the molecular descriptors as features and the bioactivity values (e.g., pIC50) as the target variable, build a machine learning model to predict the activity of new compounds. Possible model choices include:</p>
+<ul>
+<li>Linear Regression</li>
+<li>Support Vector Regression (SVR)</li>
+<li>Random Forest</li>
+<li>Gradient Boosting</li>
+</ul>
+</li>
+<li>
+<p><strong>Model Evaluation:</strong>  Splitting the data into training and test sets. Training the model on the training set and evaluating its performance on the test set using metrics such as:</p>
+<ul>
+<li>Mean Squared Error (MSE)</li>
+<li>R-squared (coefficient of determination)</li>
+<li>Root Mean Squared Error (RMSE)</li>
+</ul>
+</li>
+</ul>
+<p><strong>Addressing the Errors</strong></p>
+<ul>
+<li>
+<p><strong>Error a: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p>This error occurs in PostgreSQL when you're trying to use the regular expression operator <code>~</code> (similar to LIKE) on a numeric column. PostgreSQL doesn't implicitly convert numeric types to text for regular expression matching.  The solution is to explicitly cast the <code>standard_value</code> column to text.</p>
+</li>
+<li>
+<p><strong>Error b: <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<p>This indicates that you are using an older version of scikit-learn.  The <code>squared=False</code> argument was introduced in a later version of scikit-learn's <code>mean_squared_error</code> function to directly return the Root Mean Squared Error (RMSE).  You have two options:</p>
+<ol>
+<li>
+<p><strong>Upgrade scikit-learn:</strong>  The easiest solution is to upgrade your scikit-learn version to the latest stable release.  In your Jupyter Notebook, run:</p>
+<p><code>python
+!pip install -U scikit-learn</code></p>
+</li>
+<li>
+<p><strong>Calculate RMSE Manually:</strong> If upgrading isn't feasible, you can calculate the RMSE by taking the square root of the MSE:</p>
+<p>```python
+from sklearn.metrics import mean_squared_error
+import numpy as np</p>
+<p>mse = mean_squared_error(y_true, y_predicted)
+rmse = np.sqrt(mse)
+print(f"RMSE: {rmse}")
+```</p>
+</li>
+</ol>
+</li>
+</ul>
+<p><strong>2. SQL and Python Code (with corrections and examples)</strong></p>
+<p>Here's the SQL and Python code, incorporating the error corrections and aiming for a 100-row sample.  This example assumes that <code>Topic_CheMBL_35_5</code> relates to finding inhibitors for a specific target. I'll use target ID <code>CHEMBL205</code> (a common target) as an example.  <strong>Adjust the WHERE clauses to match your specific research question and target.</strong></p>
+<p><strong>English:</strong></p>
+<p><strong>SQL (query.sql):</strong></p>
+<p><code>sql
+-- Adjust the WHERE clauses to match your target and criteria
+SELECT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    compound_structures cs
+JOIN
+    molecule_dictionary md ON cs.molregno = md.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    assay_components ac ON act.assay_id = ac.assay_id
+JOIN
+    component_sequences cs2 ON ac.component_id = cs2.component_id
+WHERE
+    cs2.accession = 'P00533'  -- Example: EGFR target (UniProt accession) -- Adjust this to YOUR target
+    AND act.standard_type = 'IC50'  -- Example: IC50 values
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::TEXT ~ '^[0-9\.]+$'  -- Corrected: Casting to TEXT for regex
+    AND act.confidence_score &gt;= 7 -- High Confidence data
+LIMIT 100;</code></p>
+<p><strong>Explanation:</strong></p>
+<ol>
+<li><strong>Target Filtering:</strong> The <code>WHERE cs2.accession = 'P00533'</code> line filters for activities related to a specific target (EGFR in this example, identified by its UniProt accession number).  <strong>Change this to the UniProt accession number of YOUR target.</strong></li>
+<li><strong>Activity Filtering:</strong> <code>act.standard_type = 'IC50'</code> filters for IC50 values.  You might need to adjust this to other activity types (e.g., Ki, EC50) based on your research question.</li>
+<li><strong>Unit Filtering:</strong> <code>act.standard_units = 'nM'</code> ensures that the values are in nanomolars.  This is important for consistency.</li>
+<li><strong>NULL Handling:</strong> <code>act.standard_value IS NOT NULL</code> removes entries with missing activity values.</li>
+<li><strong>Regular Expression for Numeric Values:</strong>  <code>act.standard_value::TEXT ~ '^[0-9\.]+$'</code> filters to keep rows where <code>standard_value</code> is a number.  The crucial change is the <code>::TEXT</code> which <em>casts</em> the numeric value to text before applying the regex.</li>
+<li><strong>Confidence Score:</strong> <code>act.confidence_score &gt;= 7</code> ensures you're using relatively high-quality data. Adjust as needed.</li>
+<li><strong>LIMIT:</strong>  <code>LIMIT 100</code> restricts the result set to 100 rows.</li>
+</ol>
+<p><strong>How to Run SQL:</strong></p>
+<ol>
+<li>Open pgAdmin and connect to your <code>chembl_35</code> database (using the provided credentials).</li>
+<li>Open a query window.</li>
+<li>Paste the SQL code into the query window.</li>
+<li>Execute the query.</li>
+<li>Export the results to a CSV file named <code>chembl_data.csv</code> (or any name you choose) and save it to the <code>../data/</code> directory in your project.  Remember to set the appropriate separator (usually a comma).</li>
+</ol>
+<p><strong>Python (Topic_CheMBL_35_5_1_data_prep.ipynb):</strong></p>
+<p>```python
+import os
+import pandas as pd
+import numpy as np
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt</p>
+<h1>Define the base path</h1>
+<p>base_path = ".."  # Assuming notebook is in the 'notebooks' directory</p>
+<h1>Construct the file path to the CSV data</h1>
+<p>data_file = os.path.join(base_path, "data", "chembl_data.csv")  # Change filename if different</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(data_file)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: The file '{data_file}' was not found.")
+    exit()</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])  # Remove rows with missing SMILES or IC50
+df = df[df['standard_units'] == 'nM']  # Ensure units are nM
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce') #Convert standard value to number
+df = df.dropna(subset=['standard_value']) #Remove NaN values after conversion</p>
+<h1>Calculate pIC50</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] / 1e9)  # Convert IC50 to pIC50</p>
+<h1>RDKit Molecular Descriptor Calculation</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    descriptors['RotatableBonds'] = Descriptors.NumRotatableBonds(mol)
+    return pd.Series(descriptors)</p>
+<h1>Apply Descriptor Calculation</h1>
+<p>df = pd.concat([df, df['canonical_smiles'].apply(calculate_descriptors)], axis=1)
+df = df.dropna()  # Remove any rows where descriptor calculation failed</p>
+<h1>Data Splitting</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA', 'RotatableBonds']]
+y = df['pIC50']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Model Training</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Model Evaluation</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)  # Calculate RMSE manually
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error (MSE): {mse}")
+print(f"Root Mean Squared Error (RMSE): {rmse}")
+print(f"R-squared (R2): {r2}")</p>
+<h1>Visualization (Example)</h1>
+<p>plt.scatter(y_test, y_pred)
+plt.xlabel("Actual pIC50")
+plt.ylabel("Predicted pIC50")
+plt.title("Actual vs. Predicted pIC50 Values")
+plt.show()
+```</p>
+<p><strong>Explanation:</strong></p>
+<ol>
+<li><strong>Path Handling:</strong> The code uses <code>os.path.join</code> to construct the file path to the CSV data, making it more portable and robust.</li>
+<li><strong>Data Loading:</strong> Loads the CSV data using <code>pd.read_csv</code>.</li>
+<li><strong>Data Cleaning:</strong><ul>
+<li>Removes rows with missing SMILES strings or IC50 values.</li>
+<li>Filters for entries where the standard units are 'nM'.</li>
+<li>Converts <code>standard_value</code> to numeric, handling potential errors.</li>
+<li>Drops any rows that resulted in NaN after converting to a number.</li>
+</ul>
+</li>
+<li><strong>pIC50 Calculation:</strong> Converts IC50 values to pIC50 (a more common and convenient scale).</li>
+<li><strong>RDKit Descriptor Calculation:</strong>  The <code>calculate_descriptors</code> function takes a SMILES string as input, creates an RDKit molecule object, and calculates a set of common molecular descriptors.  The <code>apply</code> method is used to apply this function to each SMILES string in the DataFrame. Includes error handling for invalid SMILES.</li>
+<li><strong>Data Splitting:</strong> Splits the data into training and test sets.</li>
+<li><strong>Model Training:</strong> Trains a Linear Regression model.  You can easily experiment with other models.</li>
+<li><strong>Model Evaluation:</strong> Calculates the MSE, RMSE (manually), and R-squared to assess the model's performance.</li>
+<li><strong>Visualization:</strong>  Creates a scatter plot of actual vs. predicted pIC50 values.</li>
+</ol>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>Target Selection:</strong>  The SQL query is currently filtering for EGFR (UniProt accession P00533).  <strong>Change this to the appropriate UniProt accession number for your target.</strong></li>
+<li><strong>Activity Type:</strong>  The SQL query is filtering for IC50 values.  Adjust this if you're interested in other activity types (e.g., Ki, EC50).</li>
+<li><strong>Model Choice:</strong> Linear Regression is a simple model.  Consider more complex models like Random Forest or Gradient Boosting for better performance.  You may need to tune the hyperparameters of these models.</li>
+<li><strong>Feature Selection:</strong> You can experiment with different sets of molecular descriptors to see which ones are most predictive for your target.</li>
+<li><strong>Data Quality:</strong> Always be mindful of data quality.  Chembl data can have inconsistencies and errors.  Careful data cleaning is crucial.</li>
+<li><strong>CheMBL Version:</strong>  Make sure you are aligned with the CheMBL 35 schema. Check the official documentation.</li>
+</ul>
+<p><strong>3. Five Examples (Topic_CheMBL_35_5_2_examples.ipynb):</strong></p>
+<p>Here are five examples of what you can do with this data, focusing on different aspects:</p>
+<p>```python
+import os
+import pandas as pd
+import numpy as np
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<h1>Define the base path</h1>
+<p>base_path = ".."  # Assuming notebook is in the 'notebooks' directory</p>
+<h1>Construct the file path to the CSV data</h1>
+<p>data_file = os.path.join(base_path, "data", "chembl_data.csv")  # Change filename if different</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(data_file)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: The file '{data_file}' was not found.")
+    exit()</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])  # Remove rows with missing SMILES or IC50
+df = df[df['standard_units'] == 'nM']  # Ensure units are nM
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce') #Convert standard value to number
+df = df.dropna(subset=['standard_value']) #Remove NaN values after conversion</p>
+<h1>Calculate pIC50</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] / 1e9)  # Convert IC50 to pIC50</p>
+<h1>RDKit Molecular Descriptor Calculation</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    descriptors['RotatableBonds'] = Descriptors.NumRotatableBonds(mol)
+    return pd.Series(descriptors)</p>
+<h1>Apply Descriptor Calculation</h1>
+<p>df = pd.concat([df, df['canonical_smiles'].apply(calculate_descriptors)], axis=1)
+df = df.dropna()  # Remove any rows where descriptor calculation failed</p>
+<h1>EXAMPLE 1: Distribution of pIC50 Values</h1>
+<p>plt.figure(figsize=(8, 6))
+sns.histplot(df['pIC50'], kde=True)
+plt.title("Distribution of pIC50 Values")
+plt.xlabel("pIC50")
+plt.ylabel("Frequency")
+plt.show()</p>
+<h1>EXAMPLE 2: Scatter Plot of LogP vs. pIC50</h1>
+<p>plt.figure(figsize=(8, 6))
+plt.scatter(df['LogP'], df['pIC50'])
+plt.title("LogP vs. pIC50")
+plt.xlabel("LogP")
+plt.ylabel("pIC50")
+plt.show()</p>
+<h1>EXAMPLE 3: Boxplot of pIC50 for Different Standard Types (If you have multiple activity types)</h1>
+<h1>(This example assumes you have multiple standard types - adapt the SQL query if needed)</h1>
+<p>if 'standard_type' in df.columns and len(df['standard_type'].unique()) &gt; 1:
+    plt.figure(figsize=(8, 6))
+    sns.boxplot(x='standard_type', y='pIC50', data=df)
+    plt.title("pIC50 by Standard Type")
+    plt.xlabel("Standard Type")
+    plt.ylabel("pIC50")
+    plt.show()
+else:
+    print("Skipping Example 3: Only one standard type found.")</p>
+<h1>EXAMPLE 4:  Correlation Matrix of Descriptors</h1>
+<p>descriptors = ['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA', 'RotatableBonds', 'pIC50']
+if all(col in df.columns for col in descriptors):
+    correlation_matrix = df[descriptors].corr()
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm")
+    plt.title("Correlation Matrix of Molecular Descriptors and pIC50")
+    plt.show()
+else:
+    print("Skipping Example 4: Not all descriptors are present.")</p>
+<h1>EXAMPLE 5: Train a Random Forest Regressor and Compare to Linear Regression</h1>
+<p>from sklearn.ensemble import RandomForestRegressor</p>
+<h1>Data Splitting</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA', 'RotatableBonds']]
+y = df['pIC50']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train Linear Regression</h1>
+<p>linear_model = LinearRegression()
+linear_model.fit(X_train, y_train)
+linear_predictions = linear_model.predict(X_test)
+linear_rmse = np.sqrt(mean_squared_error(y_test, linear_predictions))</p>
+<h1>Train Random Forest Regressor</h1>
+<p>rf_model = RandomForestRegressor(n_estimators=100, random_state=42) # Adjust n_estimators as needed
+rf_model.fit(X_train, y_train)
+rf_predictions = rf_model.predict(X_test)
+rf_rmse = np.sqrt(mean_squared_error(y_test, rf_predictions))</p>
+<p>print(f"Linear Regression RMSE: {linear_rmse}")
+print(f"Random Forest RMSE: {rf_rmse}")</p>
+<p>```</p>
+<p><strong>Explanation of Examples:</strong></p>
+<ul>
+<li><strong>Example 1:</strong> Visualizes the distribution of pIC50 values to understand the range of activity in your dataset.</li>
+<li><strong>Example 2:</strong> Examines the relationship between LogP (a measure of lipophilicity) and pIC50.  This can help identify trends in activity related to lipophilicity.</li>
+<li><strong>Example 3:</strong> Compares pIC50 values for different assay types (e.g., IC50 vs. Ki) if your dataset includes multiple assay types.  This helps assess if different assay types give consistent results.</li>
+<li><strong>Example 4:</strong>  Shows the correlation matrix between the various molecular descriptors and pIC50. This will highlight which descriptors are most strongly correlated with the target variable.</li>
+<li><strong>Example 5:</strong> Trains a Random Forest model, a more advanced machine learning model than linear regression, and compares its performance (RMSE) to linear regression. This helps determine if a more complex model improves predictive accuracy.</li>
+</ul>
+<p><strong>Important Notes about Examples:</strong></p>
+<ul>
+<li>These examples are starting points.  Customize them to explore your specific research questions.</li>
+<li>Adapt the SQL queries to retrieve the data needed for each example. For Example 3, adapt the SQL to get other types.</li>
+<li>Consider more advanced visualizations (e.g., 3D scatter plots, heatmaps of descriptor values).</li>
+<li>Experiment with different machine learning models and hyperparameter tuning to improve model performance.</li>
+</ul>
+<p><strong>In summary, I have provided a comprehensive guide to address your Chembl 35 data analysis project.  This includes the analysis of the model, corrected SQL and Python code, and five illustrative examples. Remember to adapt the code and examples to match your specific target, research question, and the specific content of Topic_CheMBL_35_5.</strong></p>
+        </body>
+        </html>
+        

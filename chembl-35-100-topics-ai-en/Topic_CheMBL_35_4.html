@@ -1,0 +1,515 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_4</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Filtering rule-of-five compliant molecules</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project using RDKit within an AIMLops framework. You're facing issues with SQL syntax and scikit-learn compatibility.  We'll address these, build SQL queries to extract data, and construct Python code in Jupyter Notebooks (following your naming convention) with error handling and data manipulation using RDKit.  The goal is to filter data down to a manageable size (100 rows) for your machine and provide 5 examples.</p>
+<p>Here's the analysis, code, and examples in both English and Vietnamese:</p>
+<p><strong>1. Analysis of the Analysis Model</strong></p>
+<ul>
+<li><strong>Objective:</strong>  The project aims to analyze Chembl 35 data for drug research and development. The focus is likely on extracting relevant information about chemical compounds and their biological activities, then using this data to potentially build predictive models or identify promising drug candidates.</li>
+<li><strong>Data Source:</strong> Chembl 35 (accessed via PostgreSQL)</li>
+<li><strong>Tools:</strong><ul>
+<li><strong>PostgreSQL (psql):</strong>  Used to query and extract data from the Chembl 35 database.  We'll use SQL to filter the data to the relevant compounds and activity measurements.</li>
+<li><strong>RDKit:</strong> A powerful cheminformatics toolkit for manipulating and analyzing chemical structures (SMILES strings). It can be used to generate molecular descriptors, calculate properties, and perform similarity searches.</li>
+<li><strong>Jupyter Notebook:</strong> An interactive environment for writing and executing Python code, creating visualizations, and documenting your analysis.</li>
+<li><strong>scikit-learn:</strong> a powerful Machine Learning library that offers various model implementation, such as LinearRegression, DecisionTree, RandomForest...</li>
+</ul>
+</li>
+<li><strong>Key Steps:</strong><ol>
+<li><strong>Data Extraction:</strong>  Use SQL to extract compound information (e.g., SMILES strings, molecule structure) and biological activity data (e.g., IC50, Ki values) from Chembl 35.  The SQL will need to handle the <code>numeric ~ unknown</code> error.</li>
+<li><strong>Data Preprocessing:</strong> Clean and transform the extracted data. This might involve:<ul>
+<li>Converting SMILES strings to RDKit Mol objects.</li>
+<li>Handling missing or invalid data.</li>
+<li>Converting activity values to a consistent unit (e.g., pIC50).</li>
+</ul>
+</li>
+<li><strong>Feature Generation:</strong> Generate molecular descriptors using RDKit. These descriptors represent the chemical properties of the molecules.</li>
+<li><strong>Analysis &amp; Modeling (Optional):</strong> Use the molecular descriptors and activity data to build predictive models (e.g., regression models to predict activity).</li>
+<li><strong>Visualization:</strong> Create plots and charts to visualize the data and the results of your analysis.</li>
+</ol>
+</li>
+</ul>
+<p><strong>2. SQL and Python Code</strong></p>
+<p><strong>SQL Code (SQL file: <code>Topic_CheMBL_35_4.sql</code> saved in <code>../data/</code>)</strong></p>
+<p>```sql
+-- Corrected SQL query to avoid "numeric ~ unknown" error and limit to 100 rows
+-- and to get Standard Type is IC50
+SELECT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    compound_structures cs
+JOIN
+    molecule_dictionary md ON cs.molregno = md.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE act.standard_type = 'IC50'
+  AND act.standard_value IS NOT NULL
+  AND act.standard_value::TEXT SIMILAR TO '[0-9.]+' -- Cast to text and use SIMILAR TO
+ORDER BY md.molregno
+LIMIT 100;</p>
+<p>--Save this output to data/Topic_CheMBL_35_4.csv
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><code>act.standard_value::TEXT SIMILAR TO '[0-9\.]+'</code>: This line is crucial.  The original <code>act.standard_value ~ '^[0-9\.]+$'</code> uses a regular expression operator that might not be directly compatible with numeric types in PostgreSQL.  We cast <code>act.standard_value</code> to <code>TEXT</code> and then use the <code>SIMILAR TO</code> operator which performs pattern matching on strings.  This avoids the <code>numeric ~ unknown</code> error.</li>
+<li><code>LIMIT 100</code>:  Limits the result set to 100 rows for faster processing.</li>
+<li><code>act.standard_type = 'IC50'</code> : Filter for only IC50 values to make it more specific.</li>
+<li>The output of this SQL query is saved into the data folder, create a file <code>Topic_CheMBL_35_4.csv</code></li>
+</ul>
+<p><strong>Python Code (Jupyter Notebook: <code>Topic_CheMBL_35_4_1_Data_Extraction_and_Preprocessing.ipynb</code>)</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np</p>
+<h1>Define the base path for your project</h1>
+<p>base_path = "."  # Assuming the notebook is in the root directory</p>
+<h1>Construct the path to the CSV file</h1>
+<p>csv_file_path = os.path.join(base_path, "data", "Topic_CheMBL_35_4.csv")</p>
+<h1>Load the data from the CSV file</h1>
+<p>try:
+    df = pd.read_csv(csv_file_path)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: CSV file not found at {csv_file_path}")
+    exit()
+except Exception as e:
+    print(f"Error loading CSV file: {e}")
+    exit()</p>
+<h1>Display the first few rows of the DataFrame</h1>
+<p>print("\nFirst 5 rows of the data:")
+print(df.head())</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<h1>Convert standard_value to numeric, handling errors</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')</p>
+<h1>Drop rows with missing standard_value</h1>
+<p>df = df.dropna(subset=['standard_value'])</p>
+<h1>Filter out any standard_value that is zero</h1>
+<p>df = df[df['standard_value'] != 0]</p>
+<h1>Convert IC50 to pIC50 (example transformation)</h1>
+<h1>pIC50 = -log10(IC50 in Molar)</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] * 1e-9)  # Convert nM to M</p>
+<h1>RDKit Mol object creation</h1>
+<p>def smiles_to_mol(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is not None:
+            return mol
+        else:
+            return None
+    except:
+        return None</p>
+<p>df['mol'] = df['canonical_smiles'].apply(smiles_to_mol)</p>
+<h1>Drop rows where RDKit failed to create a Mol object</h1>
+<p>df = df.dropna(subset=['mol'])</p>
+<h1>Molecular Descriptor Calculation (Example: Molecular Weight)</h1>
+<p>def calculate_mw(mol):
+    try:
+        return Descriptors.MolWt(mol)
+    except:
+        return None</p>
+<p>df['molecular_weight'] = df['mol'].apply(calculate_mw)</p>
+<h1>Drop rows where molecular weight failed to create a Mol object</h1>
+<p>df = df.dropna(subset=['molecular_weight'])</p>
+<p>print("\nData after preprocessing:")
+print(df.head())
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Error Handling:</strong> The code includes <code>try...except</code> blocks to handle potential errors during file loading, SMILES parsing, and descriptor calculation.</li>
+<li><strong>Path Management:</strong> Uses <code>os.path.join</code> for constructing file paths, making the code more portable.</li>
+<li><strong>Data Cleaning:</strong> Converts <code>standard_value</code> to numeric and removes rows with missing values. It also filter <code>standard_value !=0</code></li>
+<li><strong>pIC50 Conversion:</strong> Calculates pIC50 values (a common practice in drug discovery).</li>
+<li><strong>RDKit Integration:</strong> Creates RDKit <code>Mol</code> objects from SMILES strings.</li>
+<li><strong>Molecular Descriptor Calculation:</strong> Calculates molecular weight as an example.  You can add more descriptors as needed.</li>
+</ul>
+<p><strong>Python Code (Jupyter Notebook: <code>Topic_CheMBL_35_4_2_Analysis_and_Visualization.ipynb</code>)</strong></p>
+<p>```python
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<h1>Define the base path for your project</h1>
+<p>base_path = "."  # Assuming the notebook is in the root directory</p>
+<h1>Construct the path to the CSV file</h1>
+<p>csv_file_path = os.path.join(base_path, "data", "Topic_CheMBL_35_4.csv")</p>
+<h1>Load the data from the CSV file</h1>
+<p>try:
+    df = pd.read_csv(csv_file_path)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: CSV file not found at {csv_file_path}")
+    exit()
+except Exception as e:
+    print(f"Error loading CSV file: {e}")
+    exit()</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<h1>Convert standard_value to numeric, handling errors</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')</p>
+<h1>Drop rows with missing standard_value</h1>
+<p>df = df.dropna(subset=['standard_value'])</p>
+<h1>Filter out any standard_value that is zero</h1>
+<p>df = df[df['standard_value'] != 0]</p>
+<h1>Convert IC50 to pIC50 (example transformation)</h1>
+<h1>pIC50 = -log10(IC50 in Molar)</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] * 1e-9)  # Convert nM to M</p>
+<h1>--- Visualization Examples ---</h1>
+<h1>1. Distribution of pIC50 values</h1>
+<p>plt.figure(figsize=(8, 6))
+sns.histplot(df['pIC50'], kde=True)
+plt.title('Distribution of pIC50 Values')
+plt.xlabel('pIC50')
+plt.ylabel('Frequency')
+plt.show()</p>
+<h1>2. Scatter plot of Molecular Weight vs. pIC50 (requires calculation of molecular weight in previous notebook)</h1>
+<p>try:
+    plt.figure(figsize=(8, 6))
+    sns.scatterplot(x='molecular_weight', y='pIC50', data=df)
+    plt.title('Molecular Weight vs. pIC50')
+    plt.xlabel('Molecular Weight')
+    plt.ylabel('pIC50')
+    plt.show()
+except KeyError:
+    print("Error: 'molecular_weight' column not found.  Make sure to run the first notebook to calculate it.")</p>
+<h1>3. Box plot of pIC50 values for different standard_types (if you have multiple standard_types after filtering)</h1>
+<p>if len(df['standard_type'].unique()) &gt; 1:
+    plt.figure(figsize=(8, 6))
+    sns.boxplot(x='standard_type', y='pIC50', data=df)
+    plt.title('pIC50 Values by Standard Type')
+    plt.xlabel('Standard Type')
+    plt.ylabel('pIC50')
+    plt.show()
+else:
+    print("Only one standard type found, skipping boxplot.")</p>
+<h1>4. Correlation heatmap of numerical features (after descriptor calculation)</h1>
+<p>try:
+    numerical_cols = ['pIC50', 'molecular_weight']  # Add other numerical columns you calculate
+    corr_matrix = df[numerical_cols].corr()
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm')
+    plt.title('Correlation Heatmap')
+    plt.show()
+except KeyError:
+    print("Error: Not enough numerical columns to calculate correlation.  Calculate more descriptors in the first notebook.")</p>
+<h1>5.  Basic statistics of pIC50</h1>
+<p>print("\nDescriptive Statistics for pIC50:")
+print(df['pIC50'].describe())
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Loads Preprocessed Data:</strong> Assumes you've run the first notebook (<code>Topic_CheMBL_35_4_1_Data_Extraction_and_Preprocessing.ipynb</code>) and have a CSV file with the preprocessed data and calculated molecular weight.</li>
+<li><strong>Visualization with <code>matplotlib</code> and <code>seaborn</code>:</strong> Creates several common plots:<ul>
+<li>Histogram of pIC50 values</li>
+<li>Scatter plot of molecular weight vs. pIC50</li>
+<li>Box plot of pIC50 values by standard type (if applicable)</li>
+<li>Correlation heatmap</li>
+</ul>
+</li>
+<li><strong>Error Handling:</strong>  Includes <code>try...except</code> blocks to handle cases where the required columns are missing (e.g., <code>molecular_weight</code> if you haven't calculated it yet).</li>
+<li><strong>Conditional Plotting:</strong> The boxplot is only created if there are multiple <code>standard_type</code> values in the data.</li>
+</ul>
+<p><strong>3. Five Examples (Illustrating Use Cases)</strong></p>
+<p>Here are five example scenarios of how you might use this code and the resulting data in a drug discovery project:</p>
+<ol>
+<li>
+<p><strong>Target Prioritization:</strong>  You want to prioritize a target for drug discovery based on the availability of high-quality activity data. You extract IC50 values for compounds tested against the target and analyze the distribution of pIC50 values.  A target with a wide range of potent inhibitors (high pIC50 values) might be a good starting point.</p>
+</li>
+<li>
+<p><strong>Lead Identification:</strong> You are looking for lead compounds with specific properties.  You can filter the data based on pIC50 values (e.g., find compounds with pIC50 &gt; 7), molecular weight (e.g., MW &lt; 500), and other calculated descriptors to identify promising leads.</p>
+</li>
+<li>
+<p><strong>Structure-Activity Relationship (SAR) Analysis:</strong> You want to understand how changes in chemical structure affect activity. You can use RDKit to calculate a variety of molecular descriptors and then correlate these descriptors with pIC50 values.  This can help you identify key structural features that contribute to activity.</p>
+</li>
+<li>
+<p><strong>Virtual Screening:</strong> You have a database of compounds and want to predict their activity against a target. You can train a machine learning model using the Chembl 35 data and then use this model to predict the activity of the compounds in your database.</p>
+</li>
+<li>
+<p><strong>Data Quality Assessment:</strong> You want to assess the quality of the activity data in Chembl 35. You can analyze the distribution of standard values, identify outliers, and check for inconsistencies in the data.</p>
+</li>
+</ol>
+<p><strong>Vietnamese Translation</strong></p>
+<p><strong>1. Phân Tích Mô Hình Phân Tích</strong></p>
+<ul>
+<li><strong>Mục tiêu:</strong> Dự án nhằm phân tích dữ liệu Chembl 35 cho nghiên cứu và phát triển thuốc. Trọng tâm có thể là trích xuất thông tin liên quan về các hợp chất hóa học và hoạt tính sinh học của chúng, sau đó sử dụng dữ liệu này để xây dựng các mô hình dự đoán hoặc xác định các ứng cử viên thuốc đầy triển vọng.</li>
+<li><strong>Nguồn dữ liệu:</strong> Chembl 35 (được truy cập qua PostgreSQL)</li>
+<li><strong>Công cụ:</strong><ul>
+<li><strong>PostgreSQL (psql):</strong> Được sử dụng để truy vấn và trích xuất dữ liệu từ cơ sở dữ liệu Chembl 35. Chúng ta sẽ sử dụng SQL để lọc dữ liệu thành các hợp chất và phép đo hoạt động có liên quan.</li>
+<li><strong>RDKit:</strong> Một bộ công cụ tin học hóa học mạnh mẽ để thao tác và phân tích cấu trúc hóa học (chuỗi SMILES). Nó có thể được sử dụng để tạo các mô tả phân tử, tính toán các thuộc tính và thực hiện các tìm kiếm tương tự.</li>
+<li><strong>Jupyter Notebook:</strong> Một môi trường tương tác để viết và thực thi mã Python, tạo trực quan hóa và ghi lại phân tích của bạn.</li>
+<li><strong>scikit-learn:</strong> Một thư viện Machine Learning mạnh mẽ cung cấp các mô hình triển khai khác nhau, chẳng hạn như LinearRegression, DecisionTree, RandomForest...</li>
+</ul>
+</li>
+<li><strong>Các bước chính:</strong><ol>
+<li><strong>Trích xuất dữ liệu:</strong> Sử dụng SQL để trích xuất thông tin hợp chất (ví dụ: chuỗi SMILES, cấu trúc phân tử) và dữ liệu hoạt tính sinh học (ví dụ: giá trị IC50, Ki) từ Chembl 35. SQL sẽ cần xử lý lỗi <code>numeric ~ unknown</code>.</li>
+<li><strong>Tiền xử lý dữ liệu:</strong> Làm sạch và chuyển đổi dữ liệu đã trích xuất. Điều này có thể bao gồm:<ul>
+<li>Chuyển đổi chuỗi SMILES thành đối tượng Mol RDKit.</li>
+<li>Xử lý dữ liệu bị thiếu hoặc không hợp lệ.</li>
+<li>Chuyển đổi các giá trị hoạt động thành một đơn vị nhất quán (ví dụ: pIC50).</li>
+</ul>
+</li>
+<li><strong>Tạo đặc trưng:</strong> Tạo các mô tả phân tử bằng RDKit. Các mô tả này đại diện cho các thuộc tính hóa học của các phân tử.</li>
+<li><strong>Phân tích &amp; Mô hình hóa (Tùy chọn):</strong> Sử dụng các mô tả phân tử và dữ liệu hoạt động để xây dựng các mô hình dự đoán (ví dụ: mô hình hồi quy để dự đoán hoạt động).</li>
+<li><strong>Trực quan hóa:</strong> Tạo các biểu đồ và đồ thị để trực quan hóa dữ liệu và kết quả phân tích của bạn.</li>
+</ol>
+</li>
+</ul>
+<p><strong>2. Mã SQL và Python</strong></p>
+<p><strong>Mã SQL (Tệp SQL: <code>Topic_CheMBL_35_4.sql</code> được lưu trong <code>../data/</code>)</strong></p>
+<p>```sql
+-- Truy vấn SQL đã sửa để tránh lỗi "numeric ~ unknown" và giới hạn ở 100 hàng
+-- và để lấy Standard Type là IC50
+SELECT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    compound_structures cs
+JOIN
+    molecule_dictionary md ON cs.molregno = md.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE act.standard_type = 'IC50'
+  AND act.standard_value IS NOT NULL
+  AND act.standard_value::TEXT SIMILAR TO '[0-9.]+' -- Ép kiểu về text và sử dụng SIMILAR TO
+ORDER BY md.molregno
+LIMIT 100;</p>
+<p>-- Lưu kết quả này vào data/Topic_CheMBL_35_4.csv
+```</p>
+<p><strong>Giải thích:</strong></p>
+<ul>
+<li><code>act.standard_value::TEXT SIMILAR TO '[0-9\.]+'</code>: Dòng này rất quan trọng. <code>act.standard_value ~ '^[0-9\.]+$'</code> ban đầu sử dụng một toán tử biểu thức chính quy có thể không tương thích trực tiếp với các kiểu số trong PostgreSQL. Chúng ta ép kiểu <code>act.standard_value</code> thành <code>TEXT</code> và sau đó sử dụng toán tử <code>SIMILAR TO</code> để thực hiện so khớp mẫu trên các chuỗi. Điều này tránh lỗi <code>numeric ~ unknown</code>.</li>
+<li><code>LIMIT 100</code>: Giới hạn tập kết quả thành 100 hàng để xử lý nhanh hơn.</li>
+<li><code>act.standard_type = 'IC50'</code> : Lọc chỉ các giá trị IC50 để cụ thể hơn.</li>
+<li>Đầu ra của truy vấn SQL này được lưu vào thư mục data, tạo một tệp <code>Topic_CheMBL_35_4.csv</code></li>
+</ul>
+<p><strong>Mã Python (Jupyter Notebook: <code>Topic_CheMBL_35_4_1_Data_Extraction_and_Preprocessing.ipynb</code>)</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np</p>
+<h1>Xác định đường dẫn cơ sở cho dự án của bạn</h1>
+<p>base_path = "."  # Giả sử notebook nằm trong thư mục gốc</p>
+<h1>Xây dựng đường dẫn đến tệp CSV</h1>
+<p>csv_file_path = os.path.join(base_path, "data", "Topic_CheMBL_35_4.csv")</p>
+<h1>Tải dữ liệu từ tệp CSV</h1>
+<p>try:
+    df = pd.read_csv(csv_file_path)
+    print("Dữ liệu đã được tải thành công.")
+except FileNotFoundError:
+    print(f"Lỗi: Không tìm thấy tệp CSV tại {csv_file_path}")
+    exit()
+except Exception as e:
+    print(f"Lỗi khi tải tệp CSV: {e}")
+    exit()</p>
+<h1>Hiển thị vài hàng đầu tiên của DataFrame</h1>
+<p>print("\n5 hàng đầu tiên của dữ liệu:")
+print(df.head())</p>
+<h1>Làm sạch và tiền xử lý dữ liệu</h1>
+<h1>Chuyển đổi standard_value thành số, xử lý lỗi</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')</p>
+<h1>Loại bỏ các hàng có standard_value bị thiếu</h1>
+<p>df = df.dropna(subset=['standard_value'])</p>
+<h1>Lọc bỏ bất kỳ standard_value nào bằng không</h1>
+<p>df = df[df['standard_value'] != 0]</p>
+<h1>Chuyển đổi IC50 thành pIC50 (ví dụ về chuyển đổi)</h1>
+<h1>pIC50 = -log10(IC50 tính bằng Molar)</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] * 1e-9)  # Chuyển đổi nM sang M</p>
+<h1>Tạo đối tượng RDKit Mol</h1>
+<p>def smiles_to_mol(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is not None:
+            return mol
+        else:
+            return None
+    except:
+        return None</p>
+<p>df['mol'] = df['canonical_smiles'].apply(smiles_to_mol)</p>
+<h1>Loại bỏ các hàng mà RDKit không thể tạo đối tượng Mol</h1>
+<p>df = df.dropna(subset=['mol'])</p>
+<h1>Tính toán mô tả phân tử (Ví dụ: Khối lượng phân tử)</h1>
+<p>def calculate_mw(mol):
+    try:
+        return Descriptors.MolWt(mol)
+    except:
+        return None</p>
+<p>df['molecular_weight'] = df['mol'].apply(calculate_mw)</p>
+<h1>Loại bỏ các hàng mà khối lượng phân tử không thể tạo đối tượng Mol</h1>
+<p>df = df.dropna(subset=['molecular_weight'])</p>
+<p>print("\nDữ liệu sau khi tiền xử lý:")
+print(df.head())
+```</p>
+<p><strong>Giải thích:</strong></p>
+<ul>
+<li><strong>Xử lý lỗi:</strong> Mã bao gồm các khối <code>try...except</code> để xử lý các lỗi tiềm ẩn trong quá trình tải tệp, phân tích cú pháp SMILES và tính toán mô tả.</li>
+<li><strong>Quản lý đường dẫn:</strong> Sử dụng <code>os.path.join</code> để xây dựng đường dẫn tệp, giúp mã dễ di chuyển hơn.</li>
+<li><strong>Làm sạch dữ liệu:</strong> Chuyển đổi <code>standard_value</code> thành số và loại bỏ các hàng có giá trị bị thiếu. Nó cũng lọc <code>standard_value !=0</code></li>
+<li><strong>Chuyển đổi pIC50:</strong> Tính toán các giá trị pIC50 (một thực hành phổ biến trong khám phá thuốc).</li>
+<li><strong>Tích hợp RDKit:</strong> Tạo các đối tượng <code>Mol</code> RDKit từ chuỗi SMILES.</li>
+<li><strong>Tính toán mô tả phân tử:</strong> Tính toán khối lượng phân tử làm ví dụ. Bạn có thể thêm nhiều mô tả hơn nếu cần.</li>
+</ul>
+<p><strong>Mã Python (Jupyter Notebook: <code>Topic_CheMBL_35_4_2_Analysis_and_Visualization.ipynb</code>)</strong></p>
+<p>```python
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<h1>Xác định đường dẫn cơ sở cho dự án của bạn</h1>
+<p>base_path = "."  # Giả sử notebook nằm trong thư mục gốc</p>
+<h1>Xây dựng đường dẫn đến tệp CSV</h1>
+<p>csv_file_path = os.path.join(base_path, "data", "Topic_CheMBL_35_4.csv")</p>
+<h1>Tải dữ liệu từ tệp CSV</h1>
+<p>try:
+    df = pd.read_csv(csv_file_path)
+    print("Dữ liệu đã được tải thành công.")
+except FileNotFoundError:
+    print(f"Lỗi: Không tìm thấy tệp CSV tại {csv_file_path}")
+    exit()
+except Exception as e:
+    print(f"Lỗi khi tải tệp CSV: {e}")
+    exit()</p>
+<h1>Làm sạch và tiền xử lý dữ liệu</h1>
+<h1>Chuyển đổi standard_value thành số, xử lý lỗi</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')</p>
+<h1>Loại bỏ các hàng có standard_value bị thiếu</h1>
+<p>df = df.dropna(subset=['standard_value'])</p>
+<h1>Lọc bỏ bất kỳ standard_value nào bằng không</h1>
+<p>df = df[df['standard_value'] != 0]</p>
+<h1>Chuyển đổi IC50 thành pIC50 (ví dụ về chuyển đổi)</h1>
+<h1>pIC50 = -log10(IC50 tính bằng Molar)</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] * 1e-9)  # Chuyển đổi nM sang M</p>
+<h1>--- Ví dụ về trực quan hóa ---</h1>
+<h1>1. Phân phối các giá trị pIC50</h1>
+<p>plt.figure(figsize=(8, 6))
+sns.histplot(df['pIC50'], kde=True)
+plt.title('Phân phối các giá trị pIC50')
+plt.xlabel('pIC50')
+plt.ylabel('Tần số')
+plt.show()</p>
+<h1>2. Biểu đồ phân tán của Khối lượng phân tử so với pIC50 (yêu cầu tính toán khối lượng phân tử trong notebook trước)</h1>
+<p>try:
+    plt.figure(figsize=(8, 6))
+    sns.scatterplot(x='molecular_weight', y='pIC50', data=df)
+    plt.title('Khối lượng phân tử so với pIC50')
+    plt.xlabel('Khối lượng phân tử')
+    plt.ylabel('pIC50')
+    plt.show()
+except KeyError:
+    print("Lỗi: Không tìm thấy cột 'molecular_weight'. Đảm bảo chạy notebook đầu tiên để tính toán nó.")</p>
+<h1>3. Biểu đồ hộp của các giá trị pIC50 cho các standard_types khác nhau (nếu bạn có nhiều standard_types sau khi lọc)</h1>
+<p>if len(df['standard_type'].unique()) &gt; 1:
+    plt.figure(figsize=(8, 6))
+    sns.boxplot(x='standard_type', y='pIC50', data=df)
+    plt.title('Giá trị pIC50 theo Standard Type')
+    plt.xlabel('Standard Type')
+    plt.ylabel('pIC50')
+    plt.show()
+else:
+    print("Chỉ tìm thấy một standard type, bỏ qua biểu đồ hộp.")</p>
+<h1>4. Bản đồ nhiệt tương quan của các đặc trưng số (sau khi tính toán mô tả)</h1>
+<p>try:
+    numerical_cols = ['pIC50', 'molecular_weight']  # Thêm các cột số khác mà bạn tính toán
+    corr_matrix = df[numerical_cols].corr()
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm')
+    plt.title('Bản đồ nhiệt tương quan')
+    plt.show()
+except KeyError:
+    print("Lỗi: Không đủ cột số để tính toán tương quan. Tính toán thêm các mô tả trong notebook đầu tiên.")</p>
+<h1>5. Thống kê cơ bản của pIC50</h1>
+<p>print("\nThống kê mô tả cho pIC50:")
+print(df['pIC50'].describe())
+```</p>
+<p><strong>Giải thích:</strong></p>
+<ul>
+<li><strong>Tải dữ liệu đã tiền xử lý:</strong> Giả định rằng bạn đã chạy notebook đầu tiên (<code>Topic_CheMBL_35_4_1_Data_Extraction_and_Preprocessing.ipynb</code>) và có một tệp CSV với dữ liệu đã tiền xử lý và khối lượng phân tử đã tính toán.</li>
+<li><strong>Trực quan hóa với <code>matplotlib</code> và <code>seaborn</code>:</strong> Tạo một số biểu đồ phổ biến:<ul>
+<li>Biểu đồ tần suất của các giá trị pIC50</li>
+<li>Biểu đồ phân tán của khối lượng phân tử so với pIC50</li>
+<li>Biểu đồ hộp của các giá trị pIC50 theo standard type (nếu có)</li>
+<li>Bản đồ nhiệt tương quan</li>
+</ul>
+</li>
+<li><strong>Xử lý lỗi:</strong> Bao gồm các khối <code>try...except</code> để xử lý các trường hợp thiếu các cột cần thiết (ví dụ: <code>molecular_weight</code> nếu bạn chưa tính toán).</li>
+<li><strong>Vẽ biểu đồ có điều kiện:</strong> Biểu đồ hộp chỉ được tạo nếu có nhiều giá trị <code>standard_type</code> trong dữ liệu.</li>
+</ul>
+<p><strong>3. Năm Ví Dụ (Minh Họa Các Trường Hợp Sử Dụng)</strong></p>
+<p>Dưới đây là năm ví dụ về cách bạn có thể sử dụng mã này và dữ liệu thu được trong một dự án khám phá thuốc:</p>
+<ol>
+<li>
+<p><strong>Ưu tiên mục tiêu:</strong> Bạn muốn ưu tiên một mục tiêu cho khám phá thuốc dựa trên tính khả dụng của dữ liệu hoạt động chất lượng cao. Bạn trích xuất các giá trị IC50 cho các hợp chất được thử nghiệm chống lại mục tiêu và phân tích phân phối của các giá trị pIC50. Một mục tiêu có nhiều chất ức chế mạnh (giá trị pIC50 cao) có thể là một điểm khởi đầu tốt.</p>
+</li>
+<li>
+<p><strong>Xác định hợp chất dẫn đầu:</strong> Bạn đang tìm kiếm các hợp chất dẫn đầu với các thuộc tính cụ thể. Bạn có thể lọc dữ liệu dựa trên các giá trị pIC50 (ví dụ: tìm các hợp chất có pIC50 &gt; 7), khối lượng phân tử (ví dụ: MW &lt; 500) và các mô tả đã tính toán khác để xác định các hợp chất dẫn đầu đầy triển vọng.</p>
+</li>
+<li>
+<p><strong>Phân tích mối quan hệ cấu trúc-hoạt tính (SAR):</strong> Bạn muốn hiểu cách thay đổi cấu trúc hóa học ảnh hưởng đến hoạt động. Bạn có thể sử dụng RDKit để tính toán một loạt các mô tả phân tử và sau đó tương quan các mô tả này với các giá trị pIC50. Điều này có thể giúp bạn xác định các đặc điểm cấu trúc chính góp phần vào hoạt động.</p>
+</li>
+<li>
+<p><strong>Sàng lọc ảo:</strong> Bạn có một cơ sở dữ liệu các hợp chất và muốn dự đoán hoạt động của chúng chống lại một mục tiêu. Bạn có thể huấn luyện một mô hình học máy bằng dữ liệu Chembl 35 và sau đó sử dụng mô hình này để dự đoán hoạt động của các hợp chất trong cơ sở dữ liệu của bạn.</p>
+</li>
+<li>
+<p><strong>Đánh giá chất lượng dữ liệu:</strong> Bạn muốn đánh giá chất lượng của dữ liệu hoạt động trong Chembl 35. Bạn có thể phân tích phân phối các giá trị tiêu chuẩn, xác định các giá trị ngoại lệ và kiểm tra tính nhất quán của dữ liệu.</p>
+</li>
+</ol>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>Database Credentials:</strong>  Make sure to replace <code>"ip: 192.168.206.136"</code>, <code>"user:rd"</code>, <code>"pass: rd"</code>, <code>"database: chembl_35"</code> with your actual database credentials.  For security, avoid hardcoding these directly into your notebooks.  Use environment variables or a configuration file instead.</li>
+<li><strong>Descriptor Selection:</strong>  The molecular weight is just one example.  RDKit provides a vast array of descriptors.  Choose descriptors that are relevant to the target and the compounds you are studying.</li>
+<li><strong>Model Building:</strong> If you plan to build predictive models, you'll need to:<ul>
+<li>Split your data into training and testing sets.</li>
+<li>Select appropriate machine learning algorithms.</li>
+<li>Tune the model parameters to optimize performance.</li>
+<li>Evaluate the model's performance on the test set.</li>
+</ul>
+</li>
+<li><strong>Data Filtering:</strong>  The <code>LIMIT 100</code> clause is for demonstration. You'll likely need to work with a larger dataset once your code is working correctly.</li>
+<li><strong>AIMLops Integration:</strong>  Consider how you will integrate this code into your AIMLops pipeline for automated data extraction, model training, and deployment.</li>
+</ul>
+<p>This comprehensive guide should get you started with your Chembl 35 analysis project. Let me know if you have any more questions!</p>
+        </body>
+        </html>
+        

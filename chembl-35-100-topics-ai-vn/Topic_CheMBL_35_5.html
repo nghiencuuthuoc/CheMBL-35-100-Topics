@@ -1,0 +1,642 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_5</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Phân tích tính giống thuốc bằng RDKit</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 sử dụng RDKit. Với vai trò là một chuyên gia R&amp;D Dược học, tôi sẽ cung cấp cho bạn hướng dẫn chi tiết, code mẫu và giải thích để bạn có thể triển khai dự án một cách hiệu quả.</p>
+<p><strong>Tổng quan dự án:</strong></p>
+<p>Dự án này tập trung vào việc khai thác dữ liệu từ cơ sở dữ liệu ChEMBL 35, kết hợp với các công cụ tin sinh học như RDKit, để hỗ trợ quá trình nghiên cứu và phát triển thuốc. Bạn sẽ sử dụng SQL để truy vấn và trích xuất dữ liệu từ ChEMBL, sau đó sử dụng Python (với RDKit và các thư viện liên quan) để phân tích và mô hình hóa dữ liệu.</p>
+<p><strong>Cấu trúc thư mục dự án (tuân theo AIMLOps Template):</strong></p>
+<p><code>├── data/
+│   └── *.csv  # Dữ liệu trích xuất từ SQL
+├── notebooks/
+│   └── Topic_CheMBL_35_5_1_*.ipynb
+│   └── Topic_CheMBL_35_5_2_*.ipynb
+├── src/
+│   └── # (Optional) Các module Python tùy chỉnh
+└── README.md</code></p>
+<p><strong>1. Phân tích mô hình phân tích (Analysis Model):</strong></p>
+<p>Chủ đề <code>Topic_CheMBL_35_5</code> có thể tập trung vào nhiều khía cạnh khác nhau của quá trình phát triển thuốc. Dưới đây là một số mô hình phân tích tiềm năng, cùng với hướng dẫn và code mẫu:</p>
+<ul>
+<li><strong>Mô hình 1: Phân tích mối tương quan giữa cấu trúc hóa học và hoạt tính sinh học (SAR/QSAR):</strong><ul>
+<li><strong>Mục tiêu:</strong> Xác định các nhóm chức hoặc đặc điểm cấu trúc nào ảnh hưởng đến hoạt tính của một hợp chất đối với một mục tiêu sinh học cụ thể.</li>
+<li><strong>Phương pháp:</strong><ol>
+<li><strong>Trích xuất dữ liệu:</strong> Lấy dữ liệu về cấu trúc hóa học (SMILES) và hoạt tính sinh học (ví dụ: IC50, Ki) của các hợp chất từ ChEMBL.</li>
+<li><strong>Tính toán descriptor:</strong> Sử dụng RDKit để tính toán các descriptor phân tử (ví dụ: trọng lượng phân tử, logP, số lượng liên kết hydro, diện tích bề mặt phân cực).</li>
+<li><strong>Phân tích tương quan:</strong> Sử dụng các phương pháp thống kê (ví dụ: hồi quy tuyến tính, random forest) để tìm mối tương quan giữa các descriptor và hoạt tính sinh học.</li>
+</ol>
+</li>
+<li><strong>Ứng dụng:</strong> Dự đoán hoạt tính của các hợp chất mới, tối ưu hóa cấu trúc hợp chất để cải thiện hoạt tính.</li>
+</ul>
+</li>
+<li><strong>Mô hình 2: Phân tích đa dạng hóa học (Chemical Diversity Analysis):</strong><ul>
+<li><strong>Mục tiêu:</strong> Đánh giá sự đa dạng của một tập hợp các hợp chất, xác định các hợp chất đại diện cho các vùng khác nhau trong không gian hóa học.</li>
+<li><strong>Phương pháp:</strong><ol>
+<li><strong>Tính toán fingerprint:</strong> Sử dụng RDKit để tạo fingerprint cho các hợp chất (ví dụ: Morgan fingerprint, MACCS keys).</li>
+<li><strong>Phân tích thành phần chính (PCA) hoặc t-SNE:</strong> Giảm chiều dữ liệu fingerprint để trực quan hóa không gian hóa học.</li>
+<li><strong>Phân cụm (clustering):</strong> Phân nhóm các hợp chất dựa trên sự tương đồng về cấu trúc.</li>
+</ol>
+</li>
+<li><strong>Ứng dụng:</strong> Lựa chọn các hợp chất đại diện cho thử nghiệm sàng lọc, thiết kế thư viện hợp chất đa dạng.</li>
+</ul>
+</li>
+<li><strong>Mô hình 3: Dự đoán tính chất hấp thụ, phân bố, chuyển hóa, thải trừ (ADMET):</strong><ul>
+<li><strong>Mục tiêu:</strong> Dự đoán các tính chất dược động học của một hợp chất, giúp đánh giá khả năng trở thành thuốc tiềm năng.</li>
+<li><strong>Phương pháp:</strong><ol>
+<li><strong>Tính toán descriptor:</strong> Sử dụng RDKit để tính toán các descriptor phân tử liên quan đến ADMET (ví dụ: logP, diện tích bề mặt phân cực).</li>
+<li><strong>Sử dụng các mô hình dự đoán:</strong> Áp dụng các mô hình máy học (ví dụ: random forest, SVM) hoặc các quy tắc dựa trên cấu trúc để dự đoán các tính chất ADMET (ví dụ: khả năng hấp thụ qua đường uống, khả năng xâm nhập hàng rào máu não).</li>
+</ol>
+</li>
+<li><strong>Ứng dụng:</strong> Lọc bỏ các hợp chất có tính chất ADMET không phù hợp, tối ưu hóa cấu trúc hợp chất để cải thiện tính chất ADMET.</li>
+</ul>
+</li>
+</ul>
+<p><strong>2. Hướng dẫn song ngữ (Bilingual Instructions):</strong></p>
+<ul>
+<li><strong>(English)</strong>: This project focuses on analyzing ChEMBL 35 data using RDKit to support drug discovery and development. You will use SQL to query and extract data, then use Python (with RDKit) to analyze and model the data.</li>
+<li><strong>(Tiếng Việt)</strong>: Dự án này tập trung vào phân tích dữ liệu ChEMBL 35 sử dụng RDKit để hỗ trợ nghiên cứu và phát triển thuốc. Bạn sẽ sử dụng SQL để truy vấn và trích xuất dữ liệu, sau đó sử dụng Python (với RDKit) để phân tích và mô hình hóa dữ liệu.</li>
+</ul>
+<p><strong>3. Code SQL và Python mẫu (SQL and Python Code Examples):</strong></p>
+<p><strong>SQL (ví dụ 1): Lấy 100 hợp chất ức chế enzyme có IC50 &lt; 100 nM</strong></p>
+<p>```sql
+-- English
+SELECT
+    m.chembl_id,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    activities act
+JOIN
+    molecule_dictionary m ON act.molregno = m.molregno
+JOIN
+    compound_structures cs ON m.molregno = cs.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.target_type = 'SINGLE PROTEIN'
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0  -- Ensure positive values
+    AND act.standard_value &lt;= 100
+LIMIT 100;</p>
+<p>--Tiếng Việt
+--Lấy 100 hợp chất ức chế enzyme có IC50 &lt; 100 nM
+SELECT
+    m.chembl_id,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    activities act
+JOIN
+    molecule_dictionary m ON act.molregno = m.molregno
+JOIN
+    compound_structures cs ON m.molregno = cs.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.target_type = 'SINGLE PROTEIN'
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0  -- Đảm bảo giá trị dương
+    AND act.standard_value &lt;= 100
+LIMIT 100;
+```</p>
+<p><strong>Python (ví dụ 1): Tính toán descriptor phân tử và vẽ biểu đồ</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import matplotlib.pyplot as plt</p>
+<h1>Load data from CSV file</h1>
+<p>base_path = "." # Thay đổi nếu cần
+data_path = os.path.join(base_path, "data", "your_data.csv")  # Replace "your_data.csv"
+df = pd.read_csv(data_path)</p>
+<h1>Function to calculate molecular weight</h1>
+<p>def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<h1>Apply the function to the SMILES column</h1>
+<p>df['molecular_weight'] = df['canonical_smiles'].apply(calculate_mw)</p>
+<h1>Remove rows with NaN values in 'molecular_weight'</h1>
+<p>df = df.dropna(subset=['molecular_weight'])</p>
+<h1>Plotting the distribution of molecular weights</h1>
+<p>plt.figure(figsize=(10, 6))
+plt.hist(df['molecular_weight'], bins=50, color='skyblue', edgecolor='black')
+plt.title('Distribution of Molecular Weights')
+plt.xlabel('Molecular Weight (Da)')
+plt.ylabel('Frequency')
+plt.grid(True)
+plt.show()</p>
+<h1>Tiếng Việt</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import matplotlib.pyplot as plt</p>
+<h1>Tải dữ liệu từ file CSV</h1>
+<p>base_path = "." # Thay đổi nếu cần
+data_path = os.path.join(base_path, "data", "your_data.csv")  # Thay thế "your_data.csv"
+df = pd.read_csv(data_path)</p>
+<h1>Hàm tính toán trọng lượng phân tử</h1>
+<p>def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<h1>Áp dụng hàm cho cột SMILES</h1>
+<p>df['molecular_weight'] = df['canonical_smiles'].apply(calculate_mw)</p>
+<h1>Loại bỏ các hàng có giá trị NaN trong cột 'molecular_weight'</h1>
+<p>df = df.dropna(subset=['molecular_weight'])</p>
+<h1>Vẽ biểu đồ phân bố trọng lượng phân tử</h1>
+<p>plt.figure(figsize=(10, 6))
+plt.hist(df['molecular_weight'], bins=50, color='skyblue', edgecolor='black')
+plt.title('Phân bố trọng lượng phân tử')
+plt.xlabel('Trọng lượng phân tử (Da)')
+plt.ylabel('Tần số')
+plt.grid(True)
+plt.show()
+```</p>
+<p><strong>4. Ví dụ code SQL và Python mẫu (SQL and Python Code Examples):</strong></p>
+<p><strong>SQL (ví dụ 2): Lấy số lượng hợp chất cho mỗi loại mục tiêu (target type)</strong></p>
+<p>```sql
+-- English
+SELECT td.target_type, COUNT(DISTINCT m.molregno) AS num_compounds
+FROM target_dictionary td
+JOIN activities act ON td.tid = act.tid
+JOIN molecule_dictionary m ON act.molregno = m.molregno
+GROUP BY td.target_type
+ORDER BY num_compounds DESC
+LIMIT 10;</p>
+<p>-- Tiếng Việt
+-- Lấy số lượng hợp chất cho mỗi loại mục tiêu (target type)
+SELECT td.target_type, COUNT(DISTINCT m.molregno) AS num_compounds
+FROM target_dictionary td
+JOIN activities act ON td.tid = act.tid
+JOIN molecule_dictionary m ON act.molregno = m.molregno
+GROUP BY td.target_type
+ORDER BY num_compounds DESC
+LIMIT 10;
+```</p>
+<p><strong>Python (ví dụ 2): Tính toán LogP và vẽ scatter plot với IC50</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import matplotlib.pyplot as plt
+import numpy as np</p>
+<h1>Load data from CSV (replace 'your_data.csv' with your actual file)</h1>
+<p>base_path = "." # Thay đổi nếu cần
+data_path = os.path.join(base_path, "data", "your_data.csv")  # Replace "your_data.csv"
+df = pd.read_csv(data_path)</p>
+<h1>Convert IC50 to numeric, handling potential errors</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value'])</p>
+<h1>Function to calculate LogP</h1>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolLogP(mol)
+    else:
+        return None</p>
+<h1>Apply the function to the SMILES column</h1>
+<p>df['logp'] = df['canonical_smiles'].apply(calculate_logp)</p>
+<h1>Remove rows with NaN values in 'logp'</h1>
+<p>df = df.dropna(subset=['logp'])</p>
+<h1>Ensure standard_value is numeric and convert to pIC50</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] * 1e-9)  # Convert nM to M and then to pIC50</p>
+<h1>Create the scatter plot</h1>
+<p>plt.figure(figsize=(10, 6))
+plt.scatter(df['logp'], df['pIC50'], alpha=0.5)
+plt.xlabel('LogP')
+plt.ylabel('pIC50')
+plt.title('LogP vs pIC50')
+plt.grid(True)
+plt.show()</p>
+<h1>Tiếng Việt</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import matplotlib.pyplot as plt
+import numpy as np</p>
+<h1>Tải dữ liệu từ file CSV (thay 'your_data.csv' bằng tên file của bạn)</h1>
+<p>base_path = "." # Thay đổi nếu cần
+data_path = os.path.join(base_path, "data", "your_data.csv")  # Thay thế "your_data.csv"
+df = pd.read_csv(data_path)</p>
+<h1>Chuyển đổi IC50 sang dạng số, xử lý các lỗi có thể xảy ra</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value'])</p>
+<h1>Hàm tính toán LogP</h1>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolLogP(mol)
+    else:
+        return None</p>
+<h1>Áp dụng hàm cho cột SMILES</h1>
+<p>df['logp'] = df['canonical_smiles'].apply(calculate_logp)</p>
+<h1>Loại bỏ các hàng có giá trị NaN trong cột 'logp'</h1>
+<p>df = df.dropna(subset=['logp'])</p>
+<h1>Đảm bảo standard_value là số và chuyển đổi sang pIC50</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] * 1e-9)  # Chuyển đổi nM sang M và sau đó sang pIC50</p>
+<h1>Tạo biểu đồ phân tán</h1>
+<p>plt.figure(figsize=(10, 6))
+plt.scatter(df['logp'], df['pIC50'], alpha=0.5)
+plt.xlabel('LogP')
+plt.ylabel('pIC50')
+plt.title('LogP so với pIC50')
+plt.grid(True)
+plt.show()
+```</p>
+<p><strong>SQL (ví dụ 3): Lấy các hợp chất có trọng lượng phân tử nằm trong khoảng 200-500 Da</strong></p>
+<p>```sql
+-- English
+SELECT
+    m.chembl_id,
+    cs.canonical_smiles
+FROM
+    molecule_dictionary m
+JOIN
+    compound_structures cs ON m.molregno = cs.molregno
+WHERE m.molregno IN (SELECT molregno FROM molecule_properties WHERE mw_freebase BETWEEN 200 AND 500)
+LIMIT 100;</p>
+<p>-- Tiếng Việt
+-- Lấy các hợp chất có trọng lượng phân tử nằm trong khoảng 200-500 Da
+SELECT
+    m.chembl_id,
+    cs.canonical_smiles
+FROM
+    molecule_dictionary m
+JOIN
+    compound_structures cs ON m.molregno = m.molregno
+WHERE m.molregno IN (SELECT molregno FROM molecule_properties WHERE mw_freebase BETWEEN 200 AND 500)
+LIMIT 100;
+```</p>
+<p><strong>Python (ví dụ 3): Tính toán fingerprint Morgan và phân tích PCA</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+import numpy as np</p>
+<h1>Load data (replace 'your_data.csv' with your actual file)</h1>
+<p>base_path = "." # Thay đổi nếu cần
+data_path = os.path.join(base_path, "data", "your_data.csv")  # Replace "your_data.csv"
+df = pd.read_csv(data_path)</p>
+<h1>Function to generate Morgan Fingerprint</h1>
+<p>def generate_morgan_fingerprint(smiles, radius=2, nBits=2048):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=nBits)
+    else:
+        return None</p>
+<h1>Apply the function to the SMILES column</h1>
+<p>df['morgan_fp'] = df['canonical_smiles'].apply(generate_morgan_fingerprint)</p>
+<h1>Remove rows where fingerprint generation failed</h1>
+<p>df = df.dropna(subset=['morgan_fp'])</p>
+<h1>Convert fingerprints to a numpy array</h1>
+<p>fingerprint_array = np.array([list(fp) for fp in df['morgan_fp']])</p>
+<h1>Apply PCA</h1>
+<p>pca = PCA(n_components=2)
+pca_result = pca.fit_transform(fingerprint_array)</p>
+<h1>Create a scatter plot of the PCA results</h1>
+<p>plt.figure(figsize=(10, 8))
+plt.scatter(pca_result[:, 0], pca_result[:, 1], alpha=0.5)
+plt.xlabel('Principal Component 1')
+plt.ylabel('Principal Component 2')
+plt.title('PCA of Morgan Fingerprints')
+plt.grid(True)
+plt.show()</p>
+<h1>Tiếng Việt</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+import numpy as np</p>
+<h1>Tải dữ liệu (thay 'your_data.csv' bằng tên file của bạn)</h1>
+<p>base_path = "." # Thay đổi nếu cần
+data_path = os.path.join(base_path, "data", "your_data.csv")  # Thay thế "your_data.csv"
+df = pd.read_csv(data_path)</p>
+<h1>Hàm tạo Morgan Fingerprint</h1>
+<p>def generate_morgan_fingerprint(smiles, radius=2, nBits=2048):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=nBits)
+    else:
+        return None</p>
+<h1>Áp dụng hàm cho cột SMILES</h1>
+<p>df['morgan_fp'] = df['canonical_smiles'].apply(generate_morgan_fingerprint)</p>
+<h1>Loại bỏ các hàng mà quá trình tạo fingerprint bị lỗi</h1>
+<p>df = df.dropna(subset=['morgan_fp'])</p>
+<h1>Chuyển đổi fingerprint thành một mảng numpy</h1>
+<p>fingerprint_array = np.array([list(fp) for fp in df['morgan_fp']])</p>
+<h1>Áp dụng PCA</h1>
+<p>pca = PCA(n_components=2)
+pca_result = pca.fit_transform(fingerprint_array)</p>
+<h1>Tạo biểu đồ phân tán của kết quả PCA</h1>
+<p>plt.figure(figsize=(10, 8))
+plt.scatter(pca_result[:, 0], pca_result[:, 1], alpha=0.5)
+plt.xlabel('Thành phần chính 1')
+plt.ylabel('Thành phần chính 2')
+plt.title('PCA của Morgan Fingerprints')
+plt.grid(True)
+plt.show()
+```</p>
+<p><strong>SQL (ví dụ 4): Tìm các hợp chất tương tự với một hợp chất cụ thể (dựa trên SubstructureKeys)</strong></p>
+<p>```sql
+-- English
+SELECT m.chembl_id, cs.canonical_smiles
+FROM molecule_dictionary m
+JOIN compound_structures cs ON m.molregno = cs.molregno
+WHERE m.molregno IN (
+    SELECT molregno
+    FROM substructure_sets
+    WHERE substructure IN (
+        SELECT substructure FROM substructure_sets WHERE molregno = (SELECT molregno FROM molecule_dictionary WHERE chembl_id = 'CHEMBL121')
+    )
+    AND molregno != (SELECT molregno FROM molecule_dictionary WHERE chembl_id = 'CHEMBL121')
+)
+LIMIT 100;</p>
+<p>-- Tiếng Việt
+-- Tìm các hợp chất tương tự với một hợp chất cụ thể (dựa trên SubstructureKeys)
+SELECT m.chembl_id, cs.canonical_smiles
+FROM molecule_dictionary m
+JOIN compound_structures cs ON m.molregno = cs.molregno
+WHERE m.molregno IN (
+    SELECT molregno
+    FROM substructure_sets
+    WHERE substructure IN (
+        SELECT substructure FROM substructure_sets WHERE molregno = (SELECT molregno FROM molecule_dictionary WHERE chembl_id = 'CHEMBL121')
+    )
+    AND molregno != (SELECT molregno FROM molecule_dictionary WHERE chembl_id = 'CHEMBL121')
+)
+LIMIT 100;
+```</p>
+<p><strong>Python (ví dụ 4): Tính Tanimoto similarity giữa các fingerprint</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit import DataStructs</p>
+<h1>Load data (replace 'your_data.csv' with your actual file)</h1>
+<p>base_path = "." # Thay đổi nếu cần
+data_path = os.path.join(base_path, "data", "your_data.csv")  # Replace "your_data.csv"
+df = pd.read_csv(data_path)</p>
+<h1>Compound to compare against (replace with a valid CHEMBL_ID from your data)</h1>
+<p>reference_smiles = df['canonical_smiles'].iloc[0] # lấy smiles đầu tiên làm chuẩn, bạn có thể thay đổi
+reference_mol = Chem.MolFromSmiles(reference_smiles)
+reference_fp = AllChem.GetMorganFingerprintAsBitVect(reference_mol, 2, nBits=2048)</p>
+<h1>Function to calculate Tanimoto similarity</h1>
+<p>def calculate_tanimoto_similarity(smiles, reference_fp):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        fp = AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=2048)
+        return DataStructs.TanimotoSimilarity(reference_fp, fp)
+    else:
+        return None</p>
+<h1>Apply the function to the SMILES column</h1>
+<p>df['tanimoto_similarity'] = df['canonical_smiles'].apply(lambda x: calculate_tanimoto_similarity(x, reference_fp))</p>
+<h1>Show the results</h1>
+<p>print(df[['chembl_id', 'tanimoto_similarity']].head())</p>
+<h1>Tiếng Việt</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit import DataStructs</p>
+<h1>Tải dữ liệu (thay 'your_data.csv' bằng tên file của bạn)</h1>
+<p>base_path = "." # Thay đổi nếu cần
+data_path = os.path.join(base_path, "data", "your_data.csv")  # Thay thế "your_data.csv"
+df = pd.read_csv(data_path)</p>
+<h1>Hợp chất để so sánh (thay bằng một CHEMBL_ID hợp lệ từ dữ liệu của bạn)</h1>
+<p>reference_smiles = df['canonical_smiles'].iloc[0] # lấy smiles đầu tiên làm chuẩn, bạn có thể thay đổi
+reference_mol = Chem.MolFromSmiles(reference_smiles)
+reference_fp = AllChem.GetMorganFingerprintAsBitVect(reference_mol, 2, nBits=2048)</p>
+<h1>Hàm tính độ tương đồng Tanimoto</h1>
+<p>def calculate_tanimoto_similarity(smiles, reference_fp):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        fp = AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=2048)
+        return DataStructs.TanimotoSimilarity(reference_fp, fp)
+    else:
+        return None</p>
+<h1>Áp dụng hàm cho cột SMILES</h1>
+<p>df['tanimoto_similarity'] = df['canonical_smiles'].apply(lambda x: calculate_tanimoto_similarity(x, reference_fp))</p>
+<h1>Hiển thị kết quả</h1>
+<p>print(df[['chembl_id', 'tanimoto_similarity']].head())
+```</p>
+<p><strong>SQL (ví dụ 5): Lấy thông tin về các mục tiêu (targets) liên quan đến một bệnh cụ thể (ví dụ: ung thư)</strong></p>
+<p>```sql
+-- English
+SELECT td.chembl_id, td.pref_name, td.target_type
+FROM target_dictionary td
+JOIN target_components tc ON td.tid = tc.tid
+JOIN component_sequences cs ON tc.component_id = cs.component_id
+WHERE cs.description LIKE '%cancer%'
+LIMIT 100;</p>
+<p>-- Tiếng Việt
+-- Lấy thông tin về các mục tiêu (targets) liên quan đến một bệnh cụ thể (ví dụ: ung thư)
+SELECT td.chembl_id, td.pref_name, td.target_type
+FROM target_dictionary td
+JOIN target_components tc ON td.tid = tc.tid
+JOIN component_sequences cs ON tc.component_id = cs.component_id
+WHERE cs.description LIKE '%cancer%'
+LIMIT 100;
+```</p>
+<p><strong>Python (ví dụ 5): Sử dụng RDKit để chuẩn hóa SMILES</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import MolStandardize</p>
+<h1>Load data (replace 'your_data.csv' with your actual file)</h1>
+<p>base_path = "." # Thay đổi nếu cần
+data_path = os.path.join(base_path, "data", "your_data.csv")  # Replace "your_data.csv"
+df = pd.read_csv(data_path)</p>
+<p>def standardize_smiles(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is not None:
+            # Initialize the standardization object
+            std = MolStandardize.Standardizer()
+            mol = std.charge_parent(mol)  # Get the parent molecule
+            mol = std.normalize(mol)  # Apply normalization
+            mol = std.reionize(mol)  # Reionize the molecule
+            return Chem.MolToSmiles(mol)  # Convert back to SMILES
+        else:
+            return None
+    except Exception as e:
+        print(f"Error processing SMILES: {smiles} - {e}")
+        return None</p>
+<h1>Apply the standardization function</h1>
+<p>df['standardized_smiles'] = df['canonical_smiles'].apply(standardize_smiles)</p>
+<h1>Display the standardized SMILES</h1>
+<p>print(df[['canonical_smiles', 'standardized_smiles']].head())</p>
+<h1>Tiếng Việt</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import MolStandardize</p>
+<h1>Tải dữ liệu (thay 'your_data.csv' bằng tên file của bạn)</h1>
+<p>base_path = "." # Thay đổi nếu cần
+data_path = os.path.join(base_path, "data", "your_data.csv")  # Thay thế "your_data.csv"
+df = pd.read_csv(data_path)</p>
+<p>def standardize_smiles(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is not None:
+            # Khởi tạo đối tượng chuẩn hóa
+            std = MolStandardize.Standardizer()
+            mol = std.charge_parent(mol)  # Lấy phân tử gốc
+            mol = std.normalize(mol)  # Áp dụng chuẩn hóa
+            mol = std.reionize(mol)  # Tái ion hóa phân tử
+            return Chem.MolToSmiles(mol)  # Chuyển đổi lại thành SMILES
+        else:
+            return None
+    except Exception as e:
+        print(f"Lỗi xử lý SMILES: {smiles} - {e}")
+        return None</p>
+<h1>Áp dụng hàm chuẩn hóa</h1>
+<p>df['standardized_smiles'] = df['canonical_smiles'].apply(standardize_smiles)</p>
+<h1>Hiển thị SMILES đã được chuẩn hóa</h1>
+<p>print(df[['canonical_smiles', 'standardized_smiles']].head())
+```</p>
+<p><strong>5. Giải quyết các lỗi thường gặp (Addressing Common Errors):</strong></p>
+<ul>
+<li>
+<p><strong>Lỗi SQL: <code>ERROR: operator does not exist: numeric ~ unknown</code></strong></p>
+<ul>
+<li><strong>(English)</strong>: This error occurs because you're trying to use a regular expression operator (<code>~</code>) on a numeric column.  To fix this, ensure that the <code>standard_value</code> column contains only numeric data <em>before</em> applying the regular expression. You can use <code>TRY_CAST</code> to safely convert the column to numeric.</li>
+<li><strong>(Tiếng Việt)</strong>: Lỗi này xảy ra vì bạn đang cố gắng sử dụng toán tử biểu thức chính quy (<code>~</code>) trên một cột số. Để khắc phục, hãy đảm bảo rằng cột <code>standard_value</code> chỉ chứa dữ liệu số <em>trước khi</em> áp dụng biểu thức chính quy. Bạn có thể sử dụng <code>TRY_CAST</code> để chuyển đổi an toàn cột này sang kiểu số.</li>
+</ul>
+<p>```sql
+-- English
+SELECT
+    m.chembl_id,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    activities act
+JOIN
+    molecule_dictionary m ON act.molregno = m.molregno
+JOIN
+    compound_structures cs ON m.molregno = cs.molregno
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    -- Try to cast to numeric <em>before</em> filtering by regex
+    AND TRY_CAST(act.standard_value AS NUMERIC) IS NOT NULL
+    -- Now that we <em>know</em> it's numeric, we can compare it as such
+    AND TRY_CAST(act.standard_value AS NUMERIC) &gt; 0
+    AND TRY_CAST(act.standard_value AS NUMERIC) &lt;= 100
+LIMIT 100;</p>
+<p>-- Tiếng Việt
+SELECT
+    m.chembl_id,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    activities act
+JOIN
+    molecule_dictionary m ON act.molregno = m.molregno
+JOIN
+    compound_structures cs ON m.molregno = cs.molregno
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    -- Thử chuyển đổi sang kiểu số <em>trước khi</em> lọc bằng regex
+    AND TRY_CAST(act.standard_value AS NUMERIC) IS NOT NULL
+    -- Bây giờ <em>chúng ta biết</em> nó là số, chúng ta có thể so sánh nó như vậy
+    AND TRY_CAST(act.standard_value AS NUMERIC) &gt; 0
+    AND TRY_CAST(act.standard_value AS NUMERIC) &lt;= 100
+LIMIT 100;
+```</p>
+</li>
+<li>
+<p><strong>Lỗi Python: <code>TypeError: mean_squared_error() got an unexpected keyword argument 'squared'</code></strong></p>
+<ul>
+<li><strong>(English)</strong>: This error indicates that your version of scikit-learn is outdated. The <code>squared=False</code> parameter was introduced in a later version.  You have two options:<ol>
+<li><strong>Upgrade scikit-learn:</strong>  <code>pip install scikit-learn --upgrade</code></li>
+<li><strong>Remove <code>squared=False</code>:</strong> If you can't upgrade, remove the <code>squared=False</code> argument and take the square root of the result to get the RMSE (Root Mean Squared Error).</li>
+</ol>
+</li>
+<li><strong>(Tiếng Việt)</strong>: Lỗi này chỉ ra rằng phiên bản scikit-learn của bạn đã cũ. Tham số <code>squared=False</code> được giới thiệu trong một phiên bản sau này. Bạn có hai lựa chọn:<ol>
+<li><strong>Nâng cấp scikit-learn:</strong> <code>pip install scikit-learn --upgrade</code></li>
+<li><strong>Xóa <code>squared=False</code>:</strong> Nếu bạn không thể nâng cấp, hãy xóa đối số <code>squared=False</code> và lấy căn bậc hai của kết quả để có được RMSE (Root Mean Squared Error).</li>
+</ol>
+</li>
+</ul>
+<p>```python</p>
+<h1>Ví dụ:</h1>
+<p>from sklearn.metrics import mean_squared_error
+import numpy as np</p>
+<p>y_true = [3, -0.5, 2, 7]
+y_predicted = [2.5, 0.0, 2, 8]</p>
+<h1>Nếu bạn không thể nâng cấp scikit-learn:</h1>
+<p>mse = mean_squared_error(y_true, y_predicted)
+rmse = np.sqrt(mse)
+print(f"RMSE: {rmse}")</p>
+<h1>Nếu bạn đã nâng cấp scikit-learn:</h1>
+<p>rmse = mean_squared_error(y_true, y_predicted, squared=False)
+print(f"RMSE: {rmse}")
+```</p>
+</li>
+</ul>
+<p><strong>Lưu ý quan trọng:</strong></p>
+<ul>
+<li>Hãy thay thế <code>"your_data.csv"</code> bằng tên file CSV thực tế của bạn.</li>
+<li>Điều chỉnh các tham số và truy vấn SQL cho phù hợp với mục tiêu nghiên cứu cụ thể của bạn.</li>
+<li>Sử dụng <code>os.path.join(base_path, "data", "your_data.csv")</code> để đảm bảo code của bạn hoạt động trên các hệ điều hành khác nhau.</li>
+<li>Hãy nhớ cài đặt các thư viện cần thiết: <code>pip install pandas rdkit scikit-learn matplotlib</code></li>
+</ul>
+<p>Tôi hy vọng hướng dẫn này sẽ giúp bạn bắt đầu dự án của mình một cách suôn sẻ. Nếu bạn có bất kỳ câu hỏi nào khác, đừng ngần ngại hỏi!</p>
+        </body>
+        </html>
+        

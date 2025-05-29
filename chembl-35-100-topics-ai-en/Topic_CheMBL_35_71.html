@@ -1,0 +1,370 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_71</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Streamlit dashboard for bioactivity exploration</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project using RDKit and PostgreSQL, following an AIMLops template. You're experiencing some errors and want guidance on how to proceed, with a focus on retrieving a limited dataset of 100 rows for faster experimentation.</p>
+<p>Let's break down the analysis model, provide the code, address the errors, and create some examples.</p>
+<p><strong>1. Analysis Model:</strong></p>
+<p>The core of your project involves analyzing chemical and biological data from the ChEMBL database (version 35). This data likely includes information about:</p>
+<ul>
+<li><strong>Chemical Compounds:</strong> Represented by SMILES strings or other chemical identifiers.</li>
+<li><strong>Bioactivity Data:</strong> Measurements like IC50, Ki, Kd values, indicating how well a compound interacts with a target.</li>
+<li><strong>Targets:</strong>  Proteins or other biological entities that the compounds are designed to interact with.</li>
+</ul>
+<p>Your analysis goals likely include:</p>
+<ul>
+<li><strong>Data Cleaning and Preparation:</strong>  Handling missing data, standardizing units, filtering for relevant data types (e.g., focusing on IC50 values).</li>
+<li><strong>Feature Engineering:</strong>  Generating molecular descriptors from the SMILES strings using RDKit. These descriptors capture various properties of the molecules (e.g., molecular weight, LogP, number of rings, etc.).</li>
+<li><strong>Exploratory Data Analysis (EDA):</strong> Visualizing the data to understand distributions, identify outliers, and look for correlations between features and bioactivity.</li>
+<li><strong>Model Building:</strong>  Developing predictive models to estimate the bioactivity of new compounds based on their molecular descriptors. This could involve regression models (e.g., linear regression, random forests, support vector machines) or classification models (e.g., predicting whether a compound is active or inactive).</li>
+<li><strong>Model Evaluation:</strong>  Assessing the performance of the models using appropriate metrics (e.g., R-squared, RMSE for regression; accuracy, precision, recall, F1-score for classification).</li>
+</ul>
+<p><strong>Addressing Errors:</strong></p>
+<ul>
+<li>
+<p><strong>Error a: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p>This error means that you're trying to use a regular expression operator (<code>~</code>) on a numeric column (<code>act.standard_value</code>). PostgreSQL requires the column to be of a text type for regex matching. You need to cast the numeric column to text before applying the regex.</p>
+</li>
+<li>
+<p><strong>Error b: <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<p>This is a version compatibility issue.  Either update your scikit-learn library to a version that supports <code>squared=False</code> (recommended) or remove the <code>squared=False</code> argument.  Removing it will return the Mean Squared Error (MSE) instead of the Root Mean Squared Error (RMSE).</p>
+</li>
+</ul>
+<p><strong>2. SQL and Python Code:</strong></p>
+<p>Here's the code, incorporating the fixes and limitations you specified:</p>
+<p><strong>SQL (<code>Topic_CheMBL_35_71.sql</code> - to be run in pgAdmin):</strong></p>
+<p>```sql
+-- Select 100 rows of data from ChEMBL, focusing on IC50 values for a specific target.
+-- Adjust the WHERE clause to target a specific protein or biological process if needed.
+-- The limit clause is used to retrieve 100 rows for faster experimentation.</p>
+<p>SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_value
+FROM
+    compound_structures cs
+JOIN
+    molecule_dictionary md ON cs.molregno = md.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    assay_xref ax ON act.assay_id = ax.assay_id
+JOIN
+    assays a ON ax.assay_id = a.assay_id
+WHERE
+    act.standard_type = 'IC50'  -- Focus on IC50 values
+    AND act.standard_units = 'nM'  -- Ensure units are consistent
+    AND act.standard_relation = '=' --Only get equal relation
+    AND act.standard_value IS NOT NULL
+    AND a.confidence_score &gt;= 8    -- High Confidence Data
+    AND CAST(act.standard_value AS TEXT) ~ '^[0-9.]+$'  -- Fix: Cast to text for regex
+LIMIT 100;
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><code>SELECT ... FROM ... JOIN ...</code>:  Selects data from several ChEMBL tables and joins them based on common keys.  We're selecting <code>molregno</code> (molecule registry number), <code>canonical_smiles</code> (SMILES string), and <code>standard_value</code> (IC50 value).</li>
+<li><code>WHERE act.standard_type = 'IC50'</code>: Filters for IC50 values.  You can change this to other bioactivity types if needed.</li>
+<li><code>WHERE act.standard_units = 'nM'</code>: Filters for nanomolar units to ensure consistency.</li>
+<li><code>WHERE a.confidence_score &gt;= 8</code>: Filters for high-confidence data. Adjust this score based on your data quality requirements.</li>
+<li><code>AND CAST(act.standard_value AS TEXT) ~ '^[0-9\.]+$'</code>:  This is the crucial fix.  It casts the <code>standard_value</code> column to <code>TEXT</code> before applying the regular expression to ensure that the value only consists of numbers and periods.</li>
+<li><code>LIMIT 100</code>: Limits the result set to 100 rows.</li>
+</ul>
+<p><strong>Python Code (<code>Topic_CheMBL_35_71_1_Data_Analysis.ipynb</code>):</strong></p>
+<p>```python
+import os
+import pandas as pd
+import psycopg2
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Define the base path for the project</h1>
+<p>base_path = "."  # Assuming the notebook is in the root of your project</p>
+<h1>Database credentials</h1>
+<p>db_host = "192.168.206.136"
+db_user = "rd"
+db_pass = "rd"
+db_name = "chembl_35"</p>
+<h1>Function to connect to the database and execute a query</h1>
+<p>def connect_and_query(sql_query):
+    try:
+        conn = psycopg2.connect(host=db_host, user=db_user, password=db_pass, database=db_name)
+        cur = conn.cursor()
+        cur.execute(sql_query)
+        results = cur.fetchall()
+        conn.close()
+        return results
+    except Exception as e:
+        print(f"Error connecting to the database: {e}")
+        return None</p>
+<h1>Function to load data from CSV (if you prefer that to querying directly)</h1>
+<p>def load_data_from_csv(csv_file_path):
+    try:
+        df = pd.read_csv(csv_file_path)
+        return df
+    except FileNotFoundError:
+        print(f"Error: CSV file not found at {csv_file_path}")
+        return None
+    except Exception as e:
+        print(f"Error reading CSV file: {e}")
+        return None</p>
+<h1>SQL query to retrieve data</h1>
+<p>sql_query = """
+SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_value
+FROM
+    compound_structures cs
+JOIN
+    molecule_dictionary md ON cs.molregno = md.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    assay_xref ax ON act.assay_id = ax.assay_id
+JOIN
+    assays a ON ax.assay_id = a.assay_id
+WHERE
+    act.standard_type = 'IC50'  -- Focus on IC50 values
+    AND act.standard_units = 'nM'  -- Ensure units are consistent
+    AND act.standard_relation = '=' --Only get equal relation
+    AND act.standard_value IS NOT NULL
+    AND a.confidence_score &gt;= 8    -- High Confidence Data
+    AND CAST(act.standard_value AS TEXT) ~ '^[0-9.]+$'  -- Fix: Cast to text for regex
+LIMIT 100;
+"""</p>
+<h1>Option 1: Query the database directly</h1>
+<p>results = connect_and_query(sql_query)
+if results:
+    df = pd.DataFrame(results, columns=['molregno', 'smiles', 'ic50'])
+else:
+    df = None  # Handle the error appropriately</p>
+<h1>Option 2: Load from CSV (alternative if you ran the SQL query in pgAdmin)</h1>
+<h1>data_file_path = os.path.join(base_path, "data", "chembl_data.csv") #Replace "chembl_data.csv" with your file name</h1>
+<h1>df = load_data_from_csv(data_file_path)</h1>
+<p>if df is not None:
+    print("Data loaded successfully:")
+    print(df.head())</p>
+<pre><code># Data cleaning: Convert IC50 to numeric and drop missing values
+df['ic50'] = pd.to_numeric(df['ic50'], errors='coerce')  # Convert to numeric
+df = df.dropna(subset=['ic50', 'smiles']) # drop NA values if the data contain those values
+
+# Feature Engineering with RDKit
+def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Chem.Crippen.MolLogP(mol)
+    descriptors['HBD'] = Chem.Lipinski.NumHDonors(mol)
+    descriptors['HBA'] = Chem.Lipinski.NumHAcceptors(mol)
+    descriptors['TPSA'] = Chem.rdMolDescriptors.CalcTPSA(mol)
+    return pd.Series(descriptors)
+
+# Apply the function to create new columns
+df = pd.concat([df, df['smiles'].apply(calculate_descriptors)], axis=1)
+df = df.dropna() # Drop any rows that have NA for some reason
+
+# Prepare data for modeling
+X = df[['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']]  # Features
+y = np.log10(df['ic50'])  # Target variable (log-transformed IC50)
+
+# Data scaling
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+# Train a linear regression model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Evaluate the model
+mse = mean_squared_error(y_test, y_pred)  # No squared=False for older scikit-learn
+r2 = r2_score(y_test, y_pred)
+
+print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+</code></pre>
+<p>else:
+    print("Failed to load data.")
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Imports:</strong> Imports necessary libraries (pandas, psycopg2, RDKit, scikit-learn).</li>
+<li><strong>Database Connection:</strong>  <code>connect_and_query</code> function encapsulates the database connection logic, making it reusable.  It takes an SQL query as input, executes it, and returns the results.  Error handling is included.</li>
+<li><strong>CSV Loading:</strong> <code>load_data_from_csv</code> function will load your data from the file.</li>
+<li><strong>SQL Query:</strong> Defines the SQL query (the same one from the SQL section).</li>
+<li><strong>Data Loading:</strong>  Uses either the database connection or CSV loading to get the data into a Pandas DataFrame.</li>
+<li><strong>Data Cleaning:</strong> Converts the <code>ic50</code> column to a numeric type and removes any rows with missing values in the <code>ic50</code> or <code>smiles</code> columns.</li>
+<li><strong>Feature Engineering:</strong><ul>
+<li>The <code>calculate_descriptors</code> function takes a SMILES string as input, converts it to an RDKit molecule object, and calculates several molecular descriptors (Molecular Weight, LogP, Hydrogen Bond Donors, Hydrogen Bond Acceptors, TPSA).</li>
+<li>The function is applied to the <code>smiles</code> column of the DataFrame to create new columns for each descriptor.</li>
+</ul>
+</li>
+<li><strong>Data Preparation:</strong><ul>
+<li>Defines the features (X) and the target variable (y).  The target variable is log-transformed to potentially improve the distribution and model performance.</li>
+<li><code>StandardScaler</code> is used to scale the features, which is often important for linear models.</li>
+</ul>
+</li>
+<li><strong>Model Training:</strong><ul>
+<li>Splits the data into training and testing sets.</li>
+<li>Creates a <code>LinearRegression</code> model, trains it on the training data, and makes predictions on the test data.</li>
+</ul>
+</li>
+<li><strong>Model Evaluation:</strong><ul>
+<li>Calculates the Mean Squared Error (MSE) and R-squared to evaluate the model's performance.  Since you might be on an older scikit-learn version, <code>squared=False</code> is removed from <code>mean_squared_error</code>.</li>
+</ul>
+</li>
+</ul>
+<p><strong>3. AIMLops Template Integration:</strong></p>
+<p>The code follows the AIMLops template by:</p>
+<ul>
+<li>Using <code>os.path.join(base_path, ...)</code> to construct file paths relative to the project root.  This makes the code more portable.</li>
+<li>Keeping the data loading and processing logic separate from the model training and evaluation.</li>
+</ul>
+<p><strong>4. Example Usage (5 examples):</strong></p>
+<p>Here are 5 examples of how you might use and extend this code:</p>
+<p><strong>Example 1: Changing the Target</strong></p>
+<p>```python</p>
+<h1>Change the SQL query to target a different standard_type (e.g., 'Ki')</h1>
+<p>sql_query = """
+SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_value
+FROM
+    compound_structures cs
+JOIN
+    molecule_dictionary md ON cs.molregno = md.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    assay_xref ax ON act.assay_id = ax.assay_id
+JOIN
+    assays a ON ax.assay_id = a.assay_id
+WHERE
+    act.standard_type = 'Ki'  -- Changed to Ki
+    AND act.standard_units = 'nM'  -- Ensure units are consistent
+    AND act.standard_relation = '=' --Only get equal relation
+    AND act.standard_value IS NOT NULL
+    AND a.confidence_score &gt;= 8    -- High Confidence Data
+    AND CAST(act.standard_value AS TEXT) ~ '^[0-9.]+$'  -- Fix: Cast to text for regex
+LIMIT 100;
+"""
+```</p>
+<p><strong>Example 2: Adding More Descriptors</strong></p>
+<p>```python
+def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Chem.Crippen.MolLogP(mol)
+    descriptors['HBD'] = Chem.Lipinski.NumHDonors(mol)
+    descriptors['HBA'] = Chem.Lipinski.NumHAcceptors(mol)
+    descriptors['TPSA'] = Chem.rdMolDescriptors.CalcTPSA(mol)
+    descriptors['NumRings'] = Chem.rdMolDescriptors.CalcNumRings(mol)  # Add number of rings
+    return pd.Series(descriptors)</p>
+<h1>... (rest of the code remains the same)</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA', 'NumRings']]  # Add NumRings to features
+```</p>
+<p><strong>Example 3: Using a Different Model</strong></p>
+<p>```python
+from sklearn.ensemble import RandomForestRegressor</p>
+<h1>... (rest of the code, including data preparation, remains the same)</h1>
+<h1>Train a Random Forest Regression model</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42) # Example parameters
+model.fit(X_train, y_train)</p>
+<h1>... (rest of the code, including prediction and evaluation, remains the same)</h1>
+<p>```</p>
+<p><strong>Example 4: Target a specific Assay</strong></p>
+<p>```sql
+-- Select 100 rows of data from ChEMBL, focusing on IC50 values for a specific target.
+-- Adjust the WHERE clause to target a specific protein or biological process if needed.
+-- The limit clause is used to retrieve 100 rows for faster experimentation.</p>
+<p>SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_value
+FROM
+    compound_structures cs
+JOIN
+    molecule_dictionary md ON cs.molregno = md.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    assay_xref ax ON act.assay_id = ax.assay_id
+JOIN
+    assays a ON ax.assay_id = a.assay_id
+WHERE
+    act.standard_type = 'IC50'  -- Focus on IC50 values
+    AND act.standard_units = 'nM'  -- Ensure units are consistent
+    AND act.standard_relation = '=' --Only get equal relation
+    AND act.standard_value IS NOT NULL
+    AND a.confidence_score &gt;= 8    -- High Confidence Data
+    AND a.assay_id = 1234          -- replace 1234 with the assay_id of your target
+    AND CAST(act.standard_value AS TEXT) ~ '^[0-9.]+$'  -- Fix: Cast to text for regex
+LIMIT 100;
+```</p>
+<p><strong>Example 5: Saving the Model</strong></p>
+<p>```python
+import joblib  # Or pickle</p>
+<h1>... (rest of the code, including model training, remains the same)</h1>
+<h1>Save the model</h1>
+<p>model_path = os.path.join(base_path, "models", "linear_regression_model.joblib")
+joblib.dump(model, model_path)
+print(f"Model saved to {model_path}")</p>
+<h1>Later, you can load the model:</h1>
+<h1>loaded_model = joblib.load(model_path)</h1>
+<p>```</p>
+<p><strong>Summary in English:</strong></p>
+<p>This comprehensive guide provides you with a clear analysis model, SQL and Python code to address your project's requirements, solutions to the errors you encountered, and five practical examples to help you get started.  Remember to adapt the SQL query and feature engineering steps to match the specific targets and compounds you are interested in.  Good luck!</p>
+<p><strong>Resumen en español:</strong></p>
+<p>Esta guía completa le proporciona un modelo de análisis claro, código SQL y Python para abordar los requisitos de su proyecto, soluciones a los errores que encontró y cinco ejemplos prácticos para ayudarlo a comenzar. Recuerde adaptar la consulta SQL y los pasos de ingeniería de características para que coincidan con los objetivos y compuestos específicos que le interesan. ¡Buena suerte!</p>
+        </body>
+        </html>
+        

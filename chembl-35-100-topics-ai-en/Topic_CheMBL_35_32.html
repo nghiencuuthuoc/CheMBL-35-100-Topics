@@ -1,0 +1,616 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_32</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Predicting binding modes via molecular docking</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project using RDKit and want guidance on structuring your code according to an AIMLops template and running your analysis. You're facing issues with SQL and scikit-learn versions. You also need guidance on how to effectively structure your analysis in a modular and reproducible way, and need specific examples to get started.</p>
+<p>Here's a breakdown of how to approach this, along with code examples and analysis.</p>
+<p><strong>1. Analysis Model and Structure</strong></p>
+<p>Your analysis can be structured into the following steps:</p>
+<ul>
+<li><strong>Data Extraction:</strong> Use SQL to query the Chembl 35 database, extracting the necessary data (activities, compounds, etc.) and saving it as CSV files.  Specifically, we'll focus on activity data, filtering for specific activity types (e.g., IC50) and targets.</li>
+<li><strong>Data Preprocessing:</strong> Load the CSV files into a pandas DataFrame.  Clean and prepare the data for analysis. This includes handling missing values, converting data types, and potentially standardizing or normalizing numerical features.</li>
+<li><strong>Feature Generation:</strong> Use RDKit to generate molecular descriptors from the SMILES strings in your data. These descriptors will serve as features for your models.</li>
+<li><strong>Model Training and Evaluation:</strong> Choose a relevant machine learning model (e.g., linear regression, random forest) to predict activity based on the generated descriptors.  Split your data into training and testing sets, train the model, and evaluate its performance using appropriate metrics (e.g., mean squared error, R-squared).</li>
+<li><strong>Analysis and Interpretation:</strong> Analyze the model's performance, identify important features, and draw conclusions about the structure-activity relationship.</li>
+</ul>
+<p><strong>2. Addressing the Errors</strong></p>
+<ul>
+<li>
+<p><strong>Error 4.a: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p>This error occurs because you are trying to use a regular expression (<code>~</code>) on a numeric column (<code>act.standard_value</code>).  The regular expression operator in PostgreSQL is primarily used for text matching.  To fix this, you should use appropriate numeric comparison operators.  If you need to filter based on specific numerical patterns, you might need to cast the column to text first, but it's generally better to use numerical comparisons.</p>
+</li>
+<li>
+<p><strong>Error 4.b: <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<p>This indicates that you are using an older version of scikit-learn. The <code>squared=False</code> parameter was introduced in a later version to return the root mean squared error (RMSE) directly. To fix this, you have two options:</p>
+<ol>
+<li>
+<p><strong>Upgrade scikit-learn:</strong> This is the recommended approach. Use <code>pip install -U scikit-learn</code> to upgrade to the latest version.</p>
+</li>
+<li>
+<p><strong>Calculate RMSE manually:</strong> If you cannot upgrade scikit-learn, calculate the RMSE by taking the square root of the mean squared error: <code>rmse = np.sqrt(mean_squared_error(y_true, y_pred))</code>.  You'll need to import <code>numpy</code> as <code>np</code>.</p>
+</li>
+</ol>
+</li>
+</ul>
+<p><strong>3. AIMLops Folder Structure and Code Organization</strong></p>
+<p>Following the AIMLops template, your project structure could look like this:</p>
+<p><code>Project_Root/
+├── data/                # CSV files extracted from Chembl
+├── notebooks/           # Jupyter notebooks
+│   ├── Topic_CheMBL_35_32_1_data_extraction_preprocessing.ipynb
+│   ├── Topic_CheMBL_35_32_2_feature_generation.ipynb
+│   ├── Topic_CheMBL_35_32_3_model_training_evaluation.ipynb
+│   ├── Topic_CheMBL_35_32_4_analysis_interpretation.ipynb
+│   └── Topic_CheMBL_35_32_5_example_analysis.ipynb
+├── src/                 # Python modules (optional - for reusable code)
+├── models/              # Trained models (e.g., pickled files)
+├── reports/             # Reports and visualizations
+├── requirements.txt     # Python dependencies
+└── README.md            # Project documentation</code></p>
+<p><strong>4. Code Examples (SQL and Python)</strong></p>
+<p>Here are five examples, broken down by notebook purpose:</p>
+<p><strong>Example 1: <code>Topic_CheMBL_35_32_1_data_extraction_preprocessing.ipynb</code> - Data Extraction and Preprocessing</strong></p>
+<p><em>SQL Code (to run on pgAdmin and save to <code>../data/chembl_activity_data.csv</code>)</em></p>
+<p><code>sql
+-- Select data from chembl_35.activities and related tables
+SELECT
+    act.activity_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.relation,
+    cmp.molecule_structures,
+    t.tid,
+    t.pref_name
+FROM
+    chembl_35.activities act
+JOIN
+    chembl_35.assays ass ON act.assay_id = ass.assay_id
+JOIN
+    chembl_35.target_dictionary t ON ass.tid = t.tid
+JOIN
+    chembl_35.compound_structures cmp ON act.molregno = cmp.molregno
+WHERE
+    act.standard_type = 'IC50' -- Focus on IC50 values
+    AND act.standard_units = 'nM' -- Ensure units are in nM
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0  -- Exclude non-positive values
+    AND t.pref_name = 'Acetylcholinesterase'
+LIMIT 100; -- Limit to 100 rows</code></p>
+<p><em>Python Code (within <code>Topic_CheMBL_35_32_1_data_extraction_preprocessing.ipynb</code>)</em></p>
+<p>```python
+import os
+import pandas as pd</p>
+<p>base_path = os.getcwd()  # Current directory (Project_Root)
+data_path = os.path.join(base_path, 'data')
+csv_file = os.path.join(data_path, 'chembl_activity_data.csv')</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(csv_file)
+except FileNotFoundError:
+    print(f"Error: File not found at {csv_file}. Make sure you've run the SQL and saved the CSV.")
+    exit()</p>
+<p>print(f"Shape of the dataframe: {df.shape}")
+print(df.head())</p>
+<h1>Data cleaning (example - handling missing values)</h1>
+<p>df = df.dropna(subset=['standard_value', 'molecule_structures'])</p>
+<h1>Convert standard_value to numeric</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')  # Convert to numeric</p>
+<p>print(f"Shape of the dataframe after removing NA: {df.shape}")
+print(df.dtypes)
+```</p>
+<p><strong>Example 2: <code>Topic_CheMBL_35_32_2_feature_generation.ipynb</code> - Feature Generation</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors</p>
+<p>base_path = os.getcwd()
+data_path = os.path.join(base_path, 'data')
+csv_file = os.path.join(data_path, 'chembl_activity_data.csv')</p>
+<p>try:
+    df = pd.read_csv(csv_file)
+except FileNotFoundError:
+    print(f"Error: File not found at {csv_file}. Make sure you've run the previous notebook and saved the CSV.")
+    exit()</p>
+<h1>Data Cleaning</h1>
+<p>df = df.dropna(subset=['standard_value', 'molecule_structures'])
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')  # Convert to numeric</p>
+<h1>Function to calculate molecular descriptors</h1>
+<p>def calculate_descriptors(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            return None  # Handle invalid SMILES strings
+        descriptors = {}
+        descriptors['MolWt'] = Descriptors.MolWt(mol)
+        descriptors['LogP'] = Descriptors.MolLogP(mol)
+        descriptors['HBD'] = Descriptors.NumHDonors(mol)
+        descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+        return descriptors
+    except Exception as e:
+        print(f"Error processing SMILES: {smiles} - {e}")
+        return None</p>
+<h1>Apply the function to create new columns</h1>
+<p>df['descriptors'] = df['molecule_structures'].apply(calculate_descriptors)
+df = df.dropna(subset=['descriptors'])  # Remove rows where descriptor calculation failed</p>
+<h1>Expand the 'descriptors' column into separate columns</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<p>print(df.head())</p>
+<p>```</p>
+<p><strong>Example 3: <code>Topic_CheMBL_35_32_3_model_training_evaluation.ipynb</code> - Model Training and Evaluation</strong></p>
+<p>```python
+import os
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np</p>
+<p>base_path = os.getcwd()
+data_path = os.path.join(base_path, 'data')
+csv_file = os.path.join(data_path, 'chembl_activity_data.csv')</p>
+<p>try:
+    df = pd.read_csv(csv_file)
+except FileNotFoundError:
+    print(f"Error: File not found at {csv_file}. Make sure you've run the previous notebook and saved the CSV.")
+    exit()</p>
+<h1>Drop rows with missing values in relevant columns</h1>
+<p>df = df.dropna(subset=['MolWt', 'LogP', 'HBD', 'HBA', 'standard_value'])</p>
+<h1>Define features (X) and target (y)</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA']]
+y = df['standard_value']</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a linear regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions on the test set</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"Root Mean Squared Error: {rmse}")
+print(f"R-squared: {r2}")</p>
+<p>```</p>
+<p><strong>Example 4: <code>Topic_CheMBL_35_32_4_analysis_interpretation.ipynb</code> - Analysis and Interpretation</strong></p>
+<p>```python
+import os
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<p>base_path = os.getcwd()
+data_path = os.path.join(base_path, 'data')
+csv_file = os.path.join(data_path, 'chembl_activity_data.csv')</p>
+<p>try:
+    df = pd.read_csv(csv_file)
+except FileNotFoundError:
+    print(f"Error: File not found at {csv_file}. Make sure you've run the previous notebook and saved the CSV.")
+    exit()</p>
+<h1>Drop rows with missing values in relevant columns</h1>
+<p>df = df.dropna(subset=['MolWt', 'LogP', 'HBD', 'HBA', 'standard_value'])</p>
+<h1>Define features (X) and target (y)</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA']]
+y = df['standard_value']</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a linear regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Get the coefficients</h1>
+<p>coefficients = pd.DataFrame({'Feature': X.columns, 'Coefficient': model.coef_})
+coefficients = coefficients.sort_values(by='Coefficient', ascending=False)</p>
+<p>print("Model Coefficients:")
+print(coefficients)</p>
+<h1>Visualize predicted vs. actual values</h1>
+<p>y_pred = model.predict(X_test)
+plt.figure(figsize=(8, 6))
+sns.regplot(x=y_test, y=y_pred, scatter_kws={'alpha':0.5})
+plt.xlabel("Actual IC50 (nM)")
+plt.ylabel("Predicted IC50 (nM)")
+plt.title("Actual vs. Predicted IC50 Values")
+plt.show()
+```</p>
+<p><strong>Example 5: <code>Topic_CheMBL_35_32_5_example_analysis.ipynb</code> - Example Specific Analysis (e.g., Activity Cliff Detection)</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors
+from rdkit.Chem import MACCSkeys
+from rdkit.DataStructs import FingerprintSimilarity
+import numpy as np</p>
+<p>base_path = os.getcwd()
+data_path = os.path.join(base_path, 'data')
+csv_file = os.path.join(data_path, 'chembl_activity_data.csv')</p>
+<p>try:
+    df = pd.read_csv(csv_file)
+except FileNotFoundError:
+    print(f"Error: File not found at {csv_file}. Make sure you've run the previous notebook and saved the CSV.")
+    exit()</p>
+<h1>Data Cleaning</h1>
+<p>df = df.dropna(subset=['standard_value', 'molecule_structures'])
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')  # Convert to numeric</p>
+<h1>Calculate MACCS keys fingerprints</h1>
+<p>def calculate_maccs_keys(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            return None
+        return MACCSkeys.GenMACCSKeys(mol)
+    except:
+        return None</p>
+<p>df['maccs_keys'] = df['molecule_structures'].apply(calculate_maccs_keys)
+df = df.dropna(subset=['maccs_keys'])</p>
+<h1>Function to calculate similarity</h1>
+<p>def calculate_similarity(fp1, fp2):
+    return FingerprintSimilarity(fp1, fp2)</p>
+<h1>Select two compounds</h1>
+<p>compound1 = df.iloc[0]
+compound2 = df.iloc[1]</p>
+<h1>Calculate similarity</h1>
+<p>similarity = calculate_similarity(compound1['maccs_keys'], compound2['maccs_keys'])
+print(f"Similarity between compound 1 and compound 2: {similarity}")
+print(f"Activity of Compound 1: {compound1['standard_value']}")
+print(f"Activity of Compound 2: {compound2['standard_value']}")</p>
+<p>activity_difference = abs(compound1['standard_value'] - compound2['standard_value'])
+print(f"Activity Difference: {activity_difference}")</p>
+<h1>Determine Activity Cliff</h1>
+<p>if similarity &lt; 0.8 and activity_difference &gt; 10:  #Adjust Threshold as needed
+    print("This might be an activity cliff!")
+else:
+    print("Not likely an activity cliff.")
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Modularization:</strong> The code is broken down into logical notebooks, making it easier to understand, maintain, and debug.</li>
+<li><strong>File Handling:</strong>  The <code>os.path.join</code> function is used consistently for file paths, ensuring portability across different operating systems.</li>
+<li><strong>Error Handling:</strong> The code includes <code>try...except</code> blocks to handle potential errors during file loading and descriptor calculation.</li>
+<li><strong>Comments:</strong> The code is well-commented to explain the purpose of each section.</li>
+<li><strong>Dependencies:</strong> A <code>requirements.txt</code> file should be created to list all the Python dependencies used in the project (e.g., <code>pandas</code>, <code>rdkit</code>, <code>scikit-learn</code>).  You can generate this file using <code>pip freeze &gt; requirements.txt</code>.</li>
+<li><strong>Version Control:</strong> Use Git to track changes to your code and collaborate with others.</li>
+<li><strong>Data Validation:</strong>  Include data validation steps to ensure that the data meets your expectations (e.g., checking for missing values, data types, and valid ranges).</li>
+<li><strong>Visualization:</strong> Use libraries like Matplotlib and Seaborn to create informative visualizations of your data and model results.</li>
+<li><strong>Logging:</strong> Consider using a logging library to record important events and errors during the execution of your code.</li>
+</ul>
+<p><strong>Instructions:</strong></p>
+<ol>
+<li>
+<p><strong>Install Dependencies:</strong> Create a <code>requirements.txt</code> file with the following content (or add to your existing file):</p>
+<p><code>pandas
+rdkit
+scikit-learn
+matplotlib
+seaborn
+numpy</code></p>
+<p>Then, run <code>pip install -r requirements.txt</code> to install all the necessary packages.
+2.  <strong>Create Folders:</strong> Create the <code>data</code>, <code>notebooks</code>, <code>src</code>, <code>models</code>, and <code>reports</code> folders in your project directory.
+3.  <strong>SQL Execution:</strong> Run the SQL query on your pgAdmin connected to the specified server, user, password and database.
+4.  <strong>Run Notebooks:</strong> Execute the code in each Jupyter notebook sequentially. Make sure that each notebook can access the data generated by the previous notebook.
+5.  <strong>Adjust Code:</strong> Adjust the code to fit your specific needs and the structure of your data.  Experiment with different models, features, and evaluation metrics.</p>
+</li>
+</ol>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>CheMBL License:</strong> Make sure you comply with the CheMBL data license.</li>
+<li><strong>Data Privacy:</strong> Be mindful of data privacy and security when working with sensitive data.</li>
+<li><strong>Reproducibility:</strong>  Strive for reproducibility by using a consistent environment, version control, and well-documented code.</li>
+<li><strong>Model Selection:</strong>  The choice of machine learning model depends on the specific problem you are trying to solve and the characteristics of your data.  Experiment with different models to find the best one for your needs.</li>
+<li><strong>Feature Engineering:</strong>  Feature engineering is a crucial step in machine learning.  Experiment with different molecular descriptors and combinations of features to improve the performance of your models.</li>
+<li><strong>Validation:</strong>  Thoroughly validate your models using appropriate validation techniques (e.g., cross-validation) to ensure that they generalize well to unseen data.</li>
+</ul>
+<p>Let me know if you have any specific questions or need help with any of these steps. Good luck with your project!</p>
+<p><strong>Indonesian Translation</strong></p>
+<p>Oke, saya mengerti. Anda sedang mengerjakan proyek analisis data Chembl 35 menggunakan RDKit dan memerlukan panduan tentang bagaimana menstrukturkan kode Anda sesuai dengan template AIMLops dan menjalankan analisis Anda. Anda menghadapi masalah dengan SQL dan versi scikit-learn. Anda juga memerlukan panduan tentang bagaimana menstrukturkan analisis Anda secara efektif dalam cara yang modular dan dapat direproduksi, dan memerlukan contoh spesifik untuk memulai.</p>
+<p>Berikut adalah uraian tentang bagaimana mendekati hal ini, beserta contoh kode dan analisis.</p>
+<p><strong>1. Model dan Struktur Analisis</strong></p>
+<p>Analisis Anda dapat distrukturkan ke dalam langkah-langkah berikut:</p>
+<ul>
+<li><strong>Ekstraksi Data:</strong> Gunakan SQL untuk menanyakan database Chembl 35, mengekstrak data yang diperlukan (aktivitas, senyawa, dll.) dan menyimpannya sebagai file CSV. Secara khusus, kita akan fokus pada data aktivitas, memfilter jenis aktivitas tertentu (misalnya, IC50) dan target.</li>
+<li><strong>Praproses Data:</strong> Muat file CSV ke dalam DataFrame pandas. Bersihkan dan siapkan data untuk analisis. Ini termasuk menangani nilai yang hilang, mengonversi tipe data, dan berpotensi menstandardisasi atau menormalkan fitur numerik.</li>
+<li><strong>Pembuatan Fitur:</strong> Gunakan RDKit untuk menghasilkan deskriptor molekul dari string SMILES dalam data Anda. Deskriptor ini akan berfungsi sebagai fitur untuk model Anda.</li>
+<li><strong>Pelatihan dan Evaluasi Model:</strong> Pilih model pembelajaran mesin yang relevan (misalnya, regresi linier, random forest) untuk memprediksi aktivitas berdasarkan deskriptor yang dihasilkan. Pisahkan data Anda menjadi set pelatihan dan pengujian, latih model, dan evaluasi kinerjanya menggunakan metrik yang sesuai (misalnya, mean squared error, R-squared).</li>
+<li><strong>Analisis dan Interpretasi:</strong> Analisis kinerja model, identifikasi fitur penting, dan tarik kesimpulan tentang hubungan struktur-aktivitas.</li>
+</ul>
+<p><strong>2. Mengatasi Kesalahan</strong></p>
+<ul>
+<li>
+<p><strong>Kesalahan 4.a: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p>Kesalahan ini terjadi karena Anda mencoba menggunakan ekspresi reguler (<code>~</code>) pada kolom numerik (<code>act.standard_value</code>). Operator ekspresi reguler di PostgreSQL terutama digunakan untuk pencocokan teks. Untuk memperbaiki ini, Anda harus menggunakan operator perbandingan numerik yang sesuai. Jika Anda perlu memfilter berdasarkan pola numerik tertentu, Anda mungkin perlu mentransmisikan kolom ke teks terlebih dahulu, tetapi umumnya lebih baik menggunakan perbandingan numerik.</p>
+</li>
+<li>
+<p><strong>Kesalahan 4.b: <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<p>Ini menunjukkan bahwa Anda menggunakan versi scikit-learn yang lebih lama. Parameter <code>squared=False</code> diperkenalkan dalam versi yang lebih baru untuk mengembalikan root mean squared error (RMSE) secara langsung. Untuk memperbaiki ini, Anda memiliki dua opsi:</p>
+<ol>
+<li>
+<p><strong>Tingkatkan scikit-learn:</strong> Ini adalah pendekatan yang disarankan. Gunakan <code>pip install -U scikit-learn</code> untuk meningkatkan ke versi terbaru.</p>
+</li>
+<li>
+<p><strong>Hitung RMSE secara manual:</strong> Jika Anda tidak dapat meningkatkan scikit-learn, hitung RMSE dengan mengambil akar kuadrat dari mean squared error: <code>rmse = np.sqrt(mean_squared_error(y_true, y_pred))</code>. Anda perlu mengimpor <code>numpy</code> sebagai <code>np</code>.</p>
+</li>
+</ol>
+</li>
+</ul>
+<p><strong>3. Struktur Folder AIMLops dan Organisasi Kode</strong></p>
+<p>Mengikuti template AIMLops, struktur proyek Anda dapat terlihat seperti ini:</p>
+<p><code>Project_Root/
+├── data/                # File CSV yang diekstrak dari Chembl
+├── notebooks/           # Jupyter notebooks
+│   ├── Topic_CheMBL_35_32_1_data_extraction_preprocessing.ipynb
+│   ├── Topic_CheMBL_35_32_2_feature_generation.ipynb
+│   ├── Topic_CheMBL_35_32_3_model_training_evaluation.ipynb
+│   ├── Topic_CheMBL_35_32_4_analysis_interpretation.ipynb
+│   └── Topic_CheMBL_35_32_5_example_analysis.ipynb
+├── src/                 # Modul Python (opsional - untuk kode yang dapat digunakan kembali)
+├── models/              # Model terlatih (misalnya, file pickled)
+├── reports/             # Laporan dan visualisasi
+├── requirements.txt     # Dependensi Python
+└── README.md            # Dokumentasi proyek</code></p>
+<p><strong>4. Contoh Kode (SQL dan Python)</strong></p>
+<p>Berikut adalah lima contoh, dipecah berdasarkan tujuan notebook:</p>
+<p><strong>Contoh 1: <code>Topic_CheMBL_35_32_1_data_extraction_preprocessing.ipynb</code> - Ekstraksi dan Praproses Data</strong></p>
+<p><em>Kode SQL (untuk dijalankan di pgAdmin dan disimpan ke <code>../data/chembl_activity_data.csv</code>)</em></p>
+<p><code>sql
+-- Pilih data dari chembl_35.activities dan tabel terkait
+SELECT
+    act.activity_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.relation,
+    cmp.molecule_structures,
+    t.tid,
+    t.pref_name
+FROM
+    chembl_35.activities act
+JOIN
+    chembl_35.assays ass ON act.assay_id = ass.assay_id
+JOIN
+    chembl_35.target_dictionary t ON ass.tid = t.tid
+JOIN
+    chembl_35.compound_structures cmp ON act.molregno = cmp.molregno
+WHERE
+    act.standard_type = 'IC50' -- Fokus pada nilai IC50
+    AND act.standard_units = 'nM' -- Pastikan unit dalam nM
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0  -- Kecualikan nilai non-positif
+    AND t.pref_name = 'Acetylcholinesterase'
+LIMIT 100; -- Batasi hingga 100 baris</code></p>
+<p><em>Kode Python (di dalam <code>Topic_CheMBL_35_32_1_data_extraction_preprocessing.ipynb</code>)</em></p>
+<p>```python
+import os
+import pandas as pd</p>
+<p>base_path = os.getcwd()  # Direktori saat ini (Project_Root)
+data_path = os.path.join(base_path, 'data')
+csv_file = os.path.join(data_path, 'chembl_activity_data.csv')</p>
+<h1>Muat data</h1>
+<p>try:
+    df = pd.read_csv(csv_file)
+except FileNotFoundError:
+    print(f"Error: File tidak ditemukan di {csv_file}. Pastikan Anda telah menjalankan SQL dan menyimpan CSV.")
+    exit()</p>
+<p>print(f"Bentuk dataframe: {df.shape}")
+print(df.head())</p>
+<h1>Pembersihan data (contoh - menangani nilai yang hilang)</h1>
+<p>df = df.dropna(subset=['standard_value', 'molecule_structures'])</p>
+<h1>Konversi standard_value ke numerik</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')  # Konversi ke numerik</p>
+<p>print(f"Bentuk dataframe setelah menghapus NA: {df.shape}")
+print(df.dtypes)
+```</p>
+<p><strong>Contoh 2: <code>Topic_CheMBL_35_32_2_feature_generation.ipynb</code> - Pembuatan Fitur</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors</p>
+<p>base_path = os.getcwd()
+data_path = os.path.join(base_path, 'data')
+csv_file = os.path.join(data_path, 'chembl_activity_data.csv')</p>
+<p>try:
+    df = pd.read_csv(csv_file)
+except FileNotFoundError:
+    print(f"Error: File tidak ditemukan di {csv_file}. Pastikan Anda telah menjalankan notebook sebelumnya dan menyimpan CSV.")
+    exit()</p>
+<h1>Data Cleaning</h1>
+<p>df = df.dropna(subset=['standard_value', 'molecule_structures'])
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')  # Konversi ke numerik</p>
+<h1>Fungsi untuk menghitung deskriptor molekul</h1>
+<p>def calculate_descriptors(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            return None  # Tangani string SMILES yang tidak valid
+        descriptors = {}
+        descriptors['MolWt'] = Descriptors.MolWt(mol)
+        descriptors['LogP'] = Descriptors.MolLogP(mol)
+        descriptors['HBD'] = Descriptors.NumHDonors(mol)
+        descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+        return descriptors
+    except Exception as e:
+        print(f"Error memproses SMILES: {smiles} - {e}")
+        return None</p>
+<h1>Terapkan fungsi untuk membuat kolom baru</h1>
+<p>df['descriptors'] = df['molecule_structures'].apply(calculate_descriptors)
+df = df.dropna(subset=['descriptors'])  # Hapus baris di mana perhitungan deskriptor gagal</p>
+<h1>Perluas kolom 'descriptors' menjadi kolom terpisah</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<p>print(df.head())
+```</p>
+<p><strong>Contoh 3: <code>Topic_CheMBL_35_32_3_model_training_evaluation.ipynb</code> - Pelatihan dan Evaluasi Model</strong></p>
+<p>```python
+import os
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np</p>
+<p>base_path = os.getcwd()
+data_path = os.path.join(base_path, 'data')
+csv_file = os.path.join(data_path, 'chembl_activity_data.csv')</p>
+<p>try:
+    df = pd.read_csv(csv_file)
+except FileNotFoundError:
+    print(f"Error: File tidak ditemukan di {csv_file}. Pastikan Anda telah menjalankan notebook sebelumnya dan menyimpan CSV.")
+    exit()</p>
+<h1>Hapus baris dengan nilai yang hilang di kolom yang relevan</h1>
+<p>df = df.dropna(subset=['MolWt', 'LogP', 'HBD', 'HBA', 'standard_value'])</p>
+<h1>Definisikan fitur (X) dan target (y)</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA']]
+y = df['standard_value']</p>
+<h1>Pisahkan data menjadi set pelatihan dan pengujian</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Latih model regresi linier</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Buat prediksi pada set pengujian</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluasi model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"Root Mean Squared Error: {rmse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>Contoh 4: <code>Topic_CheMBL_35_32_4_analysis_interpretation.ipynb</code> - Analisis dan Interpretasi</strong></p>
+<p>```python
+import os
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<p>base_path = os.getcwd()
+data_path = os.path.join(base_path, 'data')
+csv_file = os.path.join(data_path, 'chembl_activity_data.csv')</p>
+<p>try:
+    df = pd.read_csv(csv_file)
+except FileNotFoundError:
+    print(f"Error: File tidak ditemukan di {csv_file}. Pastikan Anda telah menjalankan notebook sebelumnya dan menyimpan CSV.")
+    exit()</p>
+<h1>Hapus baris dengan nilai yang hilang di kolom yang relevan</h1>
+<p>df = df.dropna(subset=['MolWt', 'LogP', 'HBD', 'HBA', 'standard_value'])</p>
+<h1>Definisikan fitur (X) dan target (y)</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA']]
+y = df['standard_value']</p>
+<h1>Pisahkan data menjadi set pelatihan dan pengujian</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Latih model regresi linier</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Dapatkan koefisien</h1>
+<p>coefficients = pd.DataFrame({'Feature': X.columns, 'Coefficient': model.coef_})
+coefficients = coefficients.sort_values(by='Coefficient', ascending=False)</p>
+<p>print("Koefisien Model:")
+print(coefficients)</p>
+<h1>Visualisasikan nilai prediksi vs. aktual</h1>
+<p>y_pred = model.predict(X_test)
+plt.figure(figsize=(8, 6))
+sns.regplot(x=y_test, y=y_pred, scatter_kws={'alpha':0.5})
+plt.xlabel("IC50 Aktual (nM)")
+plt.ylabel("IC50 Prediksi (nM)")
+plt.title("Nilai IC50 Aktual vs. Prediksi")
+plt.show()
+```</p>
+<p><strong>Contoh 5: <code>Topic_CheMBL_35_32_5_example_analysis.ipynb</code> - Contoh Analisis Spesifik (misalnya, Deteksi Activity Cliff)</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors
+from rdkit.Chem import MACCSkeys
+from rdkit.DataStructs import FingerprintSimilarity
+import numpy as np</p>
+<p>base_path = os.getcwd()
+data_path = os.path.join(base_path, 'data')
+csv_file = os.path.join(data_path, 'chembl_activity_data.csv')</p>
+<p>try:
+    df = pd.read_csv(csv_file)
+except FileNotFoundError:
+    print(f"Error: File tidak ditemukan di {csv_file}. Pastikan Anda telah menjalankan notebook sebelumnya dan menyimpan CSV.")
+    exit()</p>
+<h1>Data Cleaning</h1>
+<p>df = df.dropna(subset=['standard_value', 'molecule_structures'])
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')  # Konversi ke numerik</p>
+<h1>Calculate MACCS keys fingerprints</h1>
+<p>def calculate_maccs_keys(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            return None
+        return MACCSkeys.GenMACCSKeys(mol)
+    except:
+        return None</p>
+<p>df['maccs_keys'] = df['molecule_structures'].apply(calculate_maccs_keys)
+df = df.dropna(subset=['maccs_keys'])</p>
+<h1>Function to calculate similarity</h1>
+<p>def calculate_similarity(fp1, fp2):
+    return FingerprintSimilarity(fp1, fp2)</p>
+<h1>Select two compounds</h1>
+<p>compound1 = df.iloc[0]
+compound2 = df.iloc[1]</p>
+<h1>Calculate similarity</h1>
+<p>similarity = calculate_similarity(compound1['maccs_keys'], compound2['maccs_keys'])
+print(f"Kesamaan antara senyawa 1 dan senyawa 2: {similarity}")
+print(f"Aktivitas Senyawa 1: {compound1['standard_value']}")
+print(f"Aktivitas Senyawa 2: {compound2['standard_value']}")</p>
+<p>activity_difference = abs(compound1['standard_value'] - compound2['standard_value'])
+print(f"Perbedaan Aktivitas: {activity_difference}")</p>
+<h1>Determine Activity Cliff</h1>
+<p>if similarity &lt; 0.8 and activity_difference &gt; 10:  #Adjust Threshold as needed
+    print("Ini mungkin activity cliff!")
+else:
+    print("Kemungkinan bukan activity cliff.")
+```</p>
+<p><strong>Penjelasan:</strong></p>
+<ul>
+<li><strong>Modularisasi:</strong> Kode dipecah menjadi notebook logis, sehingga lebih mudah dipahami, dipelihara, dan di-debug.</li>
+<li><strong>Penanganan File:</strong> Fungsi <code>os.path.join</code> digunakan secara konsisten untuk jalur file, memastikan portabilitas di berbagai sistem operasi.</li>
+<li><strong>Penanganan Kesalahan:</strong> Kode menyertakan blok <code>try...except</code> untuk menangani potensi kesalahan selama pemuatan file dan perhitungan deskriptor.</li>
+<li><strong>Komentar:</strong> Kode dik</li>
+</ul>
+        </body>
+        </html>
+        

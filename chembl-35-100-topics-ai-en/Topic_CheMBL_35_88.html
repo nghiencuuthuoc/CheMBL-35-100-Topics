@@ -1,0 +1,416 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_88</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: ChEMBL + BindingDB similarity validation</h1>
+<hr />
+<p>Okay, I understand. You're working with ChEMBL 35 data in a well-structured AIMLops project and encountering some issues while using RDKit for drug research and development data analysis. Let's break down the analysis, provide the code, address the errors, and create some example scenarios.</p>
+<p><strong>1. Analysis Model</strong></p>
+<p>The analysis model likely involves the following steps:</p>
+<ul>
+<li><strong>Data Extraction and Preparation:</strong> Querying the ChEMBL database (ChEMBL 35 in your case) using SQL to extract relevant data (e.g., compound structures, activity data). You are saving this data as CSV files.</li>
+<li><strong>Data Cleaning and Transformation:</strong>  Cleaning the data, handling missing values, converting SMILES strings to RDKit Mol objects, and standardizing the data for further analysis.</li>
+<li><strong>Feature Engineering:</strong>  Generating molecular descriptors (e.g., physicochemical properties, topological indices, structural features) using RDKit.  These descriptors will serve as input features for your machine learning models.</li>
+<li><strong>Model Building and Evaluation:</strong>  Choosing and training appropriate machine learning models (e.g., regression models for predicting activity, classification models for predicting activity types) using the generated features. Evaluating the model's performance using metrics like RMSE, R-squared, AUC, etc.</li>
+<li><strong>Interpretation and Visualization:</strong>  Interpreting the results, visualizing the data and model performance, and drawing conclusions about the structure-activity relationships (SAR).</li>
+</ul>
+<p><strong>2. Code (SQL &amp; Python)</strong></p>
+<p>Here's the code addressing the errors and using the file structure you described.</p>
+<p><strong>File Structure:</strong></p>
+<p><code>project_root/
+├── data/
+│   └── chembl_data.csv  # Data extracted from Chembl
+├── notebooks/
+│   └── Topic_CheMBL_35_88_1_data_extraction.ipynb
+│   └── Topic_CheMBL_35_88_2_data_analysis.ipynb
+├── models/
+│   └── (model files, if any)
+└── src/
+    └── (helper functions, if any)</code></p>
+<p><strong>2.1 SQL Code (data/extract_chembl_data.sql):</strong></p>
+<p>```sql
+-- data/extract_chembl_data.sql
+-- Extracts data from ChEMBL 35, addressing the numeric ~ unknown error.
+-- Limits the result to 100 rows.</p>
+<p>SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type = 'IC50'  -- Or other relevant activity type
+    AND act.standard_value IS NOT NULL
+    AND act.standard_units = 'nM'
+    AND act.standard_value::text ~ '^[0-9.]+$' -- Ensure standard_value is numeric
+LIMIT 100;
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li>The <code>act.standard_value::text ~ '^[0-9.]+$'</code>  clause explicitly casts the <code>standard_value</code> to text before applying the regular expression. This resolves the "operator does not exist: numeric ~ unknown" error.  The <code>^[0-9.]+$</code> regular expression checks if the value consists only of digits and periods.</li>
+<li>It selects only <code>IC50</code> values, or you can change this to another relevant activity type (e.g., Ki, EC50).</li>
+<li>It limits the output to 100 rows for faster processing.</li>
+<li>It converts all the values into nM.</li>
+</ul>
+<p><strong>How to Run:</strong></p>
+<ol>
+<li>Connect to your PostgreSQL database (chembl_35) using pgAdmin.</li>
+<li>Open the <code>extract_chembl_data.sql</code> file in pgAdmin.</li>
+<li>Execute the query.</li>
+<li>Export the result set to a CSV file named <code>chembl_data.csv</code> and save it in the <code>data/</code> directory.</li>
+</ol>
+<p><strong>2.2 Python Code (Notebook - Topic_CheMBL_35_88_1_data_extraction.ipynb):</strong></p>
+<p>```python</p>
+<h1>notebooks/Topic_CheMBL_35_88_1_data_extraction.ipynb</h1>
+<p>import os
+import pandas as pd</p>
+<h1>Define the base path of your project</h1>
+<p>base_path = os.path.abspath(os.path.join(os.getcwd(), ".."))</p>
+<h1>Construct the path to the CSV file</h1>
+<p>data_path = os.path.join(base_path, "data", "chembl_data.csv")</p>
+<h1>Load the data into a pandas DataFrame</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+    print("Data loaded successfully.")
+    print(df.head()) # Display the first few rows
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}")
+except Exception as e:
+    print(f"An error occurred: {e}")
+```</p>
+<p><strong>2.3 Python Code (Notebook - Topic_CheMBL_35_88_2_data_analysis.ipynb):</strong></p>
+<p>```python</p>
+<h1>notebooks/Topic_CheMBL_35_88_2_data_analysis.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Suppress future warnings to keep output clean</h1>
+<p>import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)</p>
+<h1>Define the base path of your project</h1>
+<p>base_path = os.path.abspath(os.path.join(os.getcwd(), ".."))</p>
+<h1>Construct the path to the CSV file</h1>
+<p>data_path = os.path.join(base_path, "data", "chembl_data.csv")</p>
+<h1>Load the data into a pandas DataFrame</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}")
+except Exception as e:
+    print(f"An error occurred: {e}")
+    exit()</p>
+<h1>Data Cleaning and Preparation</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])</p>
+<h1>Convert standard_value to numeric</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value']) # Drop rows where conversion failed
+df = df[df['standard_value'] &gt; 0]
+df['pIC50'] = -np.log10(df['standard_value'] * 1e-9) # Convert nM to Molar and then to pIC50</p>
+<h1>RDKit Feature Engineering</h1>
+<p>def generate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    return descriptors</p>
+<p>df['descriptors'] = df['canonical_smiles'].apply(generate_descriptors)
+df = df.dropna(subset=['descriptors'])</p>
+<h1>Convert descriptors to columns</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)
+df = df.dropna()</p>
+<h1>Model Building and Evaluation</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']]
+y = df['pIC50']</p>
+<h1>Scale the features</h1>
+<p>scaler = StandardScaler()
+X = scaler.fit_transform(X)</p>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<p>y_pred = model.predict(X_test)</p>
+<p>rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"RMSE: {rmse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Import Libraries:</strong> Imports necessary libraries (pandas, RDKit, scikit-learn).</li>
+<li><strong>Data Loading and Preparation:</strong> Loads the data from the CSV file, handles missing values in SMILES and standard values, and converts 'standard_value' to numeric, handling potential conversion errors.  It also converts IC50 values to pIC50.  Important to handle values that are zero.</li>
+<li><strong>RDKit Feature Engineering:</strong>  Defines a function <code>generate_descriptors</code> to calculate molecular descriptors using RDKit.  It calculates molecular weight, LogP, hydrogen bond donors, hydrogen bond acceptors, and TPSA.</li>
+<li><strong>Model Building and Evaluation:</strong><ul>
+<li>Selects the descriptors as features (X) and pIC50 as the target variable (y).</li>
+<li>Splits the data into training and testing sets.</li>
+<li>Creates a Linear Regression model.</li>
+<li>Fits the model to the training data.</li>
+<li>Makes predictions on the test data.</li>
+<li>Calculates and prints RMSE and R-squared.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Addressing the Errors:</strong></p>
+<ul>
+<li><strong>ERROR: operator does not exist: numeric ~ unknown:</strong>  This is addressed in the SQL code by explicitly casting <code>act.standard_value</code> to text:  <code>act.standard_value::text ~ '^[0-9.]+$'</code></li>
+<li><strong>old scikit-learn version does not support parameters squared=False in the mean_squared_error function:</strong> This is no longer an issue, since the <code>squared</code> parameter defaults to <code>True</code>, and RMSE is obtained by taking the square root.  Alternatively, you can upgrade your scikit-learn version to a more recent one (recommended).</li>
+</ul>
+<p><strong>3. Example Scenarios (Applications of this Analysis):</strong></p>
+<p>Here are 5 examples demonstrating how you can use this analysis:</p>
+<ol>
+<li><strong>Virtual Screening Prioritization:</strong> Use the model to predict the activity (pIC50) of a large library of virtual compounds. Prioritize compounds with high predicted activity for further experimental validation.</li>
+<li><strong>Lead Optimization:</strong> Analyze the SAR by examining how changes in molecular descriptors (MolWt, LogP, etc.) affect predicted activity. Use this information to guide the design of more potent analogs of a lead compound.</li>
+<li><strong>Target Identification:</strong> If you have activity data for multiple targets, build separate models for each target. Compare the descriptor importance in each model to identify key differences in the SAR for each target. This could help you understand target selectivity.</li>
+<li><strong>Data Quality Assessment:</strong>  Identify outliers in your activity data. Compounds with significantly different experimental and predicted activities might indicate errors in the experimental data or the need for more complex models.</li>
+<li><strong>Model Refinement:</strong>  Iteratively improve the model by incorporating additional features (e.g., other molecular descriptors, structural alerts), using more sophisticated machine learning algorithms (e.g., Random Forests, Support Vector Machines), or expanding the training data.</li>
+</ol>
+<p><strong>Key improvements and considerations:</strong></p>
+<ul>
+<li><strong>Error Handling:</strong>  The Python code includes error handling for file loading and SMILES parsing.</li>
+<li><strong>Data Cleaning:</strong>  The code handles missing values and ensures that the 'standard_value' column contains numeric data.</li>
+<li><strong>pIC50 Conversion:</strong> The code converts IC50 values to pIC50, a more suitable scale for modeling.</li>
+<li><strong>Regularization:</strong> Consider adding regularization to your linear regression model to prevent overfitting, especially if you have a large number of features.  You can use Ridge Regression or Lasso Regression.</li>
+<li><strong>Model Validation:</strong> Use cross-validation techniques for more robust model evaluation.</li>
+<li><strong>Feature Selection:</strong> Explore feature selection methods to identify the most relevant descriptors for predicting activity.</li>
+<li><strong>More Complex Models:</strong>  Experiment with more sophisticated machine learning algorithms like Random Forests, Gradient Boosting Machines, or Support Vector Machines.  These models can often capture more complex relationships in the data.</li>
+</ul>
+<p><strong>In summary:</strong> You now have a working script to extract, process, and model your ChEMBL 35 data. This is a starting point and can be further improved for better accuracy and insights. Remember to adapt the code and analysis to your specific research question and data.</p>
+<hr />
+<p><strong>Análisis y Guía en Español</strong></p>
+<p><strong>1. Análisis del Modelo</strong></p>
+<p>El modelo de análisis probablemente involucra los siguientes pasos:</p>
+<ul>
+<li><strong>Extracción y Preparación de Datos:</strong> Consultar la base de datos ChEMBL (ChEMBL 35 en tu caso) usando SQL para extraer datos relevantes (por ejemplo, estructuras de compuestos, datos de actividad). Estás guardando estos datos como archivos CSV.</li>
+<li><strong>Limpieza y Transformación de Datos:</strong> Limpiar los datos, manejar valores faltantes, convertir cadenas SMILES a objetos Mol de RDKit y estandarizar los datos para un análisis posterior.</li>
+<li><strong>Ingeniería de Características:</strong> Generar descriptores moleculares (por ejemplo, propiedades fisicoquímicas, índices topológicos, características estructurales) utilizando RDKit. Estos descriptores servirán como características de entrada para tus modelos de aprendizaje automático.</li>
+<li><strong>Construcción y Evaluación de Modelos:</strong> Elegir y entrenar modelos de aprendizaje automático apropiados (por ejemplo, modelos de regresión para predecir la actividad, modelos de clasificación para predecir tipos de actividad) utilizando las características generadas. Evaluar el rendimiento del modelo utilizando métricas como RMSE, R-cuadrado, AUC, etc.</li>
+<li><strong>Interpretación y Visualización:</strong> Interpretar los resultados, visualizar los datos y el rendimiento del modelo, y sacar conclusiones sobre las relaciones estructura-actividad (SAR).</li>
+</ul>
+<p><strong>2. Código (SQL y Python)</strong></p>
+<p>Aquí está el código que aborda los errores y utiliza la estructura de archivos que describiste.</p>
+<p><strong>Estructura de Archivos:</strong></p>
+<p><code>project_root/
+├── data/
+│   └── chembl_data.csv  # Datos extraídos de Chembl
+├── notebooks/
+│   └── Topic_CheMBL_35_88_1_data_extraction.ipynb
+│   └── Topic_CheMBL_35_88_2_data_analysis.ipynb
+├── models/
+│   └── (archivos de modelos, si los hay)
+└── src/
+    └── (funciones auxiliares, si las hay)</code></p>
+<p><strong>2.1 Código SQL (data/extract_chembl_data.sql):</strong></p>
+<p>```sql
+-- data/extract_chembl_data.sql
+-- Extrae datos de ChEMBL 35, abordando el error numeric ~ unknown.
+-- Limita el resultado a 100 filas.</p>
+<p>SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type = 'IC50'  -- U otro tipo de actividad relevante
+    AND act.standard_value IS NOT NULL
+    AND act.standard_units = 'nM'
+    AND act.standard_value::text ~ '^[0-9.]+$' -- Asegura que standard_value sea numérico
+LIMIT 100;
+```</p>
+<p><strong>Explicación:</strong></p>
+<ul>
+<li>La cláusula <code>act.standard_value::text ~ '^[0-9.]+$'</code> convierte explícitamente el <code>standard_value</code> a texto antes de aplicar la expresión regular. Esto resuelve el error "operator does not exist: numeric ~ unknown". La expresión regular <code>^[0-9.]+$</code> verifica si el valor consiste solo en dígitos y puntos.</li>
+<li>Selecciona solo valores de <code>IC50</code>, o puedes cambiar esto a otro tipo de actividad relevante (por ejemplo, Ki, EC50).</li>
+<li>Limita la salida a 100 filas para un procesamiento más rápido.</li>
+<li>Convierte todos los valores a nM.</li>
+</ul>
+<p><strong>Cómo Ejecutar:</strong></p>
+<ol>
+<li>Conéctate a tu base de datos PostgreSQL (chembl_35) usando pgAdmin.</li>
+<li>Abre el archivo <code>extract_chembl_data.sql</code> en pgAdmin.</li>
+<li>Ejecuta la consulta.</li>
+<li>Exporta el conjunto de resultados a un archivo CSV llamado <code>chembl_data.csv</code> y guárdalo en el directorio <code>data/</code>.</li>
+</ol>
+<p><strong>2.2 Código Python (Notebook - Topic_CheMBL_35_88_1_data_extraction.ipynb):</strong></p>
+<p>```python</p>
+<h1>notebooks/Topic_CheMBL_35_88_1_data_extraction.ipynb</h1>
+<p>import os
+import pandas as pd</p>
+<h1>Define la ruta base de tu proyecto</h1>
+<p>base_path = os.path.abspath(os.path.join(os.getcwd(), ".."))</p>
+<h1>Construye la ruta al archivo CSV</h1>
+<p>data_path = os.path.join(base_path, "data", "chembl_data.csv")</p>
+<h1>Carga los datos en un DataFrame de pandas</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+    print("Datos cargados exitosamente.")
+    print(df.head()) # Muestra las primeras filas
+except FileNotFoundError:
+    print(f"Error: Archivo no encontrado en {data_path}")
+except Exception as e:
+    print(f"Ocurrió un error: {e}")
+```</p>
+<p><strong>2.3 Código Python (Notebook - Topic_CheMBL_35_88_2_data_analysis.ipynb):</strong></p>
+<p>```python</p>
+<h1>notebooks/Topic_CheMBL_35_88_2_data_analysis.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Suprime las advertencias futuras para mantener la salida limpia</h1>
+<p>import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)</p>
+<h1>Define la ruta base de tu proyecto</h1>
+<p>base_path = os.path.abspath(os.path.join(os.getcwd(), ".."))</p>
+<h1>Construye la ruta al archivo CSV</h1>
+<p>data_path = os.path.join(base_path, "data", "chembl_data.csv")</p>
+<h1>Carga los datos en un DataFrame de pandas</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+    print("Datos cargados exitosamente.")
+except FileNotFoundError:
+    print(f"Error: Archivo no encontrado en {data_path}")
+except Exception as e:
+    print(f"Ocurrió un error: {e}")
+    exit()</p>
+<h1>Limpieza y Preparación de Datos</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])</p>
+<h1>Convierte standard_value a numérico</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value']) # Elimina las filas donde la conversión falló
+df = df[df['standard_value'] &gt; 0] #Removes rows with zero value
+df['pIC50'] = -np.log10(df['standard_value'] * 1e-9) # Convierte nM a Molar y luego a pIC50</p>
+<h1>Ingeniería de Características con RDKit</h1>
+<p>def generate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    descriptors['TPSA'] = Descriptors.TPSA(mol)
+    return descriptors</p>
+<p>df['descriptors'] = df['canonical_smiles'].apply(generate_descriptors)
+df = df.dropna(subset=['descriptors'])</p>
+<h1>Convierte los descriptores a columnas</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)
+df = df.dropna()</p>
+<h1>Construcción y Evaluación de Modelos</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']]
+y = df['pIC50']</p>
+<h1>Escala las características</h1>
+<p>scaler = StandardScaler()
+X = scaler.fit_transform(X)</p>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<p>y_pred = model.predict(X_test)</p>
+<p>rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"RMSE: {rmse}")
+print(f"R-cuadrado: {r2}")
+```</p>
+<p><strong>Explicación:</strong></p>
+<ul>
+<li><strong>Importar Librerías:</strong> Importa las librerías necesarias (pandas, RDKit, scikit-learn).</li>
+<li><strong>Carga y Preparación de Datos:</strong> Carga los datos desde el archivo CSV, maneja los valores faltantes en SMILES y valores estándar, y convierte 'standard_value' a numérico, manejando posibles errores de conversión. También convierte los valores de IC50 a pIC50.</li>
+<li><strong>Ingeniería de Características con RDKit:</strong> Define una función <code>generate_descriptors</code> para calcular descriptores moleculares utilizando RDKit. Calcula el peso molecular, LogP, donadores de enlaces de hidrógeno, aceptores de enlaces de hidrógeno y TPSA.</li>
+<li><strong>Construcción y Evaluación de Modelos:</strong><ul>
+<li>Selecciona los descriptores como características (X) y pIC50 como la variable objetivo (y).</li>
+<li>Divide los datos en conjuntos de entrenamiento y prueba.</li>
+<li>Crea un modelo de Regresión Lineal.</li>
+<li>Ajusta el modelo a los datos de entrenamiento.</li>
+<li>Realiza predicciones en los datos de prueba.</li>
+<li>Calcula e imprime RMSE y R-cuadrado.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Abordando los Errores:</strong></p>
+<ul>
+<li><strong>ERROR: operator does not exist: numeric ~ unknown:</strong> Esto se aborda en el código SQL al convertir explícitamente <code>act.standard_value</code> a texto: <code>act.standard_value::text ~ '^[0-9.]+$'</code></li>
+<li><strong>old scikit-learn version does not support parameters squared=False in the mean_squared_error function:</strong> Ya no es un problema, ya que el parámetro <code>squared</code> tiene como valor predeterminado <code>True</code>, y RMSE se obtiene al sacar la raíz cuadrada. Alternativamente, puedes actualizar tu versión de scikit-learn a una más reciente (recomendado).</li>
+</ul>
+<p><strong>3. Ejemplos de Escenarios (Aplicaciones de este Análisis):</strong></p>
+<p>Aquí hay 5 ejemplos que demuestran cómo puedes utilizar este análisis:</p>
+<ol>
+<li><strong>Priorización de Cribado Virtual:</strong> Utiliza el modelo para predecir la actividad (pIC50) de una gran biblioteca de compuestos virtuales. Prioriza los compuestos con alta actividad predicha para una mayor validación experimental.</li>
+<li><strong>Optimización de Cabezas de Serie:</strong> Analiza el SAR examinando cómo los cambios en los descriptores moleculares (MolWt, LogP, etc.) afectan la actividad predicha. Utiliza esta información para guiar el diseño de análogos más potentes de un compuesto cabeza de serie.</li>
+<li><strong>Identificación de Objetivos:</strong> Si tienes datos de actividad para múltiples objetivos, construye modelos separados para cada objetivo. Compara la importancia del descriptor en cada modelo para identificar las diferencias clave en el SAR para cada objetivo. Esto podría ayudarte a comprender la selectividad del objetivo.</li>
+<li><strong>Evaluación de la Calidad de los Datos:</strong> Identifica valores atípicos en tus datos de actividad. Los compuestos con actividades experimentales y predichas significativamente diferentes podrían indicar errores en los datos experimentales o la necesidad de modelos más complejos.</li>
+<li><strong>Refinamiento del Modelo:</strong> Mejora iterativamente el modelo incorporando características adicionales (por ejemplo, otros descriptores moleculares, alertas estructurales), utilizando algoritmos de aprendizaje automático más sofisticados (por ejemplo, Random Forests, Support Vector Machines) o expandiendo los datos de entrenamiento.</li>
+</ol>
+<p><strong>Mejoras y Consideraciones Clave:</strong></p>
+<ul>
+<li><strong>Manejo de Errores:</strong> El código Python incluye manejo de errores para la carga de archivos y el análisis de SMILES.</li>
+<li><strong>Limpieza de Datos:</strong> El código maneja los valores faltantes y asegura que la columna 'standard_value' contenga datos numéricos.</li>
+<li><strong>Conversión de pIC50:</strong> El código convierte los valores de IC50 a pIC50, una escala más adecuada para el modelado.</li>
+<li><strong>Regularización:</strong> Considera agregar regularización a tu modelo de regresión lineal para evitar el sobreajuste, especialmente si tienes una gran cantidad de características. Puedes utilizar la Regresión Ridge o la Regresión Lasso.</li>
+<li><strong>Validación del Modelo:</strong> Utiliza técnicas de validación cruzada para una evaluación más robusta del modelo.</li>
+<li><strong>Selección de Características:</strong> Explora métodos de selección de características para identificar los descriptores más relevantes para predecir la actividad.</li>
+<li><strong>Modelos Más Complejos:</strong> Experimenta con algoritmos de aprendizaje automático más sofisticados como Random Forests, Gradient Boosting Machines o Support Vector Machines. Estos modelos a menudo pueden capturar relaciones más complejas en los datos.</li>
+</ul>
+<p><strong>En resumen:</strong> Ahora tienes un script funcional para extraer, procesar y modelar tus datos de ChEMBL 35. Este es un punto de partida y puede mejorarse aún más para obtener una mayor precisión y conocimiento. Recuerda adaptar el código y el análisis a tu pregunta de investigación y datos específicos.</p>
+        </body>
+        </html>
+        

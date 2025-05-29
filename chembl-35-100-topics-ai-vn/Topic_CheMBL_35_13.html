@@ -1,0 +1,322 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_13</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Phân tích thay đổi khung hóa học (scaffold hopping)</h1>
+<hr />
+<p>Tuyệt vời! Với vai trò là một chuyên gia R&amp;D dược học, tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 này. Chúng ta sẽ cùng nhau xây dựng một quy trình làm việc hiệu quả, từ truy vấn SQL đến phân tích dữ liệu bằng Python và RDKit.</p>
+<p><strong>Tổng quan dự án</strong></p>
+<p>Dự án của bạn tập trung vào việc khai thác dữ liệu từ cơ sở dữ liệu ChEMBL 35, kết hợp với các công cụ tin sinh học như RDKit, để hỗ trợ quá trình nghiên cứu và phát triển thuốc. Bạn đã thiết lập một môi trường làm việc theo chuẩn MLOps, sử dụng PostgreSQL làm cơ sở dữ liệu và Jupyter Notebook cho phân tích dữ liệu.</p>
+<p><strong>Các bước thực hiện</strong></p>
+<ol>
+<li><strong>Truy vấn dữ liệu từ ChEMBL 35 bằng SQL:</strong> Sử dụng pgAdmin để chạy các truy vấn SQL và lưu kết quả vào các file CSV.</li>
+<li><strong>Tiền xử lý và phân tích dữ liệu bằng Python và RDKit:</strong> Sử dụng Jupyter Notebook để đọc dữ liệu từ file CSV, tiền xử lý dữ liệu (ví dụ: chuẩn hóa SMILES, tính toán descriptors phân tử), và thực hiện các phân tích thống kê và mô hình hóa.</li>
+<li><strong>Lưu trữ kết quả và báo cáo:</strong> Lưu trữ kết quả phân tích và các mô hình đã xây dựng, đồng thời tạo báo cáo chi tiết về quá trình thực hiện và kết quả đạt được.</li>
+</ol>
+<p><strong>Phân tích và Hướng dẫn chi tiết (song ngữ)</strong></p>
+<p><strong>1. Phân tích mô hình phân tích (Analysis of Analysis Model)</strong></p>
+<p>Mô hình phân tích của bạn nên tập trung vào việc trả lời các câu hỏi nghiên cứu cụ thể liên quan đến dữ liệu ChEMBL 35. Dưới đây là một số gợi ý:</p>
+<ul>
+<li><strong>Phân tích mối quan hệ cấu trúc-hoạt tính (SAR/QSAR):</strong> Xác định các đặc điểm cấu trúc phân tử quan trọng ảnh hưởng đến hoạt tính sinh học của các hợp chất.</li>
+<li><strong>Xác định các hit/lead tiềm năng:</strong> Lọc và đánh giá các hợp chất có hoạt tính cao và phù hợp với các tiêu chí phát triển thuốc.</li>
+<li><strong>Phân tích đa dạng hóa thư viện hợp chất:</strong> Đánh giá sự đa dạng về cấu trúc và hoạt tính của các hợp chất trong cơ sở dữ liệu.</li>
+<li><strong>Dự đoán hoạt tính của các hợp chất mới:</strong> Xây dựng các mô hình dự đoán hoạt tính dựa trên cấu trúc phân tử.</li>
+</ul>
+<p><em>Your analysis model should focus on answering specific research questions related to the ChEMBL 35 data. Here are some suggestions:</em></p>
+<ul>
+<li><strong><em>Structure-Activity Relationship (SAR/QSAR) Analysis:</em></strong> <em>Identify key molecular structural features that influence the biological activity of compounds.</em></li>
+<li><strong><em>Identification of Potential Hits/Leads:</em></strong> <em>Filter and evaluate compounds with high activity and suitability for drug development criteria.</em></li>
+<li><strong><em>Compound Library Diversification Analysis:</em></strong> <em>Assess the structural and activity diversity of compounds in the database.</em></li>
+<li><strong><em>Predicting Activity of New Compounds:</em></strong> <em>Build activity prediction models based on molecular structure.</em></li>
+</ul>
+<p><strong>2. Hướng dẫn song ngữ (Bilingual Guide)</strong></p>
+<p>Dưới đây là một số hướng dẫn chi tiết bằng cả tiếng Anh và tiếng Việt:</p>
+<ul>
+<li>
+<p><strong>SQL:</strong></p>
+<ul>
+<li>Sử dụng các câu lệnh <code>SELECT</code>, <code>FROM</code>, <code>WHERE</code>, <code>JOIN</code> để truy vấn dữ liệu từ các bảng khác nhau trong cơ sở dữ liệu ChEMBL 35.</li>
+<li>Sử dụng các hàm SQL như <code>LIKE</code>, <code>UPPER</code>, <code>LOWER</code> để lọc và chuẩn hóa dữ liệu.</li>
+<li>
+<p>Sử dụng các hàm thống kê như <code>AVG</code>, <code>MAX</code>, <code>MIN</code>, <code>COUNT</code> để tính toán các giá trị thống kê.</p>
+</li>
+<li>
+<p><em>Use <code>SELECT</code>, <code>FROM</code>, <code>WHERE</code>, <code>JOIN</code> statements to query data from different tables in the ChEMBL 35 database.</em></p>
+</li>
+<li><em>Use SQL functions like <code>LIKE</code>, <code>UPPER</code>, <code>LOWER</code> to filter and normalize data.</em></li>
+<li><em>Use statistical functions like <code>AVG</code>, <code>MAX</code>, <code>MIN</code>, <code>COUNT</code> to calculate statistical values.</em></li>
+<li><strong>Python:</strong></li>
+<li>Sử dụng thư viện <code>pandas</code> để đọc dữ liệu từ file CSV và xử lý dữ liệu.</li>
+<li>Sử dụng thư viện <code>RDKit</code> để đọc và xử lý cấu trúc phân tử (ví dụ: chuyển đổi SMILES sang các định dạng khác, tính toán descriptors phân tử).</li>
+<li>Sử dụng thư viện <code>scikit-learn</code> để xây dựng các mô hình học máy (ví dụ: hồi quy tuyến tính, cây quyết định, mạng nơ-ron).</li>
+<li>
+<p>Sử dụng thư viện <code>matplotlib</code> và <code>seaborn</code> để trực quan hóa dữ liệu.</p>
+</li>
+<li>
+<p><em>Use the <code>pandas</code> library to read data from CSV files and process data.</em></p>
+</li>
+<li><em>Use the <code>RDKit</code> library to read and process molecular structures (e.g., convert SMILES to other formats, calculate molecular descriptors).</em></li>
+<li><em>Use the <code>scikit-learn</code> library to build machine learning models (e.g., linear regression, decision trees, neural networks).</em></li>
+<li><em>Use the <code>matplotlib</code> and <code>seaborn</code> libraries to visualize data.</em></li>
+</ul>
+</li>
+</ul>
+<p><strong>3. Code SQL, Python (English)</strong></p>
+<p><strong>SQL:</strong></p>
+<p><code>sql
+-- Select 100 compounds with IC50 values against a specific target
+SELECT
+    md.chembl_id,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type = 'IC50'
+    AND act.target_chembl_id = 'CHEMBL205' -- Replace with your target of interest
+    AND act.standard_value IS NOT NULL
+    AND act.standard_units = 'nM'
+    AND act.standard_value ~ '^[0-9\.]+$' --Ensure that standard_value contains only numbers
+LIMIT 100;</code></p>
+<p><strong>Python:</strong></p>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import os</p>
+<h1>Define base path</h1>
+<p>base_path = "../data"</p>
+<h1>Read data from CSV file</h1>
+<p>csv_file = "chembl_ic50_data.csv"  # Replace with your CSV file name
+data = pd.read_csv(os.path.join(base_path, csv_file))</p>
+<h1>Function to calculate molecular weight</h1>
+<p>def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<h1>Apply the function to the 'smiles' column</h1>
+<p>data['molecular_weight'] = data['canonical_smiles'].apply(calculate_mw)</p>
+<h1>Print the first 5 rows of the DataFrame</h1>
+<p>print(data.head())
+```</p>
+<p><strong>Giải thích lỗi và cách khắc phục:</strong></p>
+<ul>
+<li><strong>Lỗi SQL:</strong> <code>ERROR: operator does not exist: numeric ~ unknown</code><ul>
+<li>Nguyên nhân: Lỗi này xảy ra do bạn đang cố gắng sử dụng toán tử <code>~</code> (regular expression match) trên một cột kiểu số (numeric).</li>
+<li>Khắc phục:<ol>
+<li>Đảm bảo cột <code>act.standard_value</code> có kiểu dữ liệu phù hợp (ví dụ: text hoặc varchar).</li>
+<li>Nếu cột <code>act.standard_value</code> là kiểu số, bạn có thể sử dụng hàm <code>CAST</code> để chuyển đổi nó sang kiểu text trước khi sử dụng toán tử <code>~</code>.</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<p><code>sql
+--Corrected SQL code
+SELECT
+    md.chembl_id,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type = 'IC50'
+    AND act.target_chembl_id = 'CHEMBL205' -- Replace with your target of interest
+    AND act.standard_value IS NOT NULL
+    AND act.standard_units = 'nM'
+    AND CAST(act.standard_value AS TEXT) ~ '^[0-9\.]+$' --Ensure that standard_value contains only numbers
+LIMIT 100;</code></p>
+<ul>
+<li><strong>Lỗi Python:</strong> <code>TypeError: mean_squared_error() got an unexpected keyword argument 'squared'</code><ul>
+<li>Nguyên nhân: Phiên bản scikit-learn bạn đang sử dụng không hỗ trợ tham số <code>squared</code> trong hàm <code>mean_squared_error</code>.</li>
+<li>Khắc phục: Nâng cấp phiên bản scikit-learn lên phiên bản mới hơn (ví dụ: 1.0 trở lên) hoặc bỏ tham số <code>squared=False</code> (khi đó hàm sẽ trả về giá trị MSE thay vì RMSE).</li>
+</ul>
+</li>
+</ul>
+<p>```python
+from sklearn.metrics import mean_squared_error</p>
+<h1>Tính MSE</h1>
+<p>mse = mean_squared_error(y_true, y_pred)</p>
+<h1>Nếu cần tính RMSE</h1>
+<p>rmse = mse**0.5
+```</p>
+<p><strong>4. Ví dụ code SQL và Python mẫu</strong></p>
+<p><strong>Ví dụ 1: Truy vấn thông tin cơ bản về hợp chất (SQL)</strong></p>
+<p><code>sql
+-- Get basic information about compounds
+SELECT
+    md.chembl_id,
+    md.pref_name,
+    cs.canonical_smiles
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+LIMIT 100;</code></p>
+<p><strong>Ví dụ 1: Tính toán logP (Python)</strong></p>
+<p>```python
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors</p>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        logp = Descriptors.MolLogP(mol)
+        return logp
+    else:
+        return None</p>
+<p>data['logp'] = data['canonical_smiles'].apply(calculate_logp)
+print(data[['canonical_smiles', 'logp']].head())
+```</p>
+<p><strong>Ví dụ 2: Truy vấn hoạt tính của hợp chất trên một target cụ thể (SQL)</strong></p>
+<p><code>sql
+-- Get activity data for a specific target
+SELECT
+    md.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.target_chembl_id = 'CHEMBL205'
+    AND act.standard_type IN ('IC50', 'Ki', 'Kd')
+LIMIT 100;</code></p>
+<p><strong>Ví dụ 2: Vẽ biểu đồ phân bố logP (Python)</strong></p>
+<p>```python
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<p>sns.histplot(data['logp'].dropna())
+plt.title('Distribution of logP')
+plt.xlabel('logP')
+plt.ylabel('Frequency')
+plt.show()
+```</p>
+<p><strong>Ví dụ 3: Truy vấn các hợp chất có hoạt tính IC50 dưới 100 nM (SQL)</strong></p>
+<p><code>sql
+-- Get compounds with IC50 &lt; 100 nM
+SELECT
+    md.chembl_id,
+    act.standard_value
+FROM
+    molecule_dictionary md
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_value &lt; 100
+    AND act.standard_units = 'nM'
+LIMIT 100;</code></p>
+<p><strong>Ví dụ 3: Tính toán và thêm số liên kết hydro chấp nhận (HBA) và cho (HBD) (Python)</strong></p>
+<p>```python
+from rdkit.Chem import Lipinski</p>
+<p>def calculate_hba(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        hba = Lipinski.NumHAcceptors(mol)
+        return hba
+    else:
+        return None</p>
+<p>def calculate_hbd(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        hbd = Lipinski.NumHDonors(mol)
+        return hbd
+    else:
+        return None</p>
+<p>data['hba'] = data['canonical_smiles'].apply(calculate_hba)
+data['hbd'] = data['canonical_smiles'].apply(calculate_hbd)</p>
+<p>print(data[['canonical_smiles', 'hba', 'hbd']].head())
+```</p>
+<p><strong>Ví dụ 4: Truy vấn các target liên quan đến một bệnh cụ thể (SQL)</strong></p>
+<p><code>sql
+-- Get targets associated with a specific disease
+SELECT
+    td.chembl_id,
+    td.pref_name
+FROM
+    target_dictionary td
+JOIN
+    target_components tc ON td.tid = tc.tid
+JOIN
+    component_sequences cs ON tc.component_id = cs.component_id
+WHERE
+    td.target_type = 'SINGLE PROTEIN'
+    AND td.organism = 'Homo sapiens'
+LIMIT 100;</code></p>
+<p><strong>Ví dụ 4: Trực quan hóa HBA và HBD (Python)</strong></p>
+<p><code>python
+sns.scatterplot(x='hba', y='hbd', data=data)
+plt.title('HBA vs HBD')
+plt.xlabel('Number of Hydrogen Bond Acceptors')
+plt.ylabel('Number of Hydrogen Bond Donors')
+plt.show()</code></p>
+<p><strong>Ví dụ 5: Tính TPSA (SQL)</strong></p>
+<p><code>sql
+--this function does not exist in SQL, this is only an example of a query
+--that needs to be implemented elsewhere
+SELECT smiles, TPSA(smiles) FROM compounds LIMIT 100;</code></p>
+<p><strong>Ví dụ 5: Tính TPSA (Python)</strong></p>
+<p>```python
+from rdkit.Chem import rdMolDescriptors</p>
+<p>def calculate_tpsa(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        tpsa = rdMolDescriptors.CalcTPSA(mol)
+        return tpsa
+    else:
+        return None</p>
+<p>data['tpsa'] = data['canonical_smiles'].apply(calculate_tpsa)
+print(data[['canonical_smiles', 'tpsa']].head())
+```</p>
+<p><strong>Lưu ý quan trọng:</strong></p>
+<ul>
+<li><strong>Thay đổi tên file và target:</strong> Đảm bảo bạn thay đổi tên file CSV (<code>chembl_ic50_data.csv</code>) và target ID (<code>CHEMBL205</code>) trong các ví dụ trên cho phù hợp với dữ liệu và mục tiêu nghiên cứu của bạn.</li>
+<li><strong>Cài đặt thư viện:</strong> Đảm bảo bạn đã cài đặt đầy đủ các thư viện cần thiết (pandas, RDKit, scikit-learn, matplotlib, seaborn). Bạn có thể sử dụng pip để cài đặt: <code>pip install pandas rdkit scikit-learn matplotlib seaborn</code></li>
+<li><strong>Xử lý lỗi:</strong> Luôn kiểm tra và xử lý các lỗi có thể xảy ra trong quá trình truy vấn và phân tích dữ liệu.</li>
+<li><strong>Tối ưu hóa truy vấn SQL:</strong> Để tăng tốc độ truy vấn, bạn có thể sử dụng các chỉ mục (indexes) trên các cột thường xuyên được sử dụng trong mệnh đề <code>WHERE</code>.</li>
+</ul>
+<p>Hy vọng những hướng dẫn và ví dụ trên sẽ giúp bạn triển khai dự án phân tích dữ liệu ChEMBL 35 một cách hiệu quả. Chúc bạn thành công!</p>
+        </body>
+        </html>
+        

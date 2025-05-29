@@ -1,0 +1,340 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_85</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Annotating ChEMBL targets with PDB structures</h1>
+<hr />
+<p>Okay, I understand. You are working on a drug discovery project using ChEMBL 35 data accessed via PostgreSQL, with code structured according to an AIMLops template. You're encountering issues with data filtering and a deprecated scikit-learn parameter. Let's break down the analysis, code, and provide examples.</p>
+<p><strong>1. Analysis of the Analysis Model</strong></p>
+<p>Your goal is likely to extract, process, and analyze data from the ChEMBL 35 database to gain insights for drug discovery. This involves:</p>
+<ul>
+<li><strong>Data Extraction (SQL):</strong>  You'll use SQL queries to retrieve specific activity data from ChEMBL based on criteria such as target, assay type, and activity values. The error <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code> suggests you're trying to use a regular expression (<code>~</code>) on a numeric column (<code>act.standard_value</code>).  PostgreSQL likely requires you to cast the numeric column to text before applying the regex.  The regex <code>'^[0-9\.]+$'</code> aims to filter values that are numbers (including decimals).</li>
+<li><strong>Data Processing (Python/RDKit):</strong>  Once you have the data, you'll use Python and RDKit to:<ul>
+<li>Clean and standardize the data (e.g., handling missing values, converting units).</li>
+<li>Generate molecular representations (e.g., SMILES strings to RDKit Mol objects).</li>
+<li>Calculate molecular descriptors (e.g., physicochemical properties, structural features).</li>
+</ul>
+</li>
+<li><strong>Data Analysis (Python/Scikit-learn, etc.):</strong>  You'll use the processed data to perform various analyses, such as:<ul>
+<li>Building predictive models (e.g., activity prediction, toxicity prediction).</li>
+<li>Performing structure-activity relationship (SAR) analysis.</li>
+<li>Identifying potential drug candidates.</li>
+</ul>
+</li>
+<li><strong>AIMLops Integration:</strong> Packaging your code and workflows so they are repeatable, automatable, and deployable in a consistent manner.</li>
+</ul>
+<p><strong>2. SQL Code (English and Chinese Explanation)</strong></p>
+<p>```sql
+-- English: SQL query to retrieve activity data for a specific target, filtering for valid numeric standard values, and limiting to 100 rows.</p>
+<p>-- Chinese (Simplified): SQL 查询，检索特定靶标的活性数据，过滤有效的数字标准值，并限制为 100 行。</p>
+<p>SELECT
+    act.molregno,
+    act.standard_value,
+    act.standard_units,
+    act.assay_id,
+    md.chembl_id,
+    cs.canonical_smiles
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+WHERE
+    act.standard_type = 'IC50'  -- Example: Filter for IC50 values.  Modify as needed.
+    AND act.standard_relation = '=' -- Ensure the relationship is an equality
+    AND act.standard_value IS NOT NULL -- Exclude null values
+    AND act.standard_value::TEXT ~ '^[0-9.]+$' -- Cast to TEXT and use regex to check for numeric values.
+LIMIT 100;</p>
+<p>--Save result as: ../data/chembl_activity_data.csv
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><code>SELECT</code>:  Specifies the columns to retrieve.</li>
+<li><code>FROM</code>: Specifies the tables to retrieve data from (<code>activities</code>, <code>molecule_dictionary</code>, <code>compound_structures</code>).</li>
+<li><code>JOIN</code>: Combines data from the tables based on matching columns (<code>molregno</code>).  This is crucial to link activity data to molecule information.</li>
+<li><code>WHERE</code>: Filters the data based on several criteria:<ul>
+<li><code>act.standard_type = 'IC50'</code>:  Filters for activities reported as IC50 values (adjust this to the activity type you're interested in, e.g., 'Ki', 'EC50').</li>
+<li><code>act.standard_relation = '='</code>: Only include data where the relationship is equals to.</li>
+<li><code>act.standard_value IS NOT NULL</code>: Excludes rows where <code>standard_value</code> is NULL.</li>
+<li><code>act.standard_value::TEXT ~ '^[0-9\.]+$'</code>: This is the corrected part.  It <em>casts</em> the <code>standard_value</code> column to <code>TEXT</code> so that it can be used with the regular expression operator <code>~</code>.  The regular expression <code>'^[0-9\.]+$'</code> ensures that the value consists only of digits and periods (allowing for decimal numbers).</li>
+</ul>
+</li>
+<li><code>LIMIT 100</code>: Restricts the output to 100 rows.</li>
+</ul>
+<p><strong>3. Python Code (English and Chinese Explanation)</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import warnings
+warnings.filterwarnings("ignore")</p>
+<h1>Define paths according to AIMLops template</h1>
+<p>base_path = ".."  # Assuming the notebook is one level down from the base
+data_path = os.path.join(base_path, "data", "chembl_activity_data.csv")
+model_path = os.path.join(base_path, "models")</p>
+<p>if not os.path.exists(model_path):
+    os.makedirs(model_path)</p>
+<h1>Load data</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}.  Make sure you have run the SQL query and saved the data.")
+    exit()</p>
+<h1>Data Cleaning and Preparation</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])
+df = df[df['standard_value'] &gt; 0]  # Remove zero or negative values</p>
+<h1>Function to calculate molecular weight (example descriptor)</h1>
+<p>def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<h1>Apply the function to create a new column</h1>
+<p>df['molecular_weight'] = df['canonical_smiles'].apply(calculate_mw)
+df = df.dropna(subset=['molecular_weight'])  # remove compounds where MW could not be calculated</p>
+<h1>Feature Selection and Model Training (Simple Example)</h1>
+<p>X = df[['molecular_weight']]  # Use molecular weight as a single feature
+y = np.log10(df['standard_value']) # Log transform the standard value.  Crucial for activity data.</p>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)  #random_state for reproducibility</p>
+<h1>Linear Regression Model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Predictions and Evaluation</h1>
+<p>y_pred = model.predict(X_test)</p>
+<p>mse = mean_squared_error(y_test, y_pred)  # No need to specify squared=False, as it's the default.  It was deprecated in older scikit-learn versions.
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Save the model (Optional)</h1>
+<p>import joblib
+joblib.dump(model, os.path.join(model_path, 'linear_regression_model.pkl'))</p>
+<h1>Chinese (Simplified):  Python 代码，用于加载、清洗、处理 ChEMBL 数据，计算分子描述符，并训练简单的线性回归模型。</h1>
+<h1>导入必要的库</h1>
+<h1>定义文件路径</h1>
+<h1>加载数据</h1>
+<h1>数据清洗：删除缺失值和无效值</h1>
+<h1>定义计算分子量的函数</h1>
+<h1>应用函数创建新列</h1>
+<h1>特征选择和模型训练</h1>
+<h1>划分训练集和测试集</h1>
+<h1>创建线性回归模型</h1>
+<h1>训练模型</h1>
+<h1>预测和评估</h1>
+<h1>保存模型</h1>
+<p>```</p>
+<p><strong>Explanation:</strong></p>
+<ol>
+<li><strong>Import Libraries:</strong> Imports necessary libraries (pandas, RDKit, scikit-learn).</li>
+<li><strong>Define Paths:</strong> Sets up file paths according to your AIMLops template. This makes your code portable.</li>
+<li><strong>Load Data:</strong> Loads the CSV data you saved from the SQL query.  Includes error handling if the file is not found.</li>
+<li><strong>Data Cleaning:</strong> Removes rows with missing values in the <code>canonical_smiles</code> and <code>standard_value</code> columns. Removes rows with activity values of 0 or less.</li>
+<li><strong>Molecular Descriptor Calculation:</strong><ul>
+<li><code>calculate_mw(smiles)</code>: Defines a function that takes a SMILES string as input, converts it to an RDKit <code>Mol</code> object, and calculates the molecular weight.  Returns <code>None</code> if the SMILES string is invalid.</li>
+<li>Applies the function to the <code>canonical_smiles</code> column to create a new column called <code>molecular_weight</code>.</li>
+<li>Removes rows where the molecular weight could not be calculated (invalid SMILES).</li>
+</ul>
+</li>
+<li><strong>Feature Selection and Model Training:</strong><ul>
+<li><code>X = df[['molecular_weight']]</code>: Selects molecular weight as the independent variable (feature).  This is a very simple example; you would typically use many more descriptors.</li>
+<li><code>y = np.log10(df['standard_value'])</code>:  Selects the <code>standard_value</code> as the dependent variable (target).  <strong>Crucially, it applies a log transformation.</strong>  Activity data is often log-normally distributed, and taking the logarithm helps to improve the performance of linear models.</li>
+<li><code>train_test_split</code>: Splits the data into training and testing sets. <code>random_state</code> ensures reproducibility.</li>
+<li><code>LinearRegression</code>: Creates a linear regression model.</li>
+<li><code>model.fit(X_train, y_train)</code>: Trains the model on the training data.</li>
+</ul>
+</li>
+<li><strong>Predictions and Evaluation:</strong><ul>
+<li><code>y_pred = model.predict(X_test)</code>: Makes predictions on the test data.</li>
+<li><code>mse = mean_squared_error(y_test, y_pred)</code>: Calculates the mean squared error. The <code>squared=False</code> argument is <em>not</em> needed, as it is deprecated in later versions of scikit-learn.  In recent versions, it defaults to calculating the <em>mean squared error</em>, not the root mean squared error.</li>
+<li><code>r2 = r2_score(y_test, y_pred)</code>: Calculates the R-squared value (coefficient of determination).</li>
+<li>Prints the MSE and R-squared values.</li>
+</ul>
+</li>
+<li><strong>Save Model:</strong> Saves the trained model to a file using <code>joblib</code>.</li>
+</ol>
+<p><strong>Important Notes:</strong></p>
+<ul>
+<li><strong>Error Correction:</strong> The SQL query now casts the <code>standard_value</code> to <code>TEXT</code> before applying the regex.  The Python code removes the deprecated <code>squared=False</code> argument from <code>mean_squared_error</code>.</li>
+<li><strong>Log Transformation:</strong>  The log transformation of the <code>standard_value</code> is crucial for activity data.</li>
+<li><strong>Feature Engineering:</strong> This example uses only molecular weight as a feature. In a real drug discovery project, you would calculate a much larger set of molecular descriptors using RDKit and perform feature selection to identify the most relevant descriptors.</li>
+<li><strong>Model Selection:</strong>  Linear regression is a very simple model.  You might consider using more advanced models, such as random forests, support vector machines, or neural networks.</li>
+<li><strong>Validation:</strong>  Proper validation techniques, such as cross-validation, are essential to ensure that your model generalizes well to new data.</li>
+<li><strong>Units:</strong> Always be mindful of the units of your activity data (e.g., nM, uM, mM). Convert all values to a consistent unit before performing analysis.</li>
+<li><strong>Data Size:</strong> With only 100 rows, your model will be highly susceptible to overfitting. Increase the data size when possible (but start with a smaller dataset for initial debugging, as you are doing).</li>
+</ul>
+<p><strong>4. Five Examples (Based on Different Activity Types and Descriptors)</strong></p>
+<p>Here are five variations of the code, modifying the activity type and adding other descriptors:</p>
+<p><strong>Example 1: Ki Values and LogP</strong></p>
+<ul>
+<li><strong>SQL:</strong> <code>WHERE act.standard_type = 'Ki' ...</code></li>
+<li><strong>Python:</strong>  Add a function to calculate LogP (octanol-water partition coefficient) and use both LogP and molecular weight as features.</li>
+</ul>
+<p>```python
+from rdkit.Chem import AllChem</p>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolLogP(mol)
+    else:
+        return None</p>
+<p>df['logp'] = df['canonical_smiles'].apply(calculate_logp)
+df = df.dropna(subset=['logp'])</p>
+<p>X = df[['molecular_weight', 'logp']]
+```</p>
+<p><strong>Example 2: EC50 Values and Number of Hydrogen Bond Donors</strong></p>
+<ul>
+<li><strong>SQL:</strong> <code>WHERE act.standard_type = 'EC50' ...</code></li>
+<li><strong>Python:</strong> Add a function to calculate the number of hydrogen bond donors and use it as a feature.</li>
+</ul>
+<p>```python
+def calculate_hbd(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.NumHDonors(mol)
+    else:
+        return None</p>
+<p>df['hbd'] = df['canonical_smiles'].apply(calculate_hbd)
+df = df.dropna(subset=['hbd'])</p>
+<p>X = df[['molecular_weight', 'hbd']]
+```</p>
+<p><strong>Example 3: IC50 Values and TPSA (Topological Polar Surface Area)</strong></p>
+<ul>
+<li><strong>SQL:</strong> <code>WHERE act.standard_type = 'IC50' ...</code></li>
+<li><strong>Python:</strong>  Calculate TPSA.</li>
+</ul>
+<p>```python
+def calculate_tpsa(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.TPSA(mol)
+    else:
+        return None</p>
+<p>df['tpsa'] = df['canonical_smiles'].apply(calculate_tpsa)
+df = df.dropna(subset=['tpsa'])</p>
+<p>X = df[['molecular_weight', 'tpsa']]
+```</p>
+<p><strong>Example 4:  Filtering by Target and Using Morgan Fingerprints</strong></p>
+<ul>
+<li><strong>SQL:</strong>  Add a <code>JOIN</code> to the <code>target_dictionary</code> table and filter by <code>target_chembl_id</code>.</li>
+</ul>
+<p><code>sql
+SELECT
+    act.molregno,
+    act.standard_value,
+    act.standard_units,
+    act.assay_id,
+    md.chembl_id,
+    cs.canonical_smiles
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    assays a ON act.assay_id = a.assay_id
+JOIN
+    target_dictionary td ON a.tid = td.tid
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::TEXT ~ '^[0-9\.]+$'
+    AND td.chembl_id = 'CHEMBL205'  -- Replace with the target ChEMBL ID you want
+LIMIT 100;</code></p>
+<ul>
+<li><strong>Python:</strong>  Use Morgan fingerprints as features (much more sophisticated than just molecular weight).  This requires more extensive changes to the Python code.</li>
+</ul>
+<p>```python
+def calculate_morgan_fingerprint(smiles, radius=2, nBits=2048):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        fp = AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=nBits)
+        return np.array(list(fp.ToBitString()), dtype=int) # Convert to a numpy array of integers
+    else:
+        return None</p>
+<p>df['morgan_fp'] = df['canonical_smiles'].apply(calculate_morgan_fingerprint)
+df = df.dropna(subset=['morgan_fp'])</p>
+<h1>Create a matrix of Morgan fingerprints.  This is a crucial step.</h1>
+<p>X = np.vstack(df['morgan_fp'].values) # Stack the arrays vertically</p>
+<h1>Now you will have a different shape of X and will need to adjust</h1>
+<h1>the test size and random state for your need</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<p>```</p>
+<p><strong>Example 5:  Filtering by Assay and Using a Different Model (Random Forest)</strong></p>
+<ul>
+<li><strong>SQL:</strong> Add a filter for a specific <code>assay_id</code>.</li>
+</ul>
+<p><code>sql
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_relation = '='
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::TEXT ~ '^[0-9\.]+$'
+    AND act.assay_id = 669233  -- Replace with your assay ID.
+LIMIT 100;</code></p>
+<ul>
+<li><strong>Python:</strong> Use a Random Forest Regressor instead of Linear Regression.</li>
+</ul>
+<p>```python
+from sklearn.ensemble import RandomForestRegressor</p>
+<h1>... (rest of the code is similar, but replace the LinearRegression part)</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42) #n_estimators: number of trees
+model.fit(X_train, y_train)</p>
+<h1>Predictions and Evaluation</h1>
+<p>y_pred = model.predict(X_test)</p>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+```</p>
+<p><strong>Key Improvements and Considerations:</strong></p>
+<ul>
+<li><strong>Error Handling:</strong> The Python code includes basic error handling for file loading and invalid SMILES strings.  Add more robust error handling for a production environment.</li>
+<li><strong>Data Exploration:</strong>  Before building models, perform thorough exploratory data analysis (EDA) to understand the data distribution, identify outliers, and check for data quality issues.</li>
+<li><strong>Feature Scaling:</strong>  Consider scaling your features (e.g., using <code>StandardScaler</code> or <code>MinMaxScaler</code> from scikit-learn) before training your model, especially if you are using models that are sensitive to feature scaling (e.g., Support Vector Machines).</li>
+<li><strong>Hyperparameter Tuning:</strong> Optimize the hyperparameters of your model using techniques like cross-validation and grid search or random search.</li>
+<li><strong>Reproducibility:</strong> Use <code>random_state</code> in your code to ensure that your results are reproducible.</li>
+<li><strong>Documentation:</strong> Add comments to your code to explain what each part of the code does.</li>
+<li><strong>AIMLops:</strong> Remember to integrate these scripts into a proper pipeline for repeatability, version control, and automated deployment.</li>
+</ul>
+<p>Remember to adapt these examples to your specific research question and the available data in ChEMBL 35. This comprehensive guide will help you get started with your analysis. Good luck!</p>
+        </body>
+        </html>
+        

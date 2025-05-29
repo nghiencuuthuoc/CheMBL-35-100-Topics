@@ -1,0 +1,487 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_25</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Multi-target ligand profiling</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project using RDKit within an MLOps-structured environment. You have a PostgreSQL database, and you're facing some challenges in your SQL and Python code. I'll help you analyze the problem, provide corrected code snippets, and offer guidance.</p>
+<p><strong>1. Analysis of the Analysis Model and Challenges</strong></p>
+<p>Your project aims to leverage the Chembl 35 database for drug research and development. This is a common and valuable use case. You're using RDKit for chemical informatics, which is excellent. The MLOps structure is good for organization and reproducibility.</p>
+<p>The errors you're encountering are:</p>
+<ul>
+<li>
+<p><strong>SQL Error (a): <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong> This means PostgreSQL is having trouble using the regular expression operator <code>~</code> on a numeric column (<code>act.standard_value</code>). This likely means the column is either not a text type, or that your regular expression is trying to match values that are not compatible with the way PostgreSQL handles numeric columns.</p>
+</li>
+<li>
+<p><strong>Python Error (b): <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong>  This indicates you're using an older version of scikit-learn that doesn't support the <code>squared=False</code> argument in <code>mean_squared_error</code>. This argument is used to calculate the Root Mean Squared Error (RMSE) instead of Mean Squared Error (MSE).</p>
+</li>
+</ul>
+<p><strong>Analysis Model Approach:</strong></p>
+<p>Your analysis approach should ideally involve the following steps:</p>
+<ol>
+<li>
+<p><strong>Data Extraction (SQL):</strong>  Extract relevant data from the Chembl 35 database using SQL queries.  This will likely include compound IDs, activity values (IC50, Ki, etc.), and target information. Limit to 100 rows for development.</p>
+</li>
+<li>
+<p><strong>Data Preprocessing (Python):</strong></p>
+<ul>
+<li>Clean and filter the extracted data.</li>
+<li>Convert SMILES strings to RDKit Mol objects.</li>
+<li>Calculate molecular descriptors using RDKit (e.g., molecular weight, logP, number of hydrogen bond donors/acceptors).</li>
+<li>Handle missing values or outliers.</li>
+</ul>
+</li>
+<li>
+<p><strong>Feature Engineering (Python):</strong>  Create new features based on the existing data or domain knowledge. This could involve combining descriptors, creating interaction terms, or generating fingerprints.</p>
+</li>
+<li>
+<p><strong>Model Building (Python):</strong>  Choose appropriate machine learning models for your task (e.g., regression for predicting activity, classification for predicting binding affinity).</p>
+</li>
+<li>
+<p><strong>Model Evaluation (Python):</strong>  Evaluate the model's performance using appropriate metrics (e.g., RMSE, R-squared for regression; accuracy, precision, recall, F1-score for classification).</p>
+</li>
+</ol>
+<p><strong>2. Code (SQL and Python)</strong></p>
+<p>Here's the code with the corrections and examples, presented in English and then translated into Vietnamese.</p>
+<p><strong>English:</strong></p>
+<p><strong>SQL Code (save as <code>../data/Topic_CheMBL_35_25.csv</code>):</strong></p>
+<p>```sql
+-- SQL query to extract data from ChEMBL 35 (limited to 100 rows)
+-- Ensure you've loaded the ChEMBL data into your PostgreSQL database.</p>
+<p>SELECT
+    cmp.chembl_id,
+    act.standard_value,
+    act.standard_units,
+    act.standard_type,
+    mol.molfile
+FROM
+    compound_structures mol
+JOIN
+    activities act ON mol.molregno = act.molregno
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+WHERE act.standard_type = 'IC50'  -- Filter for IC50 values
+    AND act.standard_units = 'nM'  -- Filter for nM units
+    AND act.standard_value IS NOT NULL
+    AND mol.molfile IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9.]+$'  -- Ensure standard_value is a number
+ORDER BY act.standard_value ASC
+LIMIT 100;
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong><code>act.standard_value::text ~ '^[0-9\.]+$'</code>:</strong> This is the crucial fix. We explicitly cast the <code>standard_value</code> to text before applying the regular expression.  This ensures that the regular expression operator works correctly.</li>
+<li>The query now filters to only include rows where <code>standard_value</code> is numeric.</li>
+<li>The <code>LIMIT 100</code> clause ensures you only get 100 rows, as requested.</li>
+<li><code>mol.molfile IS NOT NULL</code> is added to ensure no null values.</li>
+</ul>
+<p><strong>Python Code (save as <code>notebook/Topic_CheMBL_35_25_1_data_preprocessing.ipynb</code>):</strong></p>
+<p>```python
+import pandas as pd
+import numpy as np
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import os
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score</p>
+<h1>Define the base path for your project</h1>
+<p>base_path = ".."  # Assuming the notebook is in a 'notebook' subdirectory</p>
+<h1>Construct the full path to your CSV file</h1>
+<p>csv_file_path = os.path.join(base_path, "data", "Topic_CheMBL_35_25.csv")</p>
+<h1>Load the data from the CSV file</h1>
+<p>try:
+    df = pd.read_csv(csv_file_path)
+    print("Data loaded successfully!")
+except FileNotFoundError:
+    print(f"Error: File not found at {csv_file_path}")
+    df = None # Or handle the error as appropriate</p>
+<p>if df is not None:
+    # Data Cleaning and Preprocessing
+    df = df.dropna(subset=['molfile', 'standard_value'])  # Remove rows with missing values
+    df = df[df['standard_value'] &gt; 0]  # Remove zero or negative activity values
+    df['standard_value'] = pd.to_numeric(df['standard_value'])
+    df['pIC50'] = -np.log10(df['standard_value'] * 1e-9)  # Convert IC50 to pIC50</p>
+<pre><code># RDKit processing
+def smiles_from_molfile(molfile):
+    try:
+        mol = Chem.MolFromMolBlock(molfile)
+        if mol is not None:
+            return Chem.MolToSmiles(mol)
+        else:
+            return None
+    except:
+        return None
+
+df['SMILES'] = df['molfile'].apply(smiles_from_molfile)
+df = df.dropna(subset=['SMILES'])
+
+def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        descriptors = {}
+        descriptors['MolWt'] = Descriptors.MolWt(mol)
+        descriptors['LogP'] = Descriptors.MolLogP(mol)
+        descriptors['HBD'] = Descriptors.NumHDonors(mol)
+        descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+        return pd.Series(descriptors)
+    else:
+        return pd.Series([None] * 4, index=['MolWt', 'LogP', 'HBD', 'HBA']) # return None Series
+
+df[['MolWt', 'LogP', 'HBD', 'HBA']] = df['SMILES'].apply(calculate_descriptors)
+df = df.dropna()
+
+# Feature Selection
+features = ['MolWt', 'LogP', 'HBD', 'HBA']
+X = df[features]
+y = df['pIC50']
+
+# Data Splitting
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Model Training
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Model Evaluation
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)  # Calculate RMSE manually
+r2 = r2_score(y_test, y_pred)
+
+print(f"Mean Squared Error: {mse}")
+print(f"Root Mean Squared Error: {rmse}")
+print(f"R-squared: {r2}")
+</code></pre>
+<p>```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>File Path Handling:</strong> Uses <code>os.path.join</code> to construct the file path.</li>
+<li><strong>Data Loading Error Handling:</strong> Includes a <code>try...except</code> block to handle the case where the CSV file is not found.</li>
+<li><strong>Data Cleaning:</strong> Drops rows with missing <code>molfile</code> or <code>standard_value</code>.</li>
+<li><strong>pIC50 Calculation:</strong> Converts IC50 values to pIC50 for a more suitable scale for modeling.</li>
+<li><strong>RDKit Integration:</strong><ul>
+<li>Converts SMILES strings to RDKit Mol objects.</li>
+<li>Calculates molecular descriptors (MolWt, LogP, HBD, HBA) using RDKit.  Handles cases where SMILES conversion fails.</li>
+</ul>
+</li>
+<li><strong>Feature Selection and Splitting:</strong> Selects the calculated descriptors as features and splits the data into training and testing sets.</li>
+<li><strong>Model Training:</strong> Trains a simple linear regression model.</li>
+<li><strong>Model Evaluation:</strong> Calculates MSE, RMSE, and R-squared.  Note that <code>squared=False</code> is <em>not</em> used in <code>mean_squared_error</code> because you're on an older version of scikit-learn.  Instead, the RMSE is calculated manually.</li>
+<li>Error handling is implemented when creating SMILES from molfile, if can't create SMILES, return None</li>
+<li><code>descriptors = {}</code> in def calculate_descriptors(smiles): is to avoid error</li>
+<li>return pd.Series([None] * 4, index=['MolWt', 'LogP', 'HBD', 'HBA']) to keep the number of columns consistent.</li>
+<li>df = df.dropna() to delete rows containing missing values, such as calculating molecular descriptors.</li>
+</ul>
+<p><strong>3. Five Examples</strong></p>
+<p>Here are five small modifications you can make to this code to experiment with different aspects of the analysis.</p>
+<ol>
+<li>
+<p><strong>Different Descriptors:</strong>  Change the list of descriptors being calculated in the <code>calculate_descriptors</code> function.  Try adding TPSA (Topological Polar Surface Area), number of rotatable bonds, or other common descriptors.</p>
+<p><code>python
+def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        descriptors = {}
+        descriptors['MolWt'] = Descriptors.MolWt(mol)
+        descriptors['LogP'] = Descriptors.MolLogP(mol)
+        descriptors['HBD'] = Descriptors.NumHDonors(mol)
+        descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+        descriptors['TPSA'] = Descriptors.TPSA(mol)  # Added TPSA
+        return pd.Series(descriptors)
+    else:
+        return pd.Series([None] * 5, index=['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']) # return None Series</code></p>
+</li>
+<li>
+<p><strong>Different Model:</strong>  Swap out the <code>LinearRegression</code> model for another model, such as <code>RandomForestRegressor</code> or <code>GradientBoostingRegressor</code>.  You'll need to import the new model.</p>
+<p>```python
+from sklearn.ensemble import RandomForestRegressor</p>
+<h1>... (rest of the code)</h1>
+<h1>Model Training</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)  # Example parameters
+model.fit(X_train, y_train)
+```</p>
+</li>
+<li>
+<p><strong>Different Activity Type:</strong>  Modify the SQL query to use a different <code>standard_type</code>, such as 'Ki' or 'EC50', instead of 'IC50'.</p>
+<p><code>sql
+WHERE act.standard_type = 'Ki'</code></p>
+</li>
+<li>
+<p><strong>Different Splitting Strategy:</strong>  Change the <code>test_size</code> parameter in <code>train_test_split</code> to adjust the ratio of training to testing data.</p>
+<p><code>python
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)  # 30% test data</code></p>
+</li>
+<li>
+<p><strong>Data Scaling:</strong>  Apply feature scaling to the descriptor data before training the model.  This can often improve model performance.</p>
+<p>```python
+from sklearn.preprocessing import StandardScaler</p>
+<h1>... (rest of the code)</h1>
+<h1>Data Scaling</h1>
+<p>scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)</p>
+<h1>Model Training (using scaled data)</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)
+```</p>
+</li>
+</ol>
+<p><strong>Vietnamese Translation:</strong></p>
+<p><strong>1. Phân tích Mô hình Phân tích và Thách thức</strong></p>
+<p>Dự án của bạn nhằm mục đích tận dụng cơ sở dữ liệu Chembl 35 cho nghiên cứu và phát triển thuốc. Đây là một trường hợp sử dụng phổ biến và có giá trị. Bạn đang sử dụng RDKit cho tin học hóa học, điều này rất tuyệt vời. Cấu trúc MLOps rất tốt cho việc tổ chức và khả năng tái tạo.</p>
+<p>Các lỗi bạn đang gặp phải là:</p>
+<ul>
+<li>
+<p><strong>Lỗi SQL (a): <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong> Điều này có nghĩa là PostgreSQL gặp khó khăn khi sử dụng toán tử biểu thức chính quy <code>~</code> trên cột số (<code>act.standard_value</code>). Điều này có nghĩa là cột không phải là kiểu văn bản hoặc biểu thức chính quy của bạn đang cố gắng khớp các giá trị không tương thích với cách PostgreSQL xử lý các cột số.</p>
+</li>
+<li>
+<p><strong>Lỗi Python (b): <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong> Điều này chỉ ra rằng bạn đang sử dụng phiên bản cũ của scikit-learn không hỗ trợ đối số <code>squared=False</code> trong <code>mean_squared_error</code>. Đối số này được sử dụng để tính Root Mean Squared Error (RMSE) thay vì Mean Squared Error (MSE).</p>
+</li>
+</ul>
+<p><strong>Cách tiếp cận Mô hình Phân tích:</strong></p>
+<p>Cách tiếp cận phân tích của bạn nên lý tưởng bao gồm các bước sau:</p>
+<ol>
+<li>
+<p><strong>Trích xuất Dữ liệu (SQL):</strong> Trích xuất dữ liệu liên quan từ cơ sở dữ liệu Chembl 35 bằng các truy vấn SQL. Điều này có thể bao gồm ID hợp chất, giá trị hoạt động (IC50, Ki, v.v.) và thông tin mục tiêu. Giới hạn ở 100 hàng để phát triển.</p>
+</li>
+<li>
+<p><strong>Tiền xử lý Dữ liệu (Python):</strong></p>
+<ul>
+<li>Làm sạch và lọc dữ liệu đã trích xuất.</li>
+<li>Chuyển đổi chuỗi SMILES thành đối tượng RDKit Mol.</li>
+<li>Tính toán các descriptor phân tử bằng RDKit (ví dụ: trọng lượng phân tử, logP, số lượng người cho/nhận liên kết hydro).</li>
+<li>Xử lý các giá trị bị thiếu hoặc ngoại lệ.</li>
+</ul>
+</li>
+<li>
+<p><strong>Thiết kế Tính năng (Python):</strong> Tạo các tính năng mới dựa trên dữ liệu hiện có hoặc kiến thức miền. Điều này có thể bao gồm kết hợp các descriptor, tạo các số hạng tương tác hoặc tạo dấu vân tay.</p>
+</li>
+<li>
+<p><strong>Xây dựng Mô hình (Python):</strong> Chọn các mô hình học máy phù hợp cho tác vụ của bạn (ví dụ: hồi quy để dự đoán hoạt động, phân loại để dự đoán ái lực liên kết).</p>
+</li>
+<li>
+<p><strong>Đánh giá Mô hình (Python):</strong> Đánh giá hiệu suất của mô hình bằng các chỉ số phù hợp (ví dụ: RMSE, R-squared cho hồi quy; độ chính xác, độ chính xác, độ thu hồi, F1-score cho phân loại).</p>
+</li>
+</ol>
+<p><strong>2. Mã (SQL và Python)</strong></p>
+<p>Đây là mã với các chỉnh sửa và ví dụ, được trình bày bằng tiếng Anh và sau đó được dịch sang tiếng Việt.</p>
+<p><strong>SQL Code (lưu thành <code>../data/Topic_CheMBL_35_25.csv</code>):</strong></p>
+<p>```sql
+-- Truy vấn SQL để trích xuất dữ liệu từ ChEMBL 35 (giới hạn 100 hàng)
+-- Đảm bảo bạn đã tải dữ liệu ChEMBL vào cơ sở dữ liệu PostgreSQL của mình.</p>
+<p>SELECT
+    cmp.chembl_id,
+    act.standard_value,
+    act.standard_units,
+    act.standard_type,
+    mol.molfile
+FROM
+    compound_structures mol
+JOIN
+    activities act ON mol.molregno = act.molregno
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+WHERE act.standard_type = 'IC50'  -- Lọc cho các giá trị IC50
+    AND act.standard_units = 'nM'  -- Lọc cho các đơn vị nM
+    AND act.standard_value IS NOT NULL
+    AND mol.molfile IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9.]+$'  -- Đảm bảo standard_value là một số
+ORDER BY act.standard_value ASC
+LIMIT 100;
+```</p>
+<p><strong>Giải thích:</strong></p>
+<ul>
+<li><strong><code>act.standard_value::text ~ '^[0-9\.]+$'</code>:</strong> Đây là bản sửa lỗi quan trọng. Chúng tôi chuyển đổi rõ ràng <code>standard_value</code> thành văn bản trước khi áp dụng biểu thức chính quy. Điều này đảm bảo rằng toán tử biểu thức chính quy hoạt động chính xác.</li>
+<li>Truy vấn hiện lọc để chỉ bao gồm các hàng trong đó <code>standard_value</code> là số.</li>
+<li>Mệnh đề <code>LIMIT 100</code> đảm bảo bạn chỉ nhận được 100 hàng, như đã yêu cầu.</li>
+<li><code>mol.molfile IS NOT NULL</code> được thêm vào để đảm bảo không có giá trị null.</li>
+</ul>
+<p><strong>Python Code (lưu thành <code>notebook/Topic_CheMBL_35_25_1_data_preprocessing.ipynb</code>):</strong></p>
+<p>```python
+import pandas as pd
+import numpy as np
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import os
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score</p>
+<h1>Xác định đường dẫn cơ sở cho dự án của bạn</h1>
+<p>base_path = ".."  # Giả sử notebook nằm trong thư mục con 'notebook'</p>
+<h1>Xây dựng đường dẫn đầy đủ đến tệp CSV của bạn</h1>
+<p>csv_file_path = os.path.join(base_path, "data", "Topic_CheMBL_35_25.csv")</p>
+<h1>Tải dữ liệu từ tệp CSV</h1>
+<p>try:
+    df = pd.read_csv(csv_file_path)
+    print("Dữ liệu đã được tải thành công!")
+except FileNotFoundError:
+    print(f"Lỗi: Không tìm thấy tệp tại {csv_file_path}")
+    df = None # Hoặc xử lý lỗi cho phù hợp</p>
+<p>if df is not None:
+    # Làm sạch và Tiền xử lý Dữ liệu
+    df = df.dropna(subset=['molfile', 'standard_value'])  # Loại bỏ các hàng có giá trị bị thiếu
+    df = df[df['standard_value'] &gt; 0]  # Loại bỏ các giá trị hoạt động bằng không hoặc âm
+    df['standard_value'] = pd.to_numeric(df['standard_value'])
+    df['pIC50'] = -np.log10(df['standard_value'] * 1e-9)  # Chuyển đổi IC50 thành pIC50</p>
+<pre><code># Xử lý RDKit
+def smiles_from_molfile(molfile):
+    try:
+        mol = Chem.MolFromMolBlock(molfile)
+        if mol is not None:
+            return Chem.MolToSmiles(mol)
+        else:
+            return None
+    except:
+        return None
+
+df['SMILES'] = df['molfile'].apply(smiles_from_molfile)
+df = df.dropna(subset=['SMILES'])
+
+def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        descriptors = {}
+        descriptors['MolWt'] = Descriptors.MolWt(mol)
+        descriptors['LogP'] = Descriptors.MolLogP(mol)
+        descriptors['HBD'] = Descriptors.NumHDonors(mol)
+        descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+        return pd.Series(descriptors)
+    else:
+        return pd.Series([None] * 4, index=['MolWt', 'LogP', 'HBD', 'HBA']) # return None Series
+
+df[['MolWt', 'LogP', 'HBD', 'HBA']] = df['SMILES'].apply(calculate_descriptors)
+df = df.dropna()
+
+# Lựa chọn Tính năng
+features = ['MolWt', 'LogP', 'HBD', 'HBA']
+X = df[features]
+y = df['pIC50']
+
+# Chia Dữ liệu
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Huấn luyện Mô hình
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Đánh giá Mô hình
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)  # Tính RMSE thủ công
+r2 = r2_score(y_test, y_pred)
+
+print(f"Mean Squared Error: {mse}")
+print(f"Root Mean Squared Error: {rmse}")
+print(f"R-squared: {r2}")
+</code></pre>
+<p>```</p>
+<p><strong>Giải thích:</strong></p>
+<ul>
+<li><strong>Xử lý Đường dẫn Tệp:</strong> Sử dụng <code>os.path.join</code> để xây dựng đường dẫn tệp.</li>
+<li><strong>Xử lý Lỗi Tải Dữ liệu:</strong> Bao gồm một khối <code>try...except</code> để xử lý trường hợp không tìm thấy tệp CSV.</li>
+<li><strong>Làm sạch Dữ liệu:</strong> Loại bỏ các hàng có <code>molfile</code> hoặc <code>standard_value</code> bị thiếu.</li>
+<li><strong>Tính toán pIC50:</strong> Chuyển đổi các giá trị IC50 thành pIC50 để có thang đo phù hợp hơn cho mô hình hóa.</li>
+<li><strong>Tích hợp RDKit:</strong><ul>
+<li>Chuyển đổi chuỗi SMILES thành đối tượng RDKit Mol.</li>
+<li>Tính toán các descriptor phân tử (MolWt, LogP, HBD, HBA) bằng RDKit. Xử lý các trường hợp chuyển đổi SMILES không thành công.</li>
+</ul>
+</li>
+<li><strong>Lựa chọn và Chia Tính năng:</strong> Chọn các descriptor đã tính làm tính năng và chia dữ liệu thành bộ đào tạo và bộ kiểm tra.</li>
+<li><strong>Huấn luyện Mô hình:</strong> Huấn luyện một mô hình hồi quy tuyến tính đơn giản.</li>
+<li><strong>Đánh giá Mô hình:</strong> Tính toán MSE, RMSE và R-squared. Lưu ý rằng <code>squared=False</code> <em>không</em> được sử dụng trong <code>mean_squared_error</code> vì bạn đang sử dụng phiên bản cũ hơn của scikit-learn. Thay vào đó, RMSE được tính thủ công.</li>
+<li>Xử lý lỗi được thực hiện khi tạo SMILES từ molfile, nếu không thể tạo SMILES, hãy trả về None</li>
+<li><code>descriptors = {}</code> trong def calculate_descriptors(smiles): để tránh lỗi</li>
+<li>return pd.Series([None] * 4, index=['MolWt', 'LogP', 'HBD', 'HBA']) để giữ cho số lượng cột nhất quán.</li>
+<li>df = df.dropna() để xóa các hàng chứa giá trị bị thiếu, chẳng hạn như tính toán các descriptor phân tử.</li>
+</ul>
+<p><strong>3. Năm Ví dụ</strong></p>
+<p>Dưới đây là năm sửa đổi nhỏ mà bạn có thể thực hiện đối với mã này để thử nghiệm các khía cạnh khác nhau của phân tích.</p>
+<ol>
+<li>
+<p><strong>Các Descriptor Khác nhau:</strong> Thay đổi danh sách các descriptor được tính trong hàm <code>calculate_descriptors</code>. Hãy thử thêm TPSA (Topological Polar Surface Area), số lượng liên kết có thể xoay hoặc các descriptor phổ biến khác.</p>
+<p><code>python
+def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        descriptors = {}
+        descriptors['MolWt'] = Descriptors.MolWt(mol)
+        descriptors['LogP'] = Descriptors.MolLogP(mol)
+        descriptors['HBD'] = Descriptors.NumHDonors(mol)
+        descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+        descriptors['TPSA'] = Descriptors.TPSA(mol)  # Đã thêm TPSA
+        return pd.Series(descriptors)
+    else:
+        return pd.Series([None] * 5, index=['MolWt', 'LogP', 'HBD', 'HBA', 'TPSA']) # return None Series</code></p>
+</li>
+<li>
+<p><strong>Mô hình Khác nhau:</strong> Thay thế mô hình <code>LinearRegression</code> bằng một mô hình khác, chẳng hạn như <code>RandomForestRegressor</code> hoặc <code>GradientBoostingRegressor</code>. Bạn cần nhập mô hình mới.</p>
+<p>```python
+from sklearn.ensemble import RandomForestRegressor</p>
+<h1>... (phần còn lại của mã)</h1>
+<h1>Huấn luyện Mô hình</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)  # Ví dụ về các tham số
+model.fit(X_train, y_train)
+```</p>
+</li>
+<li>
+<p><strong>Loại Hoạt động Khác nhau:</strong> Sửa đổi truy vấn SQL để sử dụng <code>standard_type</code> khác, chẳng hạn như 'Ki' hoặc 'EC50', thay vì 'IC50'.</p>
+<p><code>sql
+WHERE act.standard_type = 'Ki'</code></p>
+</li>
+<li>
+<p><strong>Chiến lược Phân chia Khác nhau:</strong> Thay đổi tham số <code>test_size</code> trong <code>train_test_split</code> để điều chỉnh tỷ lệ dữ liệu đào tạo và kiểm tra.</p>
+<p><code>python
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)  # 30% dữ liệu kiểm tra</code></p>
+</li>
+<li>
+<p><strong>Chia Tỷ lệ Dữ liệu:</strong> Áp dụng chia tỷ lệ tính năng cho dữ liệu descriptor trước khi huấn luyện mô hình. Điều này thường có thể cải thiện hiệu suất của mô hình.</p>
+<p>```python
+from sklearn.preprocessing import StandardScaler</p>
+<h1>... (phần còn lại của mã)</h1>
+<h1>Chia Tỷ lệ Dữ liệu</h1>
+<p>scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)</p>
+<h1>Huấn luyện Mô hình (sử dụng dữ liệu đã chia tỷ lệ)</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)
+```</p>
+</li>
+</ol>
+<p>I hope this comprehensive analysis and code helps you move forward with your project!  Let me know if you have any further questions.</p>
+        </body>
+        </html>
+        

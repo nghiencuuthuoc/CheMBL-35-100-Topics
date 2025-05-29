@@ -1,0 +1,342 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_93</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Comparative analysis of antihypertensive agents</h1>
+<hr />
+<p>Okay, I understand. You're working on a drug R&amp;D project using ChEMBL_35 data, leveraging RDKit in a Jupyter Notebook environment organized according to an AI/MLOps template. You're encountering a PostgreSQL error during SQL query execution and an incompatibility issue with your scikit-learn version in your Python code. You need guidance on how to proceed, including sample code to extract 100 rows of data while addressing these issues.</p>
+<p>Here's a breakdown, analysis, and guidance in both English and Vietnamese:</p>
+<p><strong>1. Analysis of the Project and Issues</strong></p>
+<ul>
+<li><strong>Project Goal:</strong> To use ChEMBL data (version 35) to inform drug research and development using RDKit.</li>
+<li><strong>Data Source:</strong> ChEMBL_35 database accessible via PostgreSQL.</li>
+<li><strong>Tools:</strong> PostgreSQL, RDKit, scikit-learn (presumably for modeling), Jupyter Notebook.</li>
+<li><strong>Infrastructure:</strong> Specific server details (IP, user, password, database name) provided.</li>
+<li><strong>Issue 1 (SQL Error):</strong>  <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code><ul>
+<li><strong>Cause:</strong> This error arises because you're trying to use a regular expression operator (<code>~</code>) to compare a numeric column (<code>act.standard_value</code>) with a text pattern (<code>'^[0-9\.]+$'</code>). PostgreSQL's <code>~</code> operator is primarily designed for text matching.  You're trying to check if the <code>standard_value</code> is a valid number string.</li>
+<li><strong>Solution:</strong>  You need to cast the <code>standard_value</code> to text or, preferably, use a different approach to check if the value represents a valid number.  A more robust solution would involve checking if the value is not NULL and is greater than or equal to zero (assuming <code>standard_value</code> should be non-negative).</li>
+</ul>
+</li>
+<li><strong>Issue 2 (scikit-learn Error):</strong> "old scikit-learn version does not support parameters squared=False in the mean_squared_error function"<ul>
+<li><strong>Cause:</strong> Your scikit-learn version is older than the one where the <code>squared</code> parameter was introduced in <code>mean_squared_error</code>.  The default behavior of <code>mean_squared_error</code> changed between scikit-learn versions.</li>
+<li><strong>Solution:</strong>  There are two options:<ol>
+<li><strong>Upgrade scikit-learn:</strong>  The easiest and recommended approach is to upgrade to a newer version of scikit-learn (e.g., using <code>pip install --upgrade scikit-learn</code>).</li>
+<li><strong>Modify the code:</strong> If upgrading is not feasible (e.g., due to environment constraints), calculate the root mean squared error (RMSE) manually by taking the square root of the output of the <code>mean_squared_error</code> function.</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>2. SQL Code (to be run on pgAdmin and saved as .csv)</strong></p>
+<p>```sql
+-- Topic_CheMBL_35_93.sql</p>
+<p>-- Extract 100 rows of data from ChEMBL.
+-- Addresses the "operator does not exist" error by avoiding regex on numeric values.</p>
+<p>SELECT
+    act.activity_id,
+    act.standard_type,
+    act.standard_relation,
+    act.standard_value,
+    act.standard_units,
+    mol.molfile AS molfile
+FROM
+    activities act
+JOIN
+    molecule_dictionary mol ON act.molregno = mol.molregno
+WHERE
+    act.standard_type = 'IC50'  -- Example filter: Select only IC50 values
+    AND act.standard_relation = '='  -- Example filter: Select only exact values
+    AND act.standard_value IS NOT NULL  -- Ensure standard_value is not null
+    AND act.standard_value &gt;= 0  -- Ensure standard_value is non-negative
+LIMIT 100;</p>
+<p>-- Save the result as a CSV file using pgAdmin's export functionality.
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li>We select a limited set of columns relevant to activity and molecule information.  The <code>molfile</code> column (containing the molecule structure in MDL molfile format) is included, which can be read by RDKit.</li>
+<li>We use <code>WHERE</code> clause to filter the data based on <code>standard_type</code>, <code>standard_relation</code> and non-null <code>standard_value</code> that is also non-negative..</li>
+<li><code>LIMIT 100</code> restricts the result set to 100 rows.  Adjust as needed.</li>
+<li><strong>Important:</strong> After running this query in pgAdmin, use the export feature to save the result as a CSV file (e.g., <code>../data/Topic_CheMBL_35_93.csv</code>).</li>
+</ul>
+<p><strong>3. Python Code (in Jupyter Notebook: <code>Topic_CheMBL_35_93_1_DataImport.ipynb</code>)</strong></p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_93_1_DataImport.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error</p>
+<h1>Define base path for data directory</h1>
+<p>base_path = os.path.abspath(os.path.join(os.getcwd(), '..'))
+data_dir = os.path.join(base_path, 'data')
+file_path = os.path.join(data_dir, 'Topic_CheMBL_35_93.csv')</p>
+<h1>Load the CSV file into a Pandas DataFrame</h1>
+<p>try:
+    df = pd.read_csv(file_path)
+    print(f"Data loaded successfully from {file_path}")
+except FileNotFoundError:
+    print(f"Error: File not found at {file_path}")
+    exit()</p>
+<h1>Display the first few rows of the DataFrame</h1>
+<p>print(df.head())</p>
+<h1>Function to convert molfile to RDKit Mol object</h1>
+<p>def molfile_to_mol(molfile_string):
+    try:
+        mol = Chem.MolFromMolBlock(molfile_string)
+        if mol is None:
+            print("Warning: Could not read molecule from molfile string.")
+            return None
+        return mol
+    except Exception as e:
+        print(f"Error reading molfile: {e}")
+        return None</p>
+<h1>Apply the function to create RDKit Mol objects</h1>
+<p>df['ROMol'] = df['molfile'].apply(molfile_to_mol)</p>
+<h1>Drop rows where ROMol is None</h1>
+<p>df = df.dropna(subset=['ROMol'])</p>
+<h1>Function to calculate Morgan Fingerprints</h1>
+<p>def calculate_morgan_fingerprint(mol, radius=2, nBits=2048):
+    try:
+        fingerprint = AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=nBits)
+        return np.array(fingerprint)
+    except Exception as e:
+        print(f"Error calculating fingerprint: {e}")
+        return None</p>
+<h1>Apply the function to calculate Morgan Fingerprints</h1>
+<p>df['Morgan_Fingerprint'] = df['ROMol'].apply(lambda x: calculate_morgan_fingerprint(x))</p>
+<h1>Drop rows where Morgan_Fingerprint is None</h1>
+<p>df = df.dropna(subset=['Morgan_Fingerprint'])</p>
+<h1>Convert standard_value to numeric and handle potential errors</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value'])</p>
+<h1>Prepare data for modeling</h1>
+<p>X = np.stack(df['Morgan_Fingerprint'].values)
+y = df['standard_value'].values</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a linear regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Calculate Mean Squared Error and Root Mean Squared Error</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)  # Calculate RMSE manually to avoid potential scikit-learn version issues</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"Root Mean Squared Error: {rmse}")</p>
+<p>```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Imports:</strong> Imports necessary libraries: <code>os</code>, <code>pandas</code>, <code>rdkit.Chem</code>, <code>rdkit.Chem.AllChem</code>, <code>numpy</code>, <code>sklearn.model_selection</code>, <code>sklearn.linear_model</code>, <code>sklearn.metrics</code>.</li>
+<li><strong>Path Handling:</strong>  Uses <code>os.path.join</code> to construct the path to the CSV file, making the code more portable.</li>
+<li><strong>Data Loading:</strong>  Loads the CSV data using <code>pd.read_csv</code> and handles potential <code>FileNotFoundError</code>.</li>
+<li><strong>Molfile Conversion:</strong> Defines a function <code>molfile_to_mol</code> to convert the <code>molfile</code> string to an RDKit <code>Mol</code> object, with error handling.</li>
+<li><strong>Fingerprint Calculation:</strong> Defines a function <code>calculate_morgan_fingerprint</code> to compute Morgan fingerprints using <code>AllChem.GetMorganFingerprintAsBitVect</code>.</li>
+<li><strong>Data Cleaning:</strong> Handles missing data by dropping rows where the <code>ROMol</code> object or fingerprint is <code>None</code>.</li>
+<li><strong>Numeric Conversion:</strong> Converts <code>standard_value</code> to numeric, handling any non-numeric values by converting them to NaN and then dropping those rows.</li>
+<li><strong>Data Preparation:</strong>  Prepares the data for modeling by extracting fingerprints and <code>standard_value</code>.</li>
+<li><strong>Train/Test Split:</strong> Splits the data into training and testing sets using <code>train_test_split</code>.</li>
+<li><strong>Model Training:</strong> Trains a linear regression model using <code>LinearRegression</code>.</li>
+<li><strong>Prediction and Evaluation:</strong> Makes predictions on the test set and calculates the Mean Squared Error (MSE).  Critically, it calculates the Root Mean Squared Error (RMSE) manually by taking the square root of the MSE.  This avoids the potential <code>squared=False</code> error with older scikit-learn versions.</li>
+</ul>
+<p><strong>4. Example Usage and Further Analysis (in Jupyter Notebook: <code>Topic_CheMBL_35_93_2_ModelBuilding.ipynb</code>)</strong></p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_93_2_ModelBuilding.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+from sklearn.ensemble import RandomForestRegressor</p>
+<h1>Define base path for data directory</h1>
+<p>base_path = os.path.abspath(os.path.join(os.getcwd(), '..'))
+data_dir = os.path.join(base_path, 'data')
+file_path = os.path.join(data_dir, 'Topic_CheMBL_35_93.csv')</p>
+<h1>Load the CSV file into a Pandas DataFrame</h1>
+<p>try:
+    df = pd.read_csv(file_path)
+    print(f"Data loaded successfully from {file_path}")
+except FileNotFoundError:
+    print(f"Error: File not found at {file_path}")
+    exit()</p>
+<h1>Function to convert molfile to RDKit Mol object</h1>
+<p>def molfile_to_mol(molfile_string):
+    try:
+        mol = Chem.MolFromMolBlock(molfile_string)
+        if mol is None:
+            print("Warning: Could not read molecule from molfile string.")
+            return None
+        return mol
+    except Exception as e:
+        print(f"Error reading molfile: {e}")
+        return None</p>
+<h1>Apply the function to create RDKit Mol objects</h1>
+<p>df['ROMol'] = df['molfile'].apply(molfile_to_mol)</p>
+<h1>Drop rows where ROMol is None</h1>
+<p>df = df.dropna(subset=['ROMol'])</p>
+<h1>Function to calculate Morgan Fingerprints</h1>
+<p>def calculate_morgan_fingerprint(mol, radius=2, nBits=2048):
+    try:
+        fingerprint = AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=nBits)
+        return np.array(fingerprint)
+    except Exception as e:
+        print(f"Error calculating fingerprint: {e}")
+        return None</p>
+<h1>Apply the function to calculate Morgan Fingerprints</h1>
+<p>df['Morgan_Fingerprint'] = df['ROMol'].apply(lambda x: calculate_morgan_fingerprint(x))</p>
+<h1>Drop rows where Morgan_Fingerprint is None</h1>
+<p>df = df.dropna(subset=['Morgan_Fingerprint'])</p>
+<h1>Convert standard_value to numeric and handle potential errors</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value'])</p>
+<h1>Prepare data for modeling</h1>
+<p>X = np.stack(df['Morgan_Fingerprint'].values)
+y = df['standard_value'].values</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>1. Random Forest Regressor Example</h1>
+<p>rf_model = RandomForestRegressor(n_estimators=100, random_state=42)  # Example parameters
+rf_model.fit(X_train, y_train)
+rf_y_pred = rf_model.predict(X_test)
+rf_mse = mean_squared_error(y_test, rf_y_pred)
+rf_rmse = np.sqrt(rf_mse)</p>
+<p>print("Random Forest Results:")
+print(f"  Mean Squared Error: {rf_mse}")
+print(f"  Root Mean Squared Error: {rf_rmse}")</p>
+<h1>2. Feature Importance (Example with Random Forest)</h1>
+<p>if hasattr(rf_model, 'feature_importances_'):
+    importances = rf_model.feature_importances_
+    print("\nFeature Importances (Top 10):")
+    for i in np.argsort(importances)[-10:]:
+        print(f"  Feature {i}: {importances[i]}")</p>
+<h1>3. Log Transformation of y (if appropriate)</h1>
+<h1>Check if y values are positive and potentially skewed</h1>
+<p>if all(y &gt; 0):
+    y_log = np.log1p(y) #log(1+y)
+    X_train, X_test, y_train_log, y_test_log = train_test_split(X, y_log, test_size=0.2, random_state=42)</p>
+<pre><code># Train a linear regression model
+model = LinearRegression()
+model.fit(X_train, y_train_log)
+
+# Make predictions
+y_pred = model.predict(X_test)
+y_pred_exp = np.expm1(y_pred)  #Back transform
+# Calculate Mean Squared Error and Root Mean Squared Error
+mse = mean_squared_error(y_test, y_pred_exp)
+rmse = np.sqrt(mse)  # Calculate RMSE manually to avoid potential scikit-learn version issues
+
+print(f"Mean Squared Error (after log transformation): {mse}")
+print(f"Root Mean Squared Error (after log transformation): {rmse}")
+</code></pre>
+<h1>4. Cross-Validation</h1>
+<p>from sklearn.model_selection import cross_val_score</p>
+<h1>Perform cross-validation</h1>
+<p>scores = cross_val_score(rf_model, X, y, cv=5, scoring='neg_mean_squared_error')
+rmse_scores = np.sqrt(-scores)</p>
+<p>print("Cross-validation results:")
+print(f"RMSE scores: {rmse_scores}")
+print(f"Mean RMSE: {rmse_scores.mean()}")</p>
+<h1>5. Try Ridge Regression</h1>
+<p>from sklearn.linear_model import Ridge</p>
+<p>ridge_model = Ridge(alpha=1.0)  # You can adjust alpha (regularization strength)
+ridge_model.fit(X_train, y_train)
+ridge_y_pred = ridge_model.predict(X_test)
+ridge_mse = mean_squared_error(y_test, ridge_y_pred)
+ridge_rmse = np.sqrt(ridge_mse)</p>
+<p>print("Ridge Regression Results:")
+print(f"  Mean Squared Error: {ridge_mse}")
+print(f"  Root Mean Squared Error: {ridge_rmse}")
+```</p>
+<p><strong>Explanation of Examples:</strong></p>
+<ol>
+<li><strong>Random Forest Regressor:</strong> Demonstrates using a <code>RandomForestRegressor</code> as an alternative model.</li>
+<li><strong>Feature Importance:</strong>  Shows how to access feature importances from a trained Random Forest model (if available). This can help identify which fingerprint bits are most predictive of activity.</li>
+<li><strong>Log Transformation:</strong>  Illustrates how to apply a log transformation to the <code>standard_value</code> (if appropriate, e.g., if the values are positively skewed). Back transform the predicted value before calculate MSE. This can sometimes improve model performance if the target variable is not normally distributed.</li>
+<li><strong>Cross-Validation:</strong>  Demonstrates using cross-validation (<code>cross_val_score</code>) to get a more robust estimate of the model's performance.  It uses 5-fold cross-validation and calculates the RMSE for each fold.</li>
+<li><strong>Ridge Regression:</strong> Tries another linear model, Ridge Regression, which adds regularization to prevent overfitting.  The <code>alpha</code> parameter controls the strength of the regularization.</li>
+</ol>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>Data Exploration:</strong> Before jumping into modeling, thoroughly explore your data.  Look at the distribution of <code>standard_value</code>, the types of molecules present, etc.</li>
+<li><strong>Feature Engineering:</strong>  Experiment with different RDKit descriptors and fingerprint types.  You might find that other features are more predictive than Morgan fingerprints.</li>
+<li><strong>Model Selection:</strong>  Try a variety of machine learning models (e.g., Support Vector Machines, Gradient Boosting Machines).</li>
+<li><strong>Hyperparameter Tuning:</strong>  Optimize the hyperparameters of your chosen model using techniques like grid search or random search.</li>
+<li><strong>Validation:</strong>  Use a separate validation set to evaluate the final performance of your model.  This helps ensure that your model generalizes well to unseen data.</li>
+<li><strong>ChEMBL License:</strong>  Remember to comply with the ChEMBL license agreement when using the data.</li>
+</ul>
+<p><strong>Vietnamese Translation:</strong></p>
+<p><strong>1. Phân tích dự án và các vấn đề:</strong></p>
+<ul>
+<li><strong>Mục tiêu dự án:</strong> Sử dụng dữ liệu ChEMBL (phiên bản 35) để hỗ trợ nghiên cứu và phát triển thuốc bằng cách sử dụng RDKit.</li>
+<li><strong>Nguồn dữ liệu:</strong> Cơ sở dữ liệu ChEMBL_35 có thể truy cập thông qua PostgreSQL.</li>
+<li><strong>Công cụ:</strong> PostgreSQL, RDKit, scikit-learn (có thể để xây dựng mô hình), Jupyter Notebook.</li>
+<li><strong>Cơ sở hạ tầng:</strong> Thông tin chi tiết về máy chủ (IP, người dùng, mật khẩu, tên cơ sở dữ liệu) đã được cung cấp.</li>
+<li><strong>Vấn đề 1 (Lỗi SQL):</strong> <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code><ul>
+<li><strong>Nguyên nhân:</strong> Lỗi này xảy ra do bạn đang cố gắng sử dụng toán tử biểu thức chính quy (<code>~</code>) để so sánh một cột số (<code>act.standard_value</code>) với một mẫu văn bản (<code>'^[0-9\.]+$'</code>). Toán tử <code>~</code> của PostgreSQL chủ yếu được thiết kế để khớp văn bản. Bạn đang cố gắng kiểm tra xem <code>standard_value</code> có phải là một chuỗi số hợp lệ hay không.</li>
+<li><strong>Giải pháp:</strong> Bạn cần chuyển đổi <code>standard_value</code> thành văn bản hoặc, tốt hơn, sử dụng một phương pháp khác để kiểm tra xem giá trị có đại diện cho một số hợp lệ hay không. Một giải pháp mạnh mẽ hơn sẽ liên quan đến việc kiểm tra xem giá trị có phải là NULL hay không và có lớn hơn hoặc bằng không hay không (giả sử <code>standard_value</code> phải không âm).</li>
+</ul>
+</li>
+<li><strong>Vấn đề 2 (Lỗi scikit-learn):</strong> "old scikit-learn version does not support parameters squared=False in the mean_squared_error function"<ul>
+<li><strong>Nguyên nhân:</strong> Phiên bản scikit-learn của bạn cũ hơn phiên bản mà tham số <code>squared</code> được giới thiệu trong <code>mean_squared_error</code>. Hành vi mặc định của <code>mean_squared_error</code> đã thay đổi giữa các phiên bản scikit-learn.</li>
+<li><strong>Giải pháp:</strong> Có hai lựa chọn:<ol>
+<li><strong>Nâng cấp scikit-learn:</strong> Cách dễ nhất và được khuyến nghị là nâng cấp lên phiên bản scikit-learn mới hơn (ví dụ: sử dụng <code>pip install --upgrade scikit-learn</code>).</li>
+<li><strong>Sửa đổi mã:</strong> Nếu việc nâng cấp không khả thi (ví dụ: do các ràng buộc về môi trường), hãy tính toán sai số bình phương gốc (RMSE) theo cách thủ công bằng cách lấy căn bậc hai của đầu ra của hàm <code>mean_squared_error</code>.</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>2. Mã SQL (chạy trên pgAdmin và lưu thành .csv):</strong> (Xem phần trên, đã được dịch trong phần mã)</p>
+<p><strong>3. Mã Python (trong Jupyter Notebook: <code>Topic_CheMBL_35_93_1_DataImport.ipynb</code>):</strong> (Xem phần trên, đã được dịch trong phần mã)</p>
+<p><strong>4. Ví dụ Sử dụng và Phân tích thêm (trong Jupyter Notebook: <code>Topic_CheMBL_35_93_2_ModelBuilding.ipynb</code>):</strong> (Xem phần trên, đã được dịch trong phần mã)</p>
+<p><strong>Các lưu ý quan trọng (Tiếng Việt):</strong></p>
+<ul>
+<li><strong>Khám phá dữ liệu:</strong> Trước khi bắt đầu xây dựng mô hình, hãy khám phá kỹ lưỡng dữ liệu của bạn. Xem xét phân phối của <code>standard_value</code>, các loại phân tử hiện có, v.v.</li>
+<li><strong>Thiết kế đặc trưng (Feature Engineering):</strong> Thử nghiệm với các mô tả và loại vân tay RDKit khác nhau. Bạn có thể thấy rằng các đặc trưng khác có khả năng dự đoán tốt hơn so với vân tay Morgan.</li>
+<li><strong>Lựa chọn mô hình:</strong> Thử nhiều mô hình học máy khác nhau (ví dụ: Máy vectơ hỗ trợ, Máy tăng cường độ dốc).</li>
+<li><strong>Điều chỉnh siêu tham số (Hyperparameter Tuning):</strong> Tối ưu hóa các siêu tham số của mô hình bạn đã chọn bằng cách sử dụng các kỹ thuật như tìm kiếm lưới (grid search) hoặc tìm kiếm ngẫu nhiên (random search).</li>
+<li><strong>Xác thực (Validation):</strong> Sử dụng một tập hợp xác thực riêng biệt để đánh giá hiệu suất cuối cùng của mô hình của bạn. Điều này giúp đảm bảo rằng mô hình của bạn khái quát hóa tốt cho dữ liệu chưa thấy.</li>
+<li><strong>Giấy phép ChEMBL:</strong> Hãy nhớ tuân thủ thỏa thuận cấp phép ChEMBL khi sử dụng dữ liệu.</li>
+</ul>
+<p>This comprehensive guide should get you started.  Remember to adjust the code and analysis based on the specifics of your project and the insights you gain from your data exploration. Good luck!</p>
+        </body>
+        </html>
+        

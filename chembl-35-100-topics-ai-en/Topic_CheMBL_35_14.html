@@ -1,0 +1,475 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_14</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Prioritizing compounds for synthesis</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project, aiming to extract and analyze information relevant to drug research and development. You're using PostgreSQL (psql) with a Chembl_35 database, RDKit for cheminformatics, and Jupyter Notebooks for your analysis.  You want to keep the data subset small (100 rows) due to resource constraints and are encountering specific errors. Let's break this down.</p>
+<p><strong>1. Analysis Model and Objectives:</strong></p>
+<p>The overall objective is to leverage the Chembl 35 database to extract relevant data, likely focusing on activity information (e.g., IC50, Ki) against specific targets. You'll use SQL to query the database and filter the data. Then, you'll use RDKit in Python to process the molecular structures and potentially perform structure-activity relationship (SAR) analysis.</p>
+<p>Specific objectives might include:</p>
+<ul>
+<li><strong>Target Identification:</strong> Identify compounds active against a specific target protein.</li>
+<li><strong>Activity Range Filtering:</strong>  Focus on compounds with activity within a certain range (e.g., IC50 &lt; 100 nM).</li>
+<li><strong>Structure Similarity Analysis:</strong> Identify compounds structurally similar to a known active compound.</li>
+<li><strong>Basic SAR:</strong> Investigate the relationship between molecular properties and activity.</li>
+</ul>
+<p><strong>2. Addressing Errors:</strong></p>
+<ul>
+<li>
+<p><strong>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9.]+$'</strong>:  This error indicates that you're trying to use the regular expression matching operator (<code>~</code>) on a numeric column (<code>act.standard_value</code>). PostgreSQL's <code>~</code> operator is for string matching.  The column <code>act.standard_value</code> is likely of type <code>numeric</code>, so it needs to be cast to text before being used with the regular expression.</p>
+</li>
+<li>
+<p><strong>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</strong>: This means you're using an older version of scikit-learn.  You have two options:</p>
+<ul>
+<li><strong>Update scikit-learn:</strong>  The recommended approach is to update to a newer version of scikit-learn using <code>pip install -U scikit-learn</code>.</li>
+<li><strong>Remove <code>squared=False</code>:</strong>  If updating isn't feasible, remove the <code>squared=False</code> argument. This will return the Mean Squared Error (MSE) instead of the Root Mean Squared Error (RMSE).</li>
+</ul>
+</li>
+</ul>
+<p><strong>3. Recommended File Structure:</strong></p>
+<p><code>Project/
+├── data/
+│   └── chembl_data.csv  # Output from SQL query
+├── notebooks/
+│   └── Topic_CheMBL_35_14_1_data_extraction.ipynb
+│   └── Topic_CheMBL_35_14_2_data_analysis.ipynb
+├── sql/
+│   └── chembl_query.sql
+└── README.md</code></p>
+<p><strong>4. Code Examples:</strong></p>
+<p><strong>a. SQL (chembl_query.sql):</strong>  This example retrieves data for a specific target (e.g., 'CHEMBL205' - Dopamine D4 receptor) and filters for activity values that are numeric.  It also limits the results to 100 rows.</p>
+<p><code>sql
+-- sql/chembl_query.sql
+SELECT
+    cmp.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    mol.molfile
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+JOIN
+    target_dictionary tgt ON act.tid = tgt.tid
+JOIN
+    compound_structures mol ON cmp.molregno = mol.molregno
+WHERE
+    tgt.chembl_id = 'CHEMBL205'  -- Dopamine D4 receptor
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value::text ~ '^[0-9\.]+$'  -- FIX: Cast to text for regex
+ORDER BY
+    act.standard_value
+LIMIT 100;</code></p>
+<p><strong>How to run:</strong></p>
+<ol>
+<li>Open pgAdmin.</li>
+<li>Connect to your database (192.168.206.136, rd, rd, chembl_35).</li>
+<li>Open a new query window.</li>
+<li>Paste the SQL code.</li>
+<li>Execute the query.</li>
+<li>Export the results as a CSV file (e.g., <code>chembl_data.csv</code>) to your <code>data/</code> directory.</li>
+</ol>
+<p><strong>b. Python (Topic_CheMBL_35_14_1_data_extraction.ipynb):</strong>  This notebook reads the CSV file generated by the SQL query.</p>
+<p>```python</p>
+<h1>notebooks/Topic_CheMBL_35_14_1_data_extraction.ipynb</h1>
+<p>import os
+import pandas as pd</p>
+<p>base_path = ".."  # Assuming notebooks are one level below the project root
+data_path = os.path.join(base_path, "data", "chembl_data.csv")</p>
+<p>try:
+    df = pd.read_csv(data_path)
+    print(df.head())
+    print(f"Data loaded successfully from {data_path}")
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}. Make sure you have run the SQL query and saved the data.")
+except Exception as e:
+    print(f"An error occurred: {e}")</p>
+<p>```</p>
+<p><strong>c. Python (Topic_CheMBL_35_14_2_data_analysis.ipynb):</strong> This notebook performs basic analysis using RDKit.</p>
+<p>```python</p>
+<h1>notebooks/Topic_CheMBL_35_14_2_data_analysis.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error</p>
+<p>base_path = ".."  # Assuming notebooks are one level below the project root
+data_path = os.path.join(base_path, "data", "chembl_data.csv")</p>
+<p>try:
+    df = pd.read_csv(data_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}. Make sure you have run the SQL query and saved the data.")
+    exit()
+except Exception as e:
+    print(f"An error occurred: {e}")
+    exit()</p>
+<h1>Convert molfile to RDKit Mol objects</h1>
+<p>df['ROMol'] = df['molfile'].apply(lambda x: Chem.MolFromMolBlock(x) if pd.notnull(x) else None)
+df = df.dropna(subset=['ROMol'])  # Remove rows with invalid molecules</p>
+<h1>Calculate Molecular Weight</h1>
+<p>df['MW'] = df['ROMol'].apply(Descriptors.MolWt)</p>
+<h1>Convert IC50 to pIC50</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] * 1e-9)  # Convert nM to Molar and then to pIC50</p>
+<h1>Prepare data for regression</h1>
+<p>X = df[['MW']]  # Feature: Molecular Weight
+y = df['pIC50'] # Target: pIC50</p>
+<h1>Handle potential missing values (replace with the median)</h1>
+<p>X = X.fillna(X.median())
+y = y.fillna(y.median())</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a linear regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model. Check your scikit-learn version before using squared=False</h1>
+<p>try:
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred, squared=False)) # Requires scikit-learn &gt;= 0.22
+except TypeError:
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred)) # For older scikit-learn versions
+print(f"Root Mean Squared Error: {rmse}")</p>
+<h1>Example: Print predicted vs. actual pIC50 for a few test samples</h1>
+<p>for i in range(5):
+    print(f"Predicted pIC50: {y_pred[i]:.2f}, Actual pIC50: {y_test.iloc[i]:.2f}")
+```</p>
+<p><strong>5. Five Examples of Analysis You Could Perform:</strong></p>
+<ol>
+<li>
+<p><strong>Basic Activity Distribution:</strong>  Create a histogram of the <code>pIC50</code> values.  This will show the range of activity and identify the most common activity levels.</p>
+<p>```python
+import matplotlib.pyplot as plt</p>
+<p>plt.hist(df['pIC50'], bins=20)
+plt.xlabel('pIC50')
+plt.ylabel('Frequency')
+plt.title('Distribution of pIC50 Values')
+plt.show()
+```</p>
+</li>
+<li>
+<p><strong>Molecular Weight vs. Activity Scatter Plot:</strong> Plot molecular weight against <code>pIC50</code> to see if there's any correlation.</p>
+<p><code>python
+plt.scatter(df['MW'], df['pIC50'])
+plt.xlabel('Molecular Weight (Da)')
+plt.ylabel('pIC50')
+plt.title('Molecular Weight vs. pIC50')
+plt.show()</code></p>
+</li>
+<li>
+<p><strong>Tanimoto Similarity Search:</strong>  Given a known active molecule, search for similar molecules in your dataset based on Tanimoto similarity.  This requires calculating fingerprints (e.g., Morgan fingerprints) for the molecules.</p>
+<p>```python
+from rdkit.Chem import AllChem
+from rdkit import DataStructs</p>
+<h1>Choose a reference molecule (replace with a ChEMBL ID from your data)</h1>
+<p>reference_chembl_id = df['chembl_id'].iloc[0]  # Example: Take the first molecule
+reference_mol = df['ROMol'].iloc[0]
+reference_fp = AllChem.GetMorganFingerprint(reference_mol, radius=2) # radius of 2 is common</p>
+<h1>Calculate Tanimoto similarity for all molecules</h1>
+<p>similarities = []
+for mol in df['ROMol']:
+    if mol is not None:
+        fp = AllChem.GetMorganFingerprint(mol, radius=2)
+        similarity = DataStructs.TanimotoSimilarity(reference_fp, fp)
+        similarities.append(similarity)
+    else:
+        similarities.append(0.0)  # Handle missing molecules</p>
+<p>df['Tanimoto'] = similarities</p>
+<h1>Sort by similarity and display the top 5 most similar compounds</h1>
+<p>top_similar = df.sort_values('Tanimoto', ascending=False).head(5)
+print(f"Compounds most similar to {reference_chembl_id}:")
+print(top_similar[['chembl_id', 'Tanimoto', 'pIC50']])
+```</p>
+</li>
+<li>
+<p><strong>Calculate and Visualize a Different Molecular Descriptor:</strong> Calculate LogP (partition coefficient) and plot it against activity.</p>
+<p>```python
+df['LogP'] = df['ROMol'].apply(Descriptors.MolLogP)</p>
+<p>plt.scatter(df['LogP'], df['pIC50'])
+plt.xlabel('LogP')
+plt.ylabel('pIC50')
+plt.title('LogP vs. pIC50')
+plt.show()
+```</p>
+</li>
+<li>
+<p><strong>Basic SAR Analysis - Grouping by Structural Alerts (Example):</strong>  This is a simplified example.  Real structural alerts require more sophisticated analysis.  This demonstrates the <em>idea</em> of associating structural features with activity.  <strong>Important:</strong>  This is a <em>highly</em> simplified example. True SAR analysis requires domain knowledge and careful consideration of structural alerts.</p>
+<p>```python
+from rdkit.Chem import Lipinski</p>
+<h1>Define a simple "structural alert" (e.g., high LogP)</h1>
+<p>df['HighLogP'] = df['LogP'] &gt; 5  # Arbitrary threshold</p>
+<h1>Group by the "structural alert" and calculate the mean pIC50</h1>
+<p>activity_by_alert = df.groupby('HighLogP')['pIC50'].mean()
+print("Mean pIC50 by High LogP Alert:")
+print(activity_by_alert)
+```</p>
+</li>
+</ol>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>Error Handling:</strong>  The Python code includes <code>try...except</code> blocks for file loading.  Extend this to handle potential errors when creating RDKit Mol objects (e.g., if a molfile is malformed).</li>
+<li><strong>Data Cleaning:</strong>  Thoroughly clean your data.  Check for missing values, invalid molecules, and outliers.</li>
+<li><strong>Units:</strong>  Be <em>extremely</em> careful with units.  Ensure all activity values are in consistent units (e.g., nM) before performing calculations.</li>
+<li><strong>Database Performance:</strong> If you need to analyze a significantly larger dataset, consider using database indexing to improve query performance.</li>
+<li><strong>Virtual Environments:</strong> Use virtual environments (<code>venv</code> or <code>conda</code>) to manage your project dependencies and avoid conflicts with other Python projects.</li>
+</ul>
+<p><strong>In Summary:</strong></p>
+<p>This guide provides a solid foundation for your Chembl 35 data analysis project. Remember to address the errors, organize your code, and focus on asking specific research questions that you can answer using the data. Good luck!</p>
+<hr />
+<p><strong>Traduction en français:</strong></p>
+<p>D'accord, je comprends. Vous travaillez sur un projet d'analyse des données Chembl 35, visant à extraire et à analyser des informations pertinentes pour la recherche et le développement de médicaments. Vous utilisez PostgreSQL (psql) avec une base de données Chembl_35, RDKit pour la chemoinformatique et des notebooks Jupyter pour votre analyse. Vous souhaitez que le sous-ensemble de données reste petit (100 lignes) en raison de contraintes de ressources et vous rencontrez des erreurs spécifiques. Décomposons cela.</p>
+<p><strong>1. Modèle d'analyse et objectifs :</strong></p>
+<p>L'objectif général est d'exploiter la base de données Chembl 35 pour extraire des données pertinentes, en se concentrant probablement sur les informations d'activité (par exemple, IC50, Ki) contre des cibles spécifiques. Vous utiliserez SQL pour interroger la base de données et filtrer les données. Ensuite, vous utiliserez RDKit en Python pour traiter les structures moléculaires et potentiellement effectuer une analyse de la relation structure-activité (SAR).</p>
+<p>Les objectifs spécifiques pourraient inclure :</p>
+<ul>
+<li><strong>Identification de la cible :</strong> Identifier les composés actifs contre une protéine cible spécifique.</li>
+<li><strong>Filtrage de la plage d'activité :</strong> Se concentrer sur les composés ayant une activité dans une certaine plage (par exemple, IC50 &lt; 100 nM).</li>
+<li><strong>Analyse de la similarité de la structure :</strong> Identifier les composés structurellement similaires à un composé actif connu.</li>
+<li><strong>SAR de base :</strong> Étudier la relation entre les propriétés moléculaires et l'activité.</li>
+</ul>
+<p><strong>2. Résolution des erreurs :</strong></p>
+<ul>
+<li>
+<p><strong>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9.]+$'</strong>: Cette erreur indique que vous essayez d'utiliser l'opérateur de correspondance d'expression régulière (<code>~</code>) sur une colonne numérique (<code>act.standard_value</code>). L'opérateur <code>~</code> de PostgreSQL est destiné à la correspondance de chaînes. La colonne <code>act.standard_value</code> est probablement de type <code>numeric</code>, elle doit donc être convertie en texte avant d'être utilisée avec l'expression régulière.</p>
+</li>
+<li>
+<p><strong>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</strong>: Cela signifie que vous utilisez une ancienne version de scikit-learn. Vous avez deux options :</p>
+<ul>
+<li><strong>Mettre à jour scikit-learn :</strong> L'approche recommandée est de mettre à jour vers une version plus récente de scikit-learn en utilisant <code>pip install -U scikit-learn</code>.</li>
+<li><strong>Supprimer <code>squared=False</code> :</strong> Si la mise à jour n'est pas possible, supprimez l'argument <code>squared=False</code>. Cela renverra l'erreur quadratique moyenne (MSE) au lieu de l'erreur quadratique moyenne (RMSE).</li>
+</ul>
+</li>
+</ul>
+<p><strong>3. Structure de fichiers recommandée :</strong></p>
+<p><code>Projet/
+├── data/
+│   └── chembl_data.csv  # Sortie de la requête SQL
+├── notebooks/
+│   └── Topic_CheMBL_35_14_1_extraction_des_données.ipynb
+│   └── Topic_CheMBL_35_14_2_analyse_des_données.ipynb
+├── sql/
+│   └── chembl_query.sql
+└── README.md</code></p>
+<p><strong>4. Exemples de code :</strong></p>
+<p><strong>a. SQL (chembl_query.sql) :</strong> Cet exemple récupère les données d'une cible spécifique (par exemple, 'CHEMBL205' - Récepteur D4 de la dopamine) et filtre les valeurs d'activité qui sont numériques. Il limite également les résultats à 100 lignes.</p>
+<p><code>sql
+-- sql/chembl_query.sql
+SELECT
+    cmp.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    mol.molfile
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+JOIN
+    target_dictionary tgt ON act.tid = tgt.tid
+JOIN
+    compound_structures mol ON cmp.molregno = mol.molregno
+WHERE
+    tgt.chembl_id = 'CHEMBL205'  -- Récepteur D4 de la dopamine
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value::text ~ '^[0-9\.]+$'  -- FIX: Conversion en texte pour regex
+ORDER BY
+    act.standard_value
+LIMIT 100;</code></p>
+<p><strong>Comment exécuter :</strong></p>
+<ol>
+<li>Ouvrez pgAdmin.</li>
+<li>Connectez-vous à votre base de données (192.168.206.136, rd, rd, chembl_35).</li>
+<li>Ouvrez une nouvelle fenêtre de requête.</li>
+<li>Collez le code SQL.</li>
+<li>Exécutez la requête.</li>
+<li>Exportez les résultats sous forme de fichier CSV (par exemple, <code>chembl_data.csv</code>) dans votre répertoire <code>data/</code>.</li>
+</ol>
+<p><strong>b. Python (Topic_CheMBL_35_14_1_data_extraction.ipynb) :</strong> Ce notebook lit le fichier CSV généré par la requête SQL.</p>
+<p>```python</p>
+<h1>notebooks/Topic_CheMBL_35_14_1_data_extraction.ipynb</h1>
+<p>import os
+import pandas as pd</p>
+<p>base_path = ".."  # En supposant que les notebooks sont un niveau en dessous de la racine du projet
+data_path = os.path.join(base_path, "data", "chembl_data.csv")</p>
+<p>try:
+    df = pd.read_csv(data_path)
+    print(df.head())
+    print(f"Données chargées avec succès depuis {data_path}")
+except FileNotFoundError:
+    print(f"Erreur : Fichier introuvable à {data_path}. Assurez-vous d'avoir exécuté la requête SQL et enregistré les données.")
+except Exception as e:
+    print(f"Une erreur s'est produite : {e}")
+```</p>
+<p><strong>c. Python (Topic_CheMBL_35_14_2_data_analysis.ipynb) :</strong> Ce notebook effectue une analyse de base à l'aide de RDKit.</p>
+<p>```python</p>
+<h1>notebooks/Topic_CheMBL_35_14_2_data_analysis.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error</p>
+<p>base_path = ".."  # En supposant que les notebooks sont un niveau en dessous de la racine du projet
+data_path = os.path.join(base_path, "data", "chembl_data.csv")</p>
+<p>try:
+    df = pd.read_csv(data_path)
+except FileNotFoundError:
+    print(f"Erreur : Fichier introuvable à {data_path}. Assurez-vous d'avoir exécuté la requête SQL et enregistré les données.")
+    exit()
+except Exception as e:
+    print(f"Une erreur s'est produite : {e}")
+    exit()</p>
+<h1>Convertir molfile en objets Mol RDKit</h1>
+<p>df['ROMol'] = df['molfile'].apply(lambda x: Chem.MolFromMolBlock(x) if pd.notnull(x) else None)
+df = df.dropna(subset=['ROMol'])  # Supprimer les lignes avec des molécules invalides</p>
+<h1>Calculer le poids moléculaire</h1>
+<p>df['MW'] = df['ROMol'].apply(Descriptors.MolWt)</p>
+<h1>Convertir IC50 en pIC50</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] * 1e-9)  # Convertir nM en Molaire puis en pIC50</p>
+<h1>Préparer les données pour la régression</h1>
+<p>X = df[['MW']]  # Caractéristique : Poids moléculaire
+y = df['pIC50'] # Cible : pIC50</p>
+<h1>Gérer les valeurs manquantes potentielles (remplacer par la médiane)</h1>
+<p>X = X.fillna(X.median())
+y = y.fillna(y.median())</p>
+<h1>Diviser les données en ensembles d'entraînement et de test</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Entraîner un modèle de régression linéaire</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Faire des prédictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Évaluer le modèle. Vérifiez votre version de scikit-learn avant d'utiliser squared=False</h1>
+<p>try:
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred, squared=False)) # Nécessite scikit-learn &gt;= 0.22
+except TypeError:
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred)) # Pour les anciennes versions de scikit-learn
+print(f"Racine carrée de l'erreur quadratique moyenne : {rmse}")</p>
+<h1>Exemple : Afficher la pIC50 prédite par rapport à la pIC50 réelle pour quelques échantillons de test</h1>
+<p>for i in range(5):
+    print(f"pIC50 prédite : {y_pred[i]:.2f}, pIC50 réelle : {y_test.iloc[i]:.2f}")
+```</p>
+<p><strong>5. Cinq exemples d'analyses que vous pourriez effectuer :</strong></p>
+<ol>
+<li>
+<p><strong>Distribution de l'activité de base :</strong> Créez un histogramme des valeurs <code>pIC50</code>. Cela montrera la plage d'activité et identifiera les niveaux d'activité les plus courants.</p>
+<p>```python
+import matplotlib.pyplot as plt</p>
+<p>plt.hist(df['pIC50'], bins=20)
+plt.xlabel('pIC50')
+plt.ylabel('Fréquence')
+plt.title('Distribution des valeurs de pIC50')
+plt.show()
+```</p>
+</li>
+<li>
+<p><strong>Diagramme de dispersion du poids moléculaire par rapport à l'activité :</strong> Tracez le poids moléculaire par rapport à <code>pIC50</code> pour voir s'il existe une corrélation.</p>
+<p><code>python
+plt.scatter(df['MW'], df['pIC50'])
+plt.xlabel('Poids moléculaire (Da)')
+plt.ylabel('pIC50')
+plt.title('Poids moléculaire vs. pIC50')
+plt.show()</code></p>
+</li>
+<li>
+<p><strong>Recherche de similarité de Tanimoto :</strong> Étant donné une molécule active connue, recherchez des molécules similaires dans votre ensemble de données en fonction de la similarité de Tanimoto. Cela nécessite le calcul des empreintes digitales (par exemple, les empreintes digitales de Morgan) pour les molécules.</p>
+<p>```python
+from rdkit.Chem import AllChem
+from rdkit import DataStructs</p>
+<h1>Choisir une molécule de référence (remplacer par un identifiant ChEMBL de vos données)</h1>
+<p>reference_chembl_id = df['chembl_id'].iloc[0]  # Exemple : Prendre la première molécule
+reference_mol = df['ROMol'].iloc[0]
+reference_fp = AllChem.GetMorganFingerprint(reference_mol, radius=2) # rayon de 2 est courant</p>
+<h1>Calculer la similarité de Tanimoto pour toutes les molécules</h1>
+<p>similarities = []
+for mol in df['ROMol']:
+    if mol is not None:
+        fp = AllChem.GetMorganFingerprint(mol, radius=2)
+        similarity = DataStructs.TanimotoSimilarity(reference_fp, fp)
+        similarities.append(similarity)
+    else:
+        similarities.append(0.0)  # Gérer les molécules manquantes</p>
+<p>df['Tanimoto'] = similarities</p>
+<h1>Trier par similarité et afficher les 5 composés les plus similaires</h1>
+<p>top_similar = df.sort_values('Tanimoto', ascending=False).head(5)
+print(f"Composés les plus similaires à {reference_chembl_id} :")
+print(top_similar[['chembl_id', 'Tanimoto', 'pIC50']])
+```</p>
+</li>
+<li>
+<p><strong>Calculer et visualiser un autre descripteur moléculaire :</strong> Calculer LogP (coefficient de partage) et le tracer par rapport à l'activité.</p>
+<p>```python
+df['LogP'] = df['ROMol'].apply(Descriptors.MolLogP)</p>
+<p>plt.scatter(df['LogP'], df['pIC50'])
+plt.xlabel('LogP')
+plt.ylabel('pIC50')
+plt.title('LogP vs. pIC50')
+plt.show()
+```</p>
+</li>
+<li>
+<p><strong>Analyse SAR de base - Regroupement par alertes structurelles (Exemple) :</strong> Ceci est un exemple simplifié. Les véritables alertes structurelles nécessitent une analyse plus sophistiquée. Ceci démontre l'<em>idée</em> d'associer des caractéristiques structurelles à l'activité. <strong>Important :</strong> Il s'agit d'un exemple <em>très</em> simplifié. Une véritable analyse SAR nécessite une connaissance du domaine et une prise en compte attentive des alertes structurelles.</p>
+<p>```python
+from rdkit.Chem import Lipinski</p>
+<h1>Définir une simple "alerte structurelle" (par exemple, LogP élevé)</h1>
+<p>df['HighLogP'] = df['LogP'] &gt; 5  # Seuil arbitraire</p>
+<h1>Grouper par "alerte structurelle" et calculer la pIC50 moyenne</h1>
+<p>activity_by_alert = df.groupby('HighLogP')['pIC50'].mean()
+print("pIC50 moyenne par alerte LogP élevé :")
+print(activity_by_alert)
+```</p>
+</li>
+</ol>
+<p><strong>Considérations importantes :</strong></p>
+<ul>
+<li><strong>Gestion des erreurs :</strong> Le code Python inclut des blocs <code>try...except</code> pour le chargement des fichiers. Étendez cela pour gérer les erreurs potentielles lors de la création d'objets Mol RDKit (par exemple, si un molfile est mal formé).</li>
+<li><strong>Nettoyage des données :</strong> Nettoyez soigneusement vos données. Vérifiez les valeurs manquantes, les molécules invalides et les valeurs aberrantes.</li>
+<li><strong>Unités :</strong> Soyez <em>extrêmement</em> prudent avec les unités. Assurez-vous que toutes les valeurs d'activité sont dans des unités cohérentes (par exemple, nM) avant d'effectuer des calculs.</li>
+<li><strong>Performances de la base de données :</strong> Si vous devez analyser un ensemble de données beaucoup plus volumineux, envisagez d'utiliser l'indexation de la base de données pour améliorer les performances des requêtes.</li>
+<li><strong>Environnements virtuels :</strong> Utilisez des environnements virtuels (<code>venv</code> ou <code>conda</code>) pour gérer les dépendances de votre projet et éviter les conflits avec d'autres projets Python.</li>
+</ul>
+<p><strong>En résumé :</strong></p>
+<p>Ce guide fournit une base solide pour votre projet d'analyse des données Chembl 35. N'oubliez pas de corriger les erreurs, d'organiser votre code et de vous concentrer sur les questions de recherche spécifiques auxquelles vous pouvez répondre à l'aide des données. Bonne chance !</p>
+        </body>
+        </html>
+        

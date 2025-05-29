@@ -1,0 +1,362 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_36</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Target enrichment from gene sets</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project using RDKit and need help structuring your code and addressing some errors you're encountering. Let's break down the analysis, provide the necessary code (SQL and Python), and address the specific issues you've highlighted.</p>
+<p><strong>Analysis Model Overview</strong></p>
+<p>The overall analysis model will follow these steps:</p>
+<ol>
+<li><strong>Data Extraction (SQL):</strong> Query the Chembl 35 database to extract relevant bioactivity data, focusing on specific activity types (e.g., IC50, Ki).  We'll filter the data to extract only 100 rows to manage memory. The extracted data will include compound structures (SMILES) and corresponding activity values.</li>
+<li><strong>Data Preprocessing (Python):</strong><ul>
+<li>Load the extracted data into a Pandas DataFrame.</li>
+<li>Clean the data: Handle missing values, remove duplicates.</li>
+<li>Convert SMILES strings to RDKit Mol objects.</li>
+<li>Calculate molecular descriptors using RDKit (e.g., molecular weight, logP, number of hydrogen bond donors/acceptors).</li>
+</ul>
+</li>
+<li><strong>Exploratory Data Analysis (EDA) (Python):</strong><ul>
+<li>Explore the distribution of activity values.</li>
+<li>Visualize the relationship between molecular descriptors and activity.</li>
+<li>Potentially identify clusters of compounds with similar activity profiles.</li>
+</ul>
+</li>
+<li><strong>Model Building (Python):</strong> (Optional, depending on your specific goal)<ul>
+<li>Split the data into training and testing sets.</li>
+<li>Train a machine learning model to predict activity based on molecular descriptors (e.g., Linear Regression, Random Forest).</li>
+<li>Evaluate the model's performance on the test set.</li>
+</ul>
+</li>
+</ol>
+<p><strong>File Structure (AIMLops Template)</strong></p>
+<p>Assuming an AIMLops-like project structure, it might look something like this:</p>
+<p><code>Topic_CheMBL_35_36/
+├── data/
+│   └── chembl_35_bioactivity_100.csv  # Extracted data from SQL
+├── notebooks/
+│   ├── Topic_CheMBL_35_36_1_data_extraction.ipynb
+│   ├── Topic_CheMBL_35_36_2_data_preprocessing.ipynb
+│   ├── Topic_CheMBL_35_36_3_eda.ipynb
+│   └── Topic_CheMBL_35_36_4_model_building.ipynb (Optional)
+├── sql/
+│   └── chembl_35_bioactivity_query.sql
+└── README.md</code></p>
+<p><strong>1. SQL Code (chembl_35_bioactivity_query.sql)</strong></p>
+<p>This SQL code extracts bioactivity data, focusing on IC50 values, filtering for human targets, and limiting the results to 100 rows.  It also addresses your error <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code> by using <code>REGEXP_MATCHES</code> instead of <code>~</code>.</p>
+<p>```sql
+-- Connect to the chembl_35 database
+\c chembl_35</p>
+<p>-- Extract bioactivity data
+SELECT
+    act.molregno,
+    cmp.smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+JOIN
+    target_dictionary tgt ON act.tid = tgt.tid
+WHERE
+    tgt.organism = 'Homo sapiens'  -- Filter for human targets
+    AND act.standard_type = 'IC50'   -- Filter for IC50 values
+    AND act.standard_units = 'nM'  -- Filter for nM units
+    AND act.standard_value::text SIMILAR TO '[0-9.]+'  -- Ensure standard_value is numeric using SIMILAR TO for numeric check
+LIMIT 100;</p>
+<p>-- Save the output to a CSV file:
+-- \copy (SELECT ...) TO 'path/to/your/data/chembl_35_bioactivity_100.csv' WITH CSV HEADER;</p>
+<p>```</p>
+<p><strong>Important:</strong>  After running this SQL in pgAdmin, replace <code>'path/to/your/data/chembl_35_bioactivity_100.csv'</code> with the <em>actual</em> path within your <code>data/</code> folder. For example, <code>'./data/chembl_35_bioactivity_100.csv'</code> if you execute the <code>\copy</code> command from the project root and assuming <code>data/</code> is in the current directory.  Make sure the user you're running pgAdmin as has write permissions to that directory.</p>
+<p><strong>2. Python Code (Jupyter Notebooks)</strong></p>
+<p>Here's the Python code, split into the notebooks as suggested.</p>
+<p><strong>2.1: Topic_CheMBL_35_36_1_data_extraction.ipynb</strong></p>
+<p>This notebook documents the SQL query used for data extraction.</p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_36_1_data_extraction.ipynb</h1>
+<p>import os</p>
+<p>base_path = "."  # Assuming the notebook is run from the project root
+data_path = os.path.join(base_path, "data")
+sql_path = os.path.join(base_path, "sql")</p>
+<p>print(f"Data path: {data_path}")
+print(f"SQL path: {sql_path}")</p>
+<h1>You would typically include the SQL query as a multiline string here for documentation:</h1>
+<p>sql_query = """
+-- Connect to the chembl_35 database
+\c chembl_35</p>
+<p>-- Extract bioactivity data
+SELECT
+    act.molregno,
+    cmp.smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+JOIN
+    target_dictionary tgt ON act.tid = tgt.tid
+WHERE
+    tgt.organism = 'Homo sapiens'  -- Filter for human targets
+    AND act.standard_type = 'IC50'   -- Filter for IC50 values
+    AND act.standard_units = 'nM'  -- Filter for nM units
+    AND act.standard_value::text SIMILAR TO '[0-9\.]+'  -- Ensure standard_value is numeric using SIMILAR TO for numeric check
+LIMIT 100;</p>
+<p>-- Save the output to a CSV file:
+-- \copy (SELECT ...) TO 'path/to/your/data/chembl_35_bioactivity_100.csv' WITH CSV HEADER;
+"""
+print("\nSQL Query Used:\n", sql_query)</p>
+<h1>This notebook is primarily for documentation.  The actual data extraction happens via pgAdmin using the SQL query.</h1>
+<p>```</p>
+<p><strong>2.2: Topic_CheMBL_35_36_2_data_preprocessing.ipynb</strong></p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_36_2_data_preprocessing.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np</p>
+<p>base_path = "."  # Assuming the notebook is run from the project root
+data_path = os.path.join(base_path, "data")
+data_file = os.path.join(data_path, "chembl_35_bioactivity_100.csv")</p>
+<p>print(f"Data file path: {data_file}")</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(data_file)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_file}.  Make sure you've run the SQL query and saved the CSV correctly.")
+    exit()</p>
+<p>print(f"Shape of the dataframe: {df.shape}")
+print(df.head())</p>
+<h1>Data Cleaning</h1>
+<p>df = df.dropna(subset=['smiles', 'standard_value']) #drop nan value
+df = df.drop_duplicates(subset=['smiles', 'standard_value']) #drop duplicate value</p>
+<h1>RDKit Conversion and descriptor calculation</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        mw = Descriptors.MolWt(mol)
+        logp = Chem.Crippen.MolLogP(mol)
+        hbd = Descriptors.NumHDonors(mol)
+        hba = Descriptors.NumHAcceptors(mol)
+        return mw, logp, hbd, hba
+    else:
+        return None, None, None, None</p>
+<p>df[['MW', 'LogP', 'HBD', 'HBA']] = df['smiles'].apply(lambda x: pd.Series(calculate_descriptors(x)))</p>
+<p>df = df.dropna()  # remove rows where descriptor calculation failed (invalid SMILES)</p>
+<p>print(df.head())</p>
+<h1>Save the processed data (optional)</h1>
+<p>processed_data_file = os.path.join(data_path, "chembl_35_bioactivity_100_processed.csv")
+df.to_csv(processed_data_file, index=False)
+print(f"Processed data saved to: {processed_data_file}")
+```</p>
+<p><strong>2.3: Topic_CheMBL_35_36_3_eda.ipynb</strong></p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_36_3_eda.ipynb</h1>
+<p>import os
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<p>base_path = "."  # Assuming the notebook is run from the project root
+data_path = os.path.join(base_path, "data")
+processed_data_file = os.path.join(data_path, "chembl_35_bioactivity_100_processed.csv")</p>
+<p>print(f"Loading processed data from: {processed_data_file}")</p>
+<p>try:
+    df = pd.read_csv(processed_data_file)
+except FileNotFoundError:
+    print(f"Error: File not found at {processed_data_file}.  Make sure you've run the preprocessing notebook.")
+    exit()</p>
+<h1>EDA</h1>
+<p>print(df.describe())</p>
+<h1>Distribution of IC50 values (log scale)</h1>
+<p>plt.figure(figsize=(8, 6))
+sns.histplot(np.log10(df['standard_value']), kde=True)
+plt.title('Distribution of log10(IC50) values')
+plt.xlabel('log10(IC50) (nM)')
+plt.ylabel('Frequency')
+plt.show()</p>
+<h1>Scatter plots of descriptors vs. IC50</h1>
+<p>plt.figure(figsize=(12, 8))
+plt.subplot(2, 2, 1)
+sns.scatterplot(x='MW', y=np.log10(df['standard_value']), data=df)
+plt.title('MW vs. log10(IC50)')</p>
+<p>plt.subplot(2, 2, 2)
+sns.scatterplot(x='LogP', y=np.log10(df['standard_value']), data=df)
+plt.title('LogP vs. log10(IC50)')</p>
+<p>plt.subplot(2, 2, 3)
+sns.scatterplot(x='HBD', y=np.log10(df['standard_value']), data=df)
+plt.title('HBD vs. log10(IC50)')</p>
+<p>plt.subplot(2, 2, 4)
+sns.scatterplot(x='HBA', y=np.log10(df['standard_value']), data=df)
+plt.title('HBA vs. log10(IC50)')</p>
+<p>plt.tight_layout()
+plt.show()
+```</p>
+<p><strong>2.4: Topic_CheMBL_35_36_4_model_building.ipynb (Optional)</strong></p>
+<p>This is an <em>optional</em> notebook if you want to build a predictive model.  It provides a basic example using Linear Regression.</p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_36_4_model_building.ipynb</h1>
+<p>import os
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler</p>
+<p>base_path = "."  # Assuming the notebook is run from the project root
+data_path = os.path.join(base_path, "data")
+processed_data_file = os.path.join(data_path, "chembl_35_bioactivity_100_processed.csv")</p>
+<p>print(f"Loading processed data from: {processed_data_file}")</p>
+<p>try:
+    df = pd.read_csv(processed_data_file)
+except FileNotFoundError:
+    print(f"Error: File not found at {processed_data_file}.  Make sure you've run the preprocessing notebook.")
+    exit()</p>
+<h1>Data Preparation</h1>
+<p>X = df[['MW', 'LogP', 'HBD', 'HBA']]
+y = np.log10(df['standard_value'])  # Use log-transformed IC50</p>
+<h1>Data Scaling</h1>
+<p>scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)</p>
+<h1>Train-Test Split</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)</p>
+<h1>Model Training</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Model Evaluation</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Addressing the scikit-learn version issue:  The squared=False parameter was introduced in later versions of scikit-learn.</h1>
+<h1>If you have an older version, you can calculate the RMSE manually:</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+rmse = mse**0.5  # Calculate RMSE manually</p>
+<h1>If you have a newer version of scikit-learn (&gt;= 0.22), you can use squared=False:</h1>
+<h1>rmse = mean_squared_error(y_test, y_pred, squared=False)</h1>
+<p>r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Root Mean Squared Error (RMSE): {rmse}")
+print(f"R-squared: {r2}")</p>
+<h1>Feature Importance (for Linear Regression)</h1>
+<p>print("\nFeature Importance:")
+for i, feature in enumerate(['MW', 'LogP', 'HBD', 'HBA']):
+    print(f"{feature}: {model.coef_[i]}")
+```</p>
+<p><strong>3. Addressing the Errors</strong></p>
+<ul>
+<li>
+<p><strong>Error a: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p>This error occurs because the <code>~</code> operator (POSIX regular expression match) might not work directly with numeric columns in some PostgreSQL configurations. Also, using regex on numeric columns is usually inefficient. The fix is to:</p>
+<ol>
+<li><strong>Cast the <code>standard_value</code> to text</strong>: <code>act.standard_value::text</code></li>
+<li><strong>Use <code>SIMILAR TO</code> instead of <code>~</code></strong>:  <code>act.standard_value::text SIMILAR TO '[0-9\.]+'</code>  <code>SIMILAR TO</code> provides a simpler pattern matching syntax for checking numeric values.  I've updated the SQL code above.</li>
+<li><strong>Type Safety</strong>:  The best solution (if possible) is to ensure that the <code>standard_value</code> column is actually a numeric type in the database (e.g., <code>NUMERIC</code> or <code>DOUBLE PRECISION</code>).  If it's stored as text, strongly consider changing the column type.  You can then remove the pattern matching entirely.</li>
+</ol>
+</li>
+<li>
+<p><strong>Error b: <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<p>This indicates that you're using an older version of scikit-learn (<code>&lt; 0.22</code>). The <code>squared</code> parameter was added in scikit-learn version 0.22. The fix is:</p>
+<ol>
+<li><strong>Upgrade scikit-learn:</strong> The recommended approach is to upgrade to a more recent version: <code>pip install -U scikit-learn</code></li>
+<li>
+<p><strong>Calculate RMSE manually:</strong> If you cannot upgrade scikit-learn, calculate the RMSE (Root Mean Squared Error) manually:</p>
+<p><code>python
+mse = mean_squared_error(y_test, y_pred)
+rmse = mse**0.5</code></p>
+<p>I've included this manual calculation in the <code>Topic_CheMBL_35_36_4_model_building.ipynb</code> notebook.</p>
+</li>
+</ol>
+</li>
+</ul>
+<p><strong>4. Example Execution</strong></p>
+<ol>
+<li>
+<p><strong>SQL (pgAdmin):</strong></p>
+<ul>
+<li>Connect to your Chembl 35 database (192.168.206.136, rd/rd, chembl_35).</li>
+<li>Open a query window.</li>
+<li>Paste the SQL code from <code>chembl_35_bioactivity_query.sql</code>.</li>
+<li><strong>Modify the <code>\copy</code> path</strong> to the correct location on your server's filesystem (e.g., <code>'/home/rd/Topic_CheMBL_35_36/data/chembl_35_bioactivity_100.csv'</code>).  Double-check permissions!</li>
+<li>Execute the query.  This will create the CSV file.</li>
+</ul>
+</li>
+<li>
+<p><strong>Jupyter Notebooks:</strong></p>
+<ul>
+<li>Navigate to the <code>notebooks/</code> directory in your project.</li>
+<li>Open each notebook (<code>Topic_CheMBL_35_36_1_data_extraction.ipynb</code>, <code>Topic_CheMBL_35_36_2_data_preprocessing.ipynb</code>, etc.) in order.</li>
+<li>Run each cell in the notebook sequentially.  Make sure the paths defined in the notebooks are correct relative to where you launch the Jupyter notebook.</li>
+</ul>
+</li>
+</ol>
+<p><strong>5. Examples</strong></p>
+<p>Here are 5 examples to illustrate how to use the code.</p>
+<ol>
+<li>
+<p><strong>Basic Data Extraction:</strong> Execute the SQL query in pgAdmin <em>exactly</em> as provided, ensuring the <code>\copy</code> path points to your <code>data/</code> folder.  Then, open <code>Topic_CheMBL_35_36_1_data_extraction.ipynb</code> and verify the SQL query documented there matches what you executed.</p>
+</li>
+<li>
+<p><strong>Data Preprocessing and Descriptor Calculation:</strong> After extracting the data (example 1), run <code>Topic_CheMBL_35_36_2_data_preprocessing.ipynb</code>.  Check the output of the <code>print(df.head())</code> statements to see the calculated molecular descriptors (MW, LogP, HBD, HBA).</p>
+</li>
+<li>
+<p><strong>Exploratory Data Analysis (EDA):</strong> After preprocessing (example 2), run <code>Topic_CheMBL_35_36_3_eda.ipynb</code>.  Observe the generated histograms and scatter plots to understand the data's distribution and relationships between descriptors and IC50.</p>
+</li>
+<li>
+<p><strong>Model Building (Linear Regression):</strong> After preprocessing (example 2), run <code>Topic_CheMBL_35_36_4_model_building.ipynb</code>.  Note the RMSE and R-squared values. Experiment with different <code>random_state</code> values in <code>train_test_split</code> to see how it affects the model's performance.</p>
+</li>
+<li>
+<p><strong>Troubleshooting File Paths:</strong> If you get a <code>FileNotFoundError</code> in any of the notebooks, double-check the <code>base_path</code>, <code>data_path</code>, and file paths. Ensure that the CSV files exist in the expected locations and that the notebook is being run from the correct directory (project root).  The <code>print(f"Data file path: {data_file}")</code> statements are your friends here!</p>
+</li>
+</ol>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>CheMBL License:</strong> Remember that the CheMBL database has licensing terms. Make sure you adhere to them.</li>
+<li><strong>Data Size:</strong> Working with the full CheMBL database requires significant computational resources. The 100-row limit is suitable for testing, but you'll need more powerful hardware and optimized code for larger-scale analyses.</li>
+<li><strong>More Sophisticated Models:</strong> Linear Regression is a simple starting point. Consider more advanced machine learning algorithms (e.g., Random Forest, Support Vector Machines, Neural Networks) for improved prediction accuracy.</li>
+<li><strong>Feature Engineering:</strong> Experiment with different molecular descriptors beyond the basic ones provided (MW, LogP, HBD, HBA). RDKit provides a vast library of descriptors. Feature selection techniques can also help improve model performance.</li>
+<li><strong>Units:</strong> Ensure that all activity values are in consistent units (e.g., nM). You might need to perform unit conversions if the data contains mixed units.</li>
+</ul>
+<p><strong>In Summary (Türkçe):</strong></p>
+<p>Bu proje, Chembl 35 veritabanından ilaç geliştirme verilerini analiz etmeyi amaçlamaktadır. Proje, RDKit kütüphanesini kullanarak moleküler tanımlayıcılar hesaplayacak ve makine öğrenimi modelleri oluşturacaktır.</p>
+<ol>
+<li><strong>Veri Çekme (SQL):</strong>  Chembl 35 veritabanından gerekli bioaktivite verilerini (IC50 değerleri gibi) çekmek için SQL sorgusu kullanılacaktır. İnsan hedeflerine odaklanılacak ve veri boyutu sınırlı tutulacaktır (100 satır). Bu, sunucunuzun aşırı yüklenmesini önleyecektir.</li>
+<li><strong>Veri Ön İşleme (Python):</strong> Çekilen veriler Pandas DataFrame'e yüklenecek, temizlenecek (eksik değerler ve tekrarlar giderilecek) ve SMILES stringleri RDKit Mol objelerine dönüştürülecektir.  Ardından, RDKit kullanarak moleküler ağırlık, logP gibi moleküler tanımlayıcılar hesaplanacaktır.</li>
+<li><strong>Keşifsel Veri Analizi (EDA) (Python):</strong>  Aktivite değerlerinin dağılımı incelenecek, moleküler tanımlayıcılar ile aktivite arasındaki ilişkiler görselleştirilecektir.</li>
+<li><strong>Model Oluşturma (Python):</strong>  Veriler eğitim ve test kümelerine ayrılacak ve aktiviteyi tahmin etmek için bir makine öğrenimi modeli eğitilecektir (örneğin, Lineer Regresyon). Modelin performansı test kümesinde değerlendirilecektir.</li>
+<li><strong>Hataları Giderme:</strong>  SQL sorgusundaki <code>~</code> operatörü hatası, <code>SIMILAR TO</code> ile çözülmüştür.  Scikit-learn sürümünüzün eski olması durumunda, RMSE değeri manuel olarak hesaplanmıştır.</li>
+</ol>
+<p>Bu adımları takip ederek, Chembl 35 verilerini analiz edebilir ve ilaç geliştirme süreçlerinize katkıda bulunabilirsiniz.  Projenizi başlatırken ve ilerletirken, hata mesajlarını dikkatlice okuyun ve her adımda çıktıları kontrol edin. Başarılar!</p>
+        </body>
+        </html>
+        

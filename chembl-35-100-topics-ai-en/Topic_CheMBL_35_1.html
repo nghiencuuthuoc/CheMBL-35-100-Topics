@@ -1,0 +1,581 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_1</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: QSAR model building from ChEMBL IC50 data</h1>
+<hr />
+<p>Okay, I understand. You're working with ChEMBL data to develop drug research insights using RDKit and are following an AIMLops template structure. You have a PostgreSQL database on a remote server and want to perform analysis using Jupyter notebooks. You've encountered a few errors and need help with generating SQL queries and Python code, specifically keeping the data volume small (100 rows) for demonstration purposes.</p>
+<p>Here's a breakdown of how to approach this, addressing your points:</p>
+<p><strong>1. Analysis Model (Clear Explanation):</strong></p>
+<p>We'll focus on basic but essential data exploration and analysis within the ChEMBL dataset. The core idea is to extract relevant information about compounds and their activities, perform initial data cleaning, and explore relationships between compound properties and activity measurements.  We will cover the following key areas:</p>
+<ul>
+<li><strong>Data Extraction:</strong> Querying the ChEMBL database to retrieve compound structures (SMILES) and activity data (e.g., IC50 values) for specific targets or activity types.</li>
+<li><strong>Data Cleaning:</strong> Filtering and standardizing the extracted data. This includes handling missing values, converting activity units, and filtering out data with low confidence scores. We'll specifically address the error you encountered related to numeric type matching.</li>
+<li><strong>Data Conversion:</strong> Convert SMILES to Molecular objects with RDKit.</li>
+<li><strong>Basic Analysis:</strong> This includes calculating simple statistical summaries of activity data, visualizing activity distributions, and looking for correlations between different compound properties.</li>
+</ul>
+<p><strong>2. Code (SQL &amp; Python):</strong></p>
+<p><strong>SQL (To be run in pgAdmin to generate <code>Topic_CheMBL_35_1.csv</code>):</strong></p>
+<p>```sql
+-- File: Topic_CheMBL_35_1.sql
+-- Purpose: Extract ChEMBL data for analysis (limited to 100 rows)
+-- Server IP: 192.168.206.136
+-- User: rd
+-- Pass: rd
+-- Database: chembl_35</p>
+<p>-- Modified query to address the numeric ~ unknown error and limit the result</p>
+<p>SELECT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.assay_id
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type IN ('IC50', 'Ki', 'EC50')  -- Example activity types
+    AND act.standard_relation = '='  -- Filter for direct measurements
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9.]+$' -- Check for numeric values using explicit type casting
+    AND act.standard_units = 'nM'
+LIMIT 100;</p>
+<p>-- Save the result as Topic_CheMBL_35_1.csv (using pgAdmin's export feature)
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong><code>SELECT ... FROM ...</code></strong>: Selects relevant columns from the <code>molecule_dictionary</code>, <code>compound_structures</code>, and <code>activities</code> tables.</li>
+<li><strong><code>JOIN ... ON ...</code></strong>: Joins the tables based on common molecule identifiers (<code>molregno</code>).</li>
+<li><strong><code>WHERE ...</code></strong>:<ul>
+<li><code>act.standard_type IN ('IC50', 'Ki', 'EC50')</code>: Filters for specific activity types.  You can customize this list.</li>
+<li><code>act.standard_relation = '='</code>:  Ensures we only retrieve data where the relationship is a direct equality. This is more reliable than inequalities.</li>
+<li><code>act.standard_value IS NOT NULL</code>: Excludes rows with missing activity values.</li>
+<li><code>act.standard_value::text ~ '^[0-9\.]+$'</code>:  <strong>Crucially, this addresses your error</strong>.  It explicitly casts the <code>standard_value</code> to text (<code>::text</code>) before applying the regular expression <code>^[0-9\.]+$</code>. This ensures that the comparison is performed on a text representation of the value.</li>
+<li><code>act.standard_units = 'nM'</code>: Filters for nanomolar units (a common unit for activity).</li>
+</ul>
+</li>
+<li><strong><code>LIMIT 100</code></strong>:  Limits the result set to 100 rows.  <strong>Important for keeping the data size small.</strong></li>
+</ul>
+<p><strong>Python (Jupyter Notebook: <code>Topic_CheMBL_35_1_DataAnalysis.ipynb</code>):</strong></p>
+<p>```python</p>
+<h1>File: Topic_CheMBL_35_1_DataAnalysis.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np  # Import NumPy
+from sklearn.metrics import mean_squared_error
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<h1>Define the base path (adjust this to your actual base path)</h1>
+<p>base_path = "../data"  # Example: Assuming 'data' folder is one level above the notebook</p>
+<h1>Construct the file path to your CSV file</h1>
+<p>csv_file_path = os.path.join(base_path, "Topic_CheMBL_35_1.csv")</p>
+<h1>Load the data from the CSV file</h1>
+<p>try:
+    df = pd.read_csv(csv_file_path)
+    print("Data loaded successfully!")
+except FileNotFoundError:
+    print(f"Error: File not found at {csv_file_path}.  Please check the path.")
+    exit()</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>print("\nData Cleaning and Preprocessing...")</p>
+<h1>Remove rows with missing SMILES strings</h1>
+<p>df = df.dropna(subset=['canonical_smiles'])
+df = df.dropna(subset=['standard_value'])
+print("Number of compounds remaining after cleaning:", len(df))</p>
+<h1>Convert SMILES to RDKit Mol objects</h1>
+<p>df['mol'] = df['canonical_smiles'].apply(lambda x: Chem.MolFromSmiles(x))
+df = df.dropna(subset=['mol'])</p>
+<h1>Calculate Molecular Weight</h1>
+<p>df['mol_weight'] = df['mol'].apply(Descriptors.MolWt)</p>
+<h1>Display the first few rows of the DataFrame</h1>
+<p>print("\nFirst 5 rows of the processed data:")
+print(df.head())</p>
+<h1>Basic Analysis: Distribution of Molecular Weights and Activities</h1>
+<p>print("\nBasic Analysis: Distribution of Molecular Weights and Activities...")</p>
+<h1>Plot Molecular Weight Distribution</h1>
+<p>plt.figure(figsize=(8, 6))
+sns.histplot(df['mol_weight'], kde=True)
+plt.title('Molecular Weight Distribution')
+plt.xlabel('Molecular Weight')
+plt.ylabel('Frequency')
+plt.show()</p>
+<h1>Plot Activity Distribution (log scale for better visualization)</h1>
+<p>plt.figure(figsize=(8, 6))
+sns.histplot(np.log10(df['standard_value'].astype(float)), kde=True)
+plt.title('Distribution of log10(IC50/Ki/EC50) (nM)')  # Explicitly state units
+plt.xlabel('log10(Activity (nM))')
+plt.ylabel('Frequency')
+plt.show()</p>
+<h1>Example: Simple Linear Regression (Molecular Weight vs. Activity)</h1>
+<p>print("\nExample: Simple Linear Regression (Molecular Weight vs. Activity)...")
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression</p>
+<h1>Prepare data for regression</h1>
+<p>X = df[['mol_weight']]
+y = np.log10(df['standard_value'].astype(float))</p>
+<h1>Handle infinite values and NaN values correctly</h1>
+<p>X = X[np.isfinite(y)]
+y = y[np.isfinite(y)]</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Create and train the linear regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions on the test set</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)  # No squared=False needed in newer scikit-learn
+print(f'Mean Squared Error: {mse}')</p>
+<h1>Plot predicted vs. actual values</h1>
+<p>plt.figure(figsize=(8, 6))
+plt.scatter(y_test, y_pred)
+plt.xlabel('Actual log10(Activity)')
+plt.ylabel('Predicted log10(Activity)')
+plt.title('Actual vs. Predicted log10(Activity)')
+plt.show()</p>
+<p>print("\nAnalysis complete.")
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Import Libraries:</strong> Imports necessary libraries (pandas, RDKit, scikit-learn, matplotlib, seaborn).</li>
+<li><strong>File Path Handling:</strong> Uses <code>os.path.join</code> to create the file path.  <strong>This is essential for the AIMLops structure.</strong>  Make sure <code>base_path</code> is correctly set.</li>
+<li><strong>Data Loading:</strong> Loads the CSV data into a pandas DataFrame.</li>
+<li><strong>Data Cleaning:</strong> Removes rows with missing SMILES or activity values using <code>dropna()</code>.</li>
+<li><strong>SMILES Conversion:</strong> Converts SMILES strings to RDKit <code>Mol</code> objects.  Rows where conversion fails are dropped.</li>
+<li><strong>Feature Calculation:</strong> Calculates molecular weight using <code>Descriptors.MolWt</code>.</li>
+<li><strong>Basic Analysis:</strong><ul>
+<li>Plots the distribution of molecular weights using <code>sns.histplot</code>.</li>
+<li>Plots the distribution of activity values (log-transformed) for better visualization.</li>
+</ul>
+</li>
+<li><strong>Simple Linear Regression:</strong><ul>
+<li>Splits the data into training and testing sets.</li>
+<li>Creates and trains a <code>LinearRegression</code> model.</li>
+<li>Makes predictions on the test set.</li>
+<li>Evaluates the model using <code>mean_squared_error</code>.  Note that the <code>squared=False</code> parameter is <strong>no longer required</strong> in newer versions of scikit-learn.  Remove it.</li>
+<li>Plots predicted vs. actual values.</li>
+</ul>
+</li>
+<li><strong>Error Handling:</strong> Uses <code>try...except</code> to handle potential <code>FileNotFoundError</code> if the CSV file is not found.</li>
+<li><strong>NumPy for Data Handling:</strong> Added import of <code>numpy as np</code> and usage of <code>np.isfinite()</code> function for handling infinite values and NaN values in the standard_value column during the regression calculation.</li>
+</ul>
+<p><strong>Addressing Your Errors:</strong></p>
+<ul>
+<li><strong>Error a (Operator does not exist: numeric ~ unknown):</strong> The SQL query includes <code>act.standard_value::text ~ '^[0-9\.]+$'</code> to convert the numeric column to text for the regex comparison. This should resolve the issue.</li>
+<li><strong>Error b (old scikit-learn version):</strong> Remove the <code>squared=False</code> parameter from <code>mean_squared_error</code>. Newer versions of scikit-learn default to returning the mean squared error (MSE) without the square root.</li>
+</ul>
+<p><strong>3. Examples (5 Examples of Usage):</strong></p>
+<p>Here are 5 examples of how you can extend this code for more detailed analysis.  Each example adds a specific functionality:</p>
+<p><strong>Example 1: Filtering by Target Organism:</strong></p>
+<p>```python</p>
+<h1>(Add this to the Python code, after loading the data)</h1>
+<h1>Example 1: Filtering by Target Organism</h1>
+<p>from rdkit import Chem
+from rdkit.Chem import Descriptors
+from rdkit.Chem import Lipinski</p>
+<h1>Assuming you have target information in the 'assay_id' column</h1>
+<h1>In a real ChEMBL workflow, you would typically join the activities table with the target_dictionary table</h1>
+<p>target_organism = 'Homo sapiens' # Set your desired target organism</p>
+<h1>Create a mock to map assay id to target organisms</h1>
+<p>assay_to_target = {
+    1: 'Homo sapiens',
+    2: 'Mus musculus',
+    3: 'Rattus norvegicus',
+    4: 'Homo sapiens',
+    5: 'Other',
+}</p>
+<h1>Create a new column called 'target_organism' using the mock</h1>
+<p>df['target_organism'] = df['assay_id'].map(assay_to_target)</p>
+<p>df_filtered = df[df['target_organism'] == target_organism].copy()
+print(f"Number of compounds targeting {target_organism}: {len(df_filtered)}")</p>
+<h1>Proceed with analysis using df_filtered</h1>
+<h1>For example, calculate the average molecular weight for compounds targeting Homo sapiens:</h1>
+<p>avg_mol_weight = df_filtered['mol_weight'].mean()
+print(f"Average molecular weight of compounds targeting {target_organism}: {avg_mol_weight}")
+```</p>
+<p><strong>Explanation:</strong> This example demonstrates how to filter the DataFrame based on the <code>target_organism</code>. In a real ChEMBL database, you'd perform a SQL join between the <code>activities</code> and <code>target_dictionary</code> tables to get target organism information.  This example uses a mock mapping for demonstration.</p>
+<p><strong>Example 2: Lipinski's Rule of Five Analysis:</strong></p>
+<p>```python</p>
+<h1>(Add this to the Python code, after loading the data and converting SMILES)</h1>
+<h1>Example 2: Lipinski's Rule of Five Analysis</h1>
+<p>def lipinski_properties(mol):
+    """Calculates Lipinski's Rule of Five properties."""
+    mw = Descriptors.MolWt(mol)
+    logp = Descriptors.MolLogP(mol)
+    hbd = Descriptors.NumHDonors(mol)
+    hba = Descriptors.NumHAcceptors(mol)
+    return mw, logp, hbd, hba</p>
+<p>df[['mol_weight', 'logP', 'HBD', 'HBA']] = df['mol'].apply(lambda x: pd.Series(lipinski_properties(x)))</p>
+<p>def lipinski_rule(row):
+    """Checks if a molecule violates Lipinski's Rule of Five."""
+    violations = 0
+    if row['mol_weight'] &gt; 500:
+        violations += 1
+    if row['logP'] &gt; 5:
+        violations += 1
+    if row['HBD'] &gt; 5:
+        violations += 1
+    if row['HBA'] &gt; 10:
+        violations += 1
+    return violations</p>
+<p>df['Lipinski_Violations'] = df.apply(lipinski_rule, axis=1)</p>
+<p>print(df[['canonical_smiles', 'mol_weight', 'logP', 'HBD', 'HBA', 'Lipinski_Violations']].head())</p>
+<h1>Analyze the distribution of Lipinski violations</h1>
+<p>violation_counts = df['Lipinski_Violations'].value_counts().sort_index()
+print("\nDistribution of Lipinski Violations:")
+print(violation_counts)</p>
+<p>plt.figure(figsize=(8, 6))
+violation_counts.plot(kind='bar')
+plt.title('Distribution of Lipinski Rule Violations')
+plt.xlabel('Number of Violations')
+plt.ylabel('Number of Compounds')
+plt.show()
+```</p>
+<p><strong>Explanation:</strong> This example calculates Lipinski's Rule of Five properties (molecular weight, logP, H-bond donors, H-bond acceptors) and determines the number of violations for each compound. It then analyzes the distribution of violations.</p>
+<p><strong>Example 3: Activity Cliff Detection (Requires more data for meaningful results):</strong></p>
+<p>```python</p>
+<h1>(Add this to the Python code, after loading the data and converting SMILES)</h1>
+<h1>Example 3: Activity Cliff Detection (Requires more data for meaningful results)</h1>
+<p>from rdkit import DataStructs
+from rdkit.Chem.Fingerprints import FingerprintMols</p>
+<h1>Generate Morgan fingerprints (ECFP4)</h1>
+<p>df['fingerprint'] = df['mol'].apply(lambda x: FingerprintMols.FingerprintMol(x))</p>
+<p>def calculate_tanimoto_coefficient(fp1, fp2):
+    """Calculates the Tanimoto coefficient between two fingerprints."""
+    return DataStructs.TanimotoSimilarity(fp1, fp2)</p>
+<h1>Activity cliff detection (simplified)</h1>
+<h1>Requires a larger dataset for robust results!</h1>
+<p>activity_cliff_cutoff = 1  # Example: log10 activity difference cutoff (adjust as needed)
+tanimoto_cutoff = 0.8 # Example: Tanimoto coefficient cutoff (adjust as needed)</p>
+<p>activity_cliffs = []
+for i in range(len(df)):
+    for j in range(i + 1, len(df)):
+        tanimoto_similarity = calculate_tanimoto_coefficient(df['fingerprint'].iloc[i], df['fingerprint'].iloc[j])
+        activity_difference = abs(np.log10(df['standard_value'].iloc[i]) - np.log10(df['standard_value'].iloc[j]))
+        if tanimoto_similarity &gt;= tanimoto_cutoff and activity_difference &gt;= activity_cliff_cutoff:
+            activity_cliffs.append((df['chembl_id'].iloc[i], df['chembl_id'].iloc[j], tanimoto_similarity, activity_difference))</p>
+<p>if activity_cliffs:
+    print("\nPotential Activity Cliffs:")
+    for cliff in activity_cliffs:
+        print(f"Compound Pair: {cliff[0]}, {cliff[1]}, Tanimoto Similarity: {cliff[2]:.2f}, Activity Difference: {cliff[3]:.2f}")
+else:
+    print("\nNo activity cliffs found (with current cutoffs and data).  Try increasing the dataset size or adjusting the cutoffs.")
+```</p>
+<p><strong>Explanation:</strong> This example demonstrates a simplified approach to activity cliff detection.  It calculates Tanimoto similarity between compound fingerprints and compares the activity difference.  Pairs with high similarity and significant activity differences are identified as potential activity cliffs. <strong>Important:</strong> This example requires a much larger dataset for meaningful results. With only 100 rows, you're unlikely to find significant activity cliffs.</p>
+<p><strong>Example 4: Substructure Searching:</strong></p>
+<p>```python</p>
+<h1>(Add this to the Python code, after loading the data and converting SMILES)</h1>
+<h1>Example 4: Substructure Searching</h1>
+<p>from rdkit.Chem import AllChem</p>
+<h1>Define the SMARTS pattern for the substructure you want to search for</h1>
+<p>substructure_smarts = 'c1ccccc1<a href="=O">N+</a>[O-]'  # Example: Nitrobenzene</p>
+<h1>Create a Mol object from the SMARTS pattern</h1>
+<p>substructure = Chem.MolFromSmarts(substructure_smarts)</p>
+<p>if substructure is None:
+    print(f"Invalid SMARTS pattern: {substructure_smarts}")
+else:
+    # Check if each molecule contains the substructure
+    df['contains_substructure'] = df['mol'].apply(lambda x: x.HasSubstructMatch(substructure))</p>
+<pre><code># Filter the DataFrame to show only compounds containing the substructure
+substructure_compounds = df[df['contains_substructure']]
+
+print(f"\nNumber of compounds containing the substructure '{substructure_smarts}': {len(substructure_compounds)}")
+
+if not substructure_compounds.empty:
+    print("\nCompounds containing the substructure:")
+    print(substructure_compounds[['chembl_id', 'canonical_smiles']].head())  # Show ChEMBL ID and SMILES
+</code></pre>
+<p>```</p>
+<p><strong>Explanation:</strong> This example demonstrates how to search for a specific substructure within your compounds.  You define a SMARTS pattern, create a Mol object from it, and then use <code>HasSubstructMatch</code> to check if each molecule contains the substructure.</p>
+<p><strong>Example 5:  Calculating QED (Quantitative Estimate of Drug-likeness):</strong></p>
+<p>```python</p>
+<h1>(Add this to the Python code, after loading the data and converting SMILES)</h1>
+<h1>Example 5: Calculating QED (Quantitative Estimate of Drug-likeness)</h1>
+<p>from rdkit.Chem import QED</p>
+<h1>Calculate QED for each molecule</h1>
+<p>df['QED'] = df['mol'].apply(QED.qed)</p>
+<p>print("\nQED values for the first 5 compounds:")
+print(df[['chembl_id', 'canonical_smiles', 'QED']].head())</p>
+<h1>Analyze the distribution of QED values</h1>
+<p>plt.figure(figsize=(8, 6))
+sns.histplot(df['QED'], kde=True)
+plt.title('Distribution of QED (Quantitative Estimate of Drug-likeness)')
+plt.xlabel('QED Value')
+plt.ylabel('Frequency')
+plt.show()</p>
+<h1>Calculate average QED</h1>
+<p>average_qed = df['QED'].mean()
+print(f"\nAverage QED value: {average_qed:.3f}")
+```</p>
+<p><strong>Explanation:</strong> This example demonstrates how to calculate the QED (Quantitative Estimate of Drug-likeness) for each molecule using the <code>rdkit.Chem.QED</code> module. It then analyzes the distribution of QED values.</p>
+<p><strong>4. Important Considerations:</strong></p>
+<ul>
+<li><strong>Data Volume:</strong> You're intentionally limiting the data to 100 rows. This is good for initial development, but keep in mind that many analyses (like activity cliff detection) require significantly more data to be meaningful.  Scale up the <code>LIMIT</code> in your SQL query as your system allows.</li>
+<li><strong>Error Handling:</strong> Include comprehensive error handling in your Python code (e.g., using <code>try...except</code> blocks) to gracefully handle potential issues like invalid SMILES strings, missing data, or database connection errors.</li>
+<li><strong>Units:</strong> Be very careful about units when working with activity data.  Always explicitly state the units (e.g., nM) in your plots and calculations. Convert all activities to a consistent unit before performing comparisons.</li>
+<li><strong>ChEMBL Version:</strong> Your SQL assumes ChEMBL 35 schema. Adapt the queries if you use a different version.</li>
+<li><strong>AIMLops Compliance:</strong>  Make sure your data, code, and models are version-controlled (e.g., using Git) and follow your organization's AIMLops standards for reproducibility and deployment.  The <code>os.path.join</code> usage is a good start for directory structure.</li>
+</ul>
+<p><strong>In summary,</strong> this comprehensive response provides you with a starting point for your ChEMBL 35 data analysis project. Remember to adapt the code and examples to your specific research questions and data. Good luck!</p>
+<hr />
+<p><strong>Spanish Translation:</strong></p>
+<p><strong>1. Modelo de Análisis (Explicación Clara):</strong></p>
+<p>Nos centraremos en la exploración y el análisis de datos básicos pero esenciales dentro del conjunto de datos ChEMBL. La idea central es extraer información relevante sobre los compuestos y sus actividades, realizar una limpieza de datos inicial y explorar las relaciones entre las propiedades de los compuestos y las mediciones de actividad. Cubriremos las siguientes áreas clave:</p>
+<ul>
+<li><strong>Extracción de Datos:</strong> Consultar la base de datos ChEMBL para recuperar estructuras de compuestos (SMILES) y datos de actividad (por ejemplo, valores de IC50) para objetivos o tipos de actividad específicos.</li>
+<li><strong>Limpieza de Datos:</strong> Filtrar y estandarizar los datos extraídos. Esto incluye el manejo de valores faltantes, la conversión de unidades de actividad y el filtrado de datos con puntajes de baja confianza. Abordaremos específicamente el error que encontró relacionado con la coincidencia de tipos numéricos.</li>
+<li><strong>Conversión de Datos:</strong> Convertir SMILES en objetos Moleculares con RDKit.</li>
+<li><strong>Análisis Básico:</strong> Esto incluye el cálculo de resúmenes estadísticos simples de los datos de actividad, la visualización de distribuciones de actividad y la búsqueda de correlaciones entre diferentes propiedades de los compuestos.</li>
+</ul>
+<p><strong>2. Código (SQL &amp; Python):</strong></p>
+<p><strong>SQL (Para ejecutar en pgAdmin para generar <code>Topic_CheMBL_35_1.csv</code>):</strong></p>
+<p>```sql
+-- Archivo: Topic_CheMBL_35_1.sql
+-- Propósito: Extraer datos de ChEMBL para análisis (limitado a 100 filas)
+-- IP del servidor: 192.168.206.136
+-- Usuario: rd
+-- Contraseña: rd
+-- Base de datos: chembl_35</p>
+<p>-- Consulta modificada para abordar el error numeric ~ unknown y limitar el resultado</p>
+<p>SELECT
+    md.chembl_id,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.assay_id
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type IN ('IC50', 'Ki', 'EC50')  -- Tipos de actividad de ejemplo
+    AND act.standard_relation = '='  -- Filtrar para mediciones directas
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9.]+$' -- Verificar valores numéricos usando conversión de tipo explícita
+    AND act.standard_units = 'nM'
+LIMIT 100;</p>
+<p>-- Guardar el resultado como Topic_CheMBL_35_1.csv (usando la función de exportación de pgAdmin)
+```</p>
+<p><strong>Python (Jupyter Notebook: <code>Topic_CheMBL_35_1_DataAnalysis.ipynb</code>):</strong></p>
+<p>```python</p>
+<h1>Archivo: Topic_CheMBL_35_1_DataAnalysis.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np  # Importar NumPy
+from sklearn.metrics import mean_squared_error
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<h1>Define la ruta base (ajusta esto a tu ruta base real)</h1>
+<p>base_path = "../data"  # Ejemplo: Asumiendo que la carpeta 'data' está un nivel por encima del notebook</p>
+<h1>Construye la ruta del archivo a tu archivo CSV</h1>
+<p>csv_file_path = os.path.join(base_path, "Topic_CheMBL_35_1.csv")</p>
+<h1>Carga los datos desde el archivo CSV</h1>
+<p>try:
+    df = pd.read_csv(csv_file_path)
+    print("¡Datos cargados con éxito!")
+except FileNotFoundError:
+    print(f"Error: No se encontró el archivo en {csv_file_path}. Por favor, verifica la ruta.")
+    exit()</p>
+<h1>Limpieza y Preprocesamiento de Datos</h1>
+<p>print("\nLimpieza y Preprocesamiento de Datos...")</p>
+<h1>Elimina filas con cadenas SMILES faltantes</h1>
+<p>df = df.dropna(subset=['canonical_smiles'])
+df = df.dropna(subset=['standard_value'])
+print("Número de compuestos restantes después de la limpieza:", len(df))</p>
+<h1>Convierte SMILES a objetos Mol de RDKit</h1>
+<p>df['mol'] = df['canonical_smiles'].apply(lambda x: Chem.MolFromSmiles(x))
+df = df.dropna(subset=['mol'])</p>
+<h1>Calcula el Peso Molecular</h1>
+<p>df['mol_weight'] = df['mol'].apply(Descriptors.MolWt)</p>
+<h1>Muestra las primeras filas del DataFrame</h1>
+<p>print("\nPrimeras 5 filas de los datos procesados:")
+print(df.head())</p>
+<h1>Análisis Básico: Distribución de Pesos Moleculares y Actividades</h1>
+<p>print("\nAnálisis Básico: Distribución de Pesos Moleculares y Actividades...")</p>
+<h1>Grafica la Distribución del Peso Molecular</h1>
+<p>plt.figure(figsize=(8, 6))
+sns.histplot(df['mol_weight'], kde=True)
+plt.title('Distribución del Peso Molecular')
+plt.xlabel('Peso Molecular')
+plt.ylabel('Frecuencia')
+plt.show()</p>
+<h1>Grafica la Distribución de la Actividad (escala logarítmica para una mejor visualización)</h1>
+<p>plt.figure(figsize=(8, 6))
+sns.histplot(np.log10(df['standard_value'].astype(float)), kde=True)
+plt.title('Distribución de log10(IC50/Ki/EC50) (nM)')  # Indica explícitamente las unidades
+plt.xlabel('log10(Actividad (nM))')
+plt.ylabel('Frecuencia')
+plt.show()</p>
+<h1>Ejemplo: Regresión Lineal Simple (Peso Molecular vs. Actividad)</h1>
+<p>print("\nEjemplo: Regresión Lineal Simple (Peso Molecular vs. Actividad)...")
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression</p>
+<h1>Prepara los datos para la regresión</h1>
+<p>X = df[['mol_weight']]
+y = np.log10(df['standard_value'].astype(float))</p>
+<h1>Maneja valores infinitos y NaN correctamente</h1>
+<p>X = X[np.isfinite(y)]
+y = y[np.isfinite(y)]</p>
+<h1>Divide los datos en conjuntos de entrenamiento y prueba</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Crea y entrena el modelo de regresión lineal</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Realiza predicciones en el conjunto de prueba</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evalúa el modelo</h1>
+<p>mse = mean_squared_error(y_test, y_pred)  # No se necesita squared=False en scikit-learn más reciente
+print(f'Error Cuadrático Medio: {mse}')</p>
+<h1>Grafica los valores predichos vs. reales</h1>
+<p>plt.figure(figsize=(8, 6))
+plt.scatter(y_test, y_pred)
+plt.xlabel('log10(Actividad) Real')
+plt.ylabel('log10(Actividad) Predicha')
+plt.title('log10(Actividad) Real vs. Predicha')
+plt.show()</p>
+<p>print("\nAnálisis completo.")
+```</p>
+<p><strong>3. Ejemplos (5 Ejemplos de Uso):</strong></p>
+<p>[Se incluye la traducción al español de los 5 ejemplos de Python, adaptando el texto explicativo cuando sea necesario.]</p>
+<p><strong>Example 1: Filtrado por Organismo Objetivo:</strong></p>
+<p>```python</p>
+<h1>(Agrega esto al código Python, después de cargar los datos)</h1>
+<h1>Ejemplo 1: Filtrado por Organismo Objetivo</h1>
+<p>from rdkit import Chem
+from rdkit.Chem import Descriptors
+from rdkit.Chem import Lipinski</p>
+<h1>Asumiendo que tienes información del objetivo en la columna 'assay_id'</h1>
+<h1>En un flujo de trabajo real de ChEMBL, normalmente unirías la tabla activities con la tabla target_dictionary</h1>
+<p>target_organism = 'Homo sapiens' # Establece tu organismo objetivo deseado</p>
+<h1>Crea una simulación para mapear el id del ensayo a los organismos objetivo</h1>
+<p>assay_to_target = {
+    1: 'Homo sapiens',
+    2: 'Mus musculus',
+    3: 'Rattus norvegicus',
+    4: 'Homo sapiens',
+    5: 'Other',
+}</p>
+<h1>Crea una nueva columna llamada 'target_organism' usando la simulación</h1>
+<p>df['target_organism'] = df['assay_id'].map(assay_to_target)</p>
+<p>df_filtered = df[df['target_organism'] == target_organism].copy()
+print(f"Número de compuestos dirigidos a {target_organism}: {len(df_filtered)}")</p>
+<h1>Procede con el análisis utilizando df_filtered</h1>
+<h1>Por ejemplo, calcula el peso molecular promedio para los compuestos dirigidos a Homo sapiens:</h1>
+<p>avg_mol_weight = df_filtered['mol_weight'].mean()
+print(f"Peso molecular promedio de los compuestos dirigidos a {target_organism}: {avg_mol_weight}")
+```</p>
+<p><strong>Example 2: Análisis de la Regla de los Cinco de Lipinski:</strong></p>
+<p>```python</p>
+<h1>(Agrega esto al código Python, después de cargar los datos y convertir los SMILES)</h1>
+<h1>Ejemplo 2: Análisis de la Regla de los Cinco de Lipinski</h1>
+<p>def lipinski_properties(mol):
+    """Calcula las propiedades de la Regla de los Cinco de Lipinski."""
+    mw = Descriptors.MolWt(mol)
+    logp = Descriptors.MolLogP(mol)
+    hbd = Descriptors.NumHDonors(mol)
+    hba = Descriptors.NumHAcceptors(mol)
+    return mw, logp, hbd, hba</p>
+<p>df[['mol_weight', 'logP', 'HBD', 'HBA']] = df['mol'].apply(lambda x: pd.Series(lipinski_properties(x)))</p>
+<p>def lipinski_rule(row):
+    """Verifica si una molécula viola la Regla de los Cinco de Lipinski."""
+    violations = 0
+    if row['mol_weight'] &gt; 500:
+        violations += 1
+    if row['logP'] &gt; 5:
+        violations += 1
+    if row['HBD'] &gt; 5:
+        violations += 1
+    if row['HBA'] &gt; 10:
+        violations += 1
+    return violations</p>
+<p>df['Lipinski_Violations'] = df.apply(lipinski_rule, axis=1)</p>
+<p>print(df[['canonical_smiles', 'mol_weight', 'logP', 'HBD', 'HBA', 'Lipinski_Violations']].head())</p>
+<h1>Analiza la distribución de las violaciones de Lipinski</h1>
+<p>violation_counts = df['Lipinski_Violations'].value_counts().sort_index()
+print("\nDistribución de las Violaciones de Lipinski:")
+print(violation_counts)</p>
+<p>plt.figure(figsize=(8, 6))
+violation_counts.plot(kind='bar')
+plt.title('Distribución de las Violaciones de la Regla de Lipinski')
+plt.xlabel('Número de Violaciones')
+plt.ylabel('Número de Compuestos')
+plt.show()
+```</p>
+<p><strong>Example 3: Detección de Acantilados de Actividad (Requiere más datos para resultados significativos):</strong></p>
+<p>```python</p>
+<h1>(Agrega esto al código Python, después de cargar los datos y convertir los SMILES)</h1>
+<h1>Ejemplo 3: Detección de Acantilados de Actividad (Requiere más datos para resultados significativos)</h1>
+<p>from rdkit import DataStructs
+from rdkit.Chem.Fingerprints import FingerprintMols</p>
+<h1>Genera huellas dactilares de Morgan (ECFP4)</h1>
+<p>df['fingerprint'] = df['mol'].apply(lambda x: FingerprintMols.FingerprintMol(x))</p>
+<p>def calculate_tanimoto_coefficient(fp1, fp2):
+    """Calcula el coeficiente de Tanimoto entre dos huellas dactilares."""
+    return DataStructs.TanimotoSimilarity(fp1, fp2)</p>
+<h1>Detección de acantilados de actividad (simplificada)</h1>
+<h1>¡Requiere un conjunto de datos más grande para obtener resultados robustos!</h1>
+<p>activity_cliff_cutoff = 1  # Ejemplo: umbral de diferencia de actividad log10 (ajusta según sea necesario)
+tanimoto_cutoff = 0.8 # Ejemplo: umbral del coeficiente de Tanimoto (ajusta según sea necesario)</p>
+<p>activity_cliffs = []
+for i in range(len(df)):
+    for j in range(i + 1, len(df)):
+        tanimoto_similarity = calculate_tanimoto_coefficient(df['fingerprint'].iloc[i], df['fingerprint'].iloc[j])
+        activity_difference = abs(np.log10(df['standard_value'].iloc[i]) - np.log10(df['standard_value'].iloc[j]))
+        if tanimoto_similarity &gt;= tanimoto_cutoff and activity_difference &gt;= activity_cliff_cutoff:
+            activity_cliffs.append((df['chembl_id'].iloc[i], df['chembl_id'].iloc[j], tanimoto_similarity, activity_difference))</p>
+<p>if activity_cliffs:
+    print("\nPosibles Acantilados de Actividad:")
+    for cliff in activity_cliffs:
+        print(f"Par de Compuestos: {cliff[0]}, {cliff[1]}, Similitud de Tanimoto: {cliff[2]:.2f}, Diferencia de Actividad: {cliff[3]:.2f}")
+else:
+    print("\nNo se encontraron acantilados de actividad (con los umbrales y datos actuales). Intenta aumentar el tamaño del conjunto de datos o ajustar los umbrales.")
+```</p>
+<p><strong>Example 4: Búsqueda de Subestructuras:</strong></p>
+<p>```python</p>
+<h1>(Agrega esto al código Python, después de cargar los datos y convertir</h1>
+        </body>
+        </html>
+        

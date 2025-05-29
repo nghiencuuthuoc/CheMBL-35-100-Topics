@@ -1,0 +1,455 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_13</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Scaffold hopping analysis</h1>
+<hr />
+<p>Okay, I understand. You're working with ChEMBL 35 data, using RDKit in Jupyter notebooks, and following an AIMLops template. You're encountering specific errors in your SQL and Python code. Your goal is to extract a small dataset (100 rows) for testing and development.</p>
+<p>Here's a breakdown, along with SQL and Python code examples, and a guide to addressing your errors.</p>
+<p><strong>1. Analysis Model Overview</strong></p>
+<p>Your project seems to involve analyzing bioactivity data from ChEMBL 35.  A typical analysis pipeline would include these steps:</p>
+<ul>
+<li><strong>Data Extraction:</strong>  Pulling relevant information from the ChEMBL database using SQL. This typically involves selecting specific activity types (e.g., IC50, Ki), targets, and compounds.</li>
+<li><strong>Data Cleaning &amp; Transformation:</strong>  Cleaning up the extracted data. This can involve filtering for specific activity units (e.g., nM), converting activity values to a consistent scale (e.g., pChEMBL), and handling missing data. This also will include data for Machine Learning processing in the future.</li>
+<li><strong>Feature Generation:</strong>  Generating molecular descriptors using RDKit.  These descriptors represent the chemical properties of the molecules and can be used as input for machine learning models.</li>
+<li><strong>Data Analysis &amp; Modeling:</strong>  Performing statistical analysis, building predictive models (e.g., regression, classification), or visualizing the data.</li>
+</ul>
+<p><strong>2. Addressing Errors</strong></p>
+<ul>
+<li>
+<p><strong>SQL Error:</strong> <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></p>
+<p>This error means PostgreSQL doesn't know how to use the regular expression operator <code>~</code> (for matching) directly with a numeric column. You need to explicitly cast the <code>standard_value</code> column to text before applying the regex.</p>
+</li>
+<li>
+<p><strong>Python Error:</strong> <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></p>
+<p>This means you are using an older version of scikit-learn. You should either upgrade scikit-learn or remove the <code>squared=False</code> parameter if you only need the Mean Squared Error (MSE), not the Root Mean Squared Error (RMSE).</p>
+</li>
+</ul>
+<p><strong>3. Code Examples (SQL &amp; Python)</strong></p>
+<p>Here's the code, incorporating error fixes and adhering to your file structure requirements.  I will create a simplified example to get you started and then add more complex examples to show case some advanced usages.</p>
+<p>```</p>
+<h1>Assumes you have a base directory for your project</h1>
+<p>import os
+import sys
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sqlalchemy import create_engine
+import warnings
+warnings.filterwarnings("ignore")</p>
+<h1>Define base path</h1>
+<p>base_path = "."  # Or your project's root directory</p>
+<h1>Create data directory if it doesn't exist</h1>
+<p>data_dir = os.path.join(base_path, "data")
+os.makedirs(data_dir, exist_ok=True)</p>
+<p>notebook_dir = os.path.join(base_path, "notebooks")
+os.makedirs(notebook_dir, exist_ok=True)</p>
+<p>def create_db_connection(user, password, host, database):
+    engine = create_engine(f'postgresql://{user}:{password}@{host}/{database}')
+    return engine.connect()</p>
+<h1>Database credentials (replace with your actual credentials)</h1>
+<p>db_user = "rd"
+db_password = "rd"
+db_host = "192.168.206.136"
+db_name = "chembl_35"</p>
+<h1>Establish database connection</h1>
+<p>try:
+    connection = create_db_connection(db_user, db_password, db_host, db_name)
+    print("Database connection successful")
+except Exception as e:
+    print(f"Error connecting to database: {e}")
+    sys.exit(1)  # Exit if connection fails</p>
+<p>```</p>
+<p><strong>SQL (Save as <code>Topic_CheMBL_35_13_extract_data.sql</code> in your <code>data</code> directory)</strong></p>
+<p>```sql
+-- Topic_CheMBL_35_13_extract_data.sql
+-- Extracts activity data for a specific target (e.g., a specific protein)
+-- and filters for a specific activity type (e.g., IC50).
+-- Limits the result to 100 rows for testing.</p>
+<p>SELECT
+    cmp.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    mol.molfile
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+JOIN
+    target_dictionary tgt ON act.tid = tgt.tid
+JOIN
+    compound_structures mol ON cmp.molregno = mol.molregno
+WHERE
+    tgt.pref_name = 'CHEMBL205'  -- Example target (replace with your target of interest)
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9.]+$'  -- Cast to text for regex matching
+LIMIT 100;
+```</p>
+<p><strong>Python (Save as <code>Topic_CheMBL_35_13_1_data_extraction.ipynb</code> in your <code>notebooks</code> directory)</strong></p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_13_1_data_extraction.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sqlalchemy import create_engine
+import warnings
+warnings.filterwarnings("ignore")</p>
+<h1>Define base path</h1>
+<p>base_path = "."  # Or your project's root directory</p>
+<h1>Create data directory if it doesn't exist</h1>
+<p>data_dir = os.path.join(base_path, "data")
+os.makedirs(data_dir, exist_ok=True)</p>
+<p>notebook_dir = os.path.join(base_path, "notebooks")
+os.makedirs(notebook_dir, exist_ok=True)</p>
+<h1>Database credentials (replace with your actual credentials)</h1>
+<p>db_user = "rd"
+db_password = "rd"
+db_host = "192.168.206.136"
+db_name = "chembl_35"</p>
+<h1>Output CSV file path</h1>
+<p>output_csv = os.path.join(data_dir, "chembl_data.csv")</p>
+<h1>SQL query to extract data (assuming you ran the .sql and have the output)</h1>
+<h1>sql_query = "SELECT * FROM activities LIMIT 100" # Example, replace with your actual query</h1>
+<p>sql_query = """
+SELECT
+    cmp.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    mol.molfile
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+JOIN
+    target_dictionary tgt ON act.tid = tgt.tid
+JOIN
+    compound_structures mol ON cmp.molregno = mol.molregno
+WHERE
+    tgt.pref_name = 'CHEMBL205'  -- Example target (replace with your target of interest)
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9.]+$'  -- Cast to text for regex matching
+LIMIT 100;
+"""</p>
+<h1>Establish database connection</h1>
+<p>try:
+    engine = create_engine(f'postgresql://{db_user}:{db_password}@{db_host}/{db_name}')
+    connection = engine.connect()
+    print("Database connection successful")
+except Exception as e:
+    print(f"Error connecting to database: {e}")
+    sys.exit(1)  # Exit if connection fails</p>
+<h1>Read data from the database using pandas</h1>
+<p>try:
+    df = pd.read_sql(sql_query, connection)
+    print("Data read successfully from the database")
+except Exception as e:
+    print(f"Error reading data from database: {e}")
+    sys.exit(1)</p>
+<h1>Save the data to a CSV file</h1>
+<p>try:
+    df.to_csv(output_csv, index=False)
+    print(f"Data saved to {output_csv}")
+except Exception as e:
+    print(f"Error saving data to CSV: {e}")
+    sys.exit(1)</p>
+<h1>Print the first few rows of the DataFrame to verify</h1>
+<p>print(df.head())</p>
+<h1>Close the database connection</h1>
+<p>connection.close()
+print("Database connection closed")
+```</p>
+<p><strong>Python (Save as <code>Topic_CheMBL_35_13_2_feature_generation_and_model.ipynb</code> in your <code>notebooks</code> directory)</strong></p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_13_2_feature_generation_and_model.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import warnings
+warnings.filterwarnings("ignore")</p>
+<h1>Define base path</h1>
+<p>base_path = "."  # Or your project's root directory</p>
+<h1>Create data directory if it doesn't exist</h1>
+<p>data_dir = os.path.join(base_path, "data")
+os.makedirs(data_dir, exist_ok=True)</p>
+<p>notebook_dir = os.path.join(base_path, "notebooks")
+os.makedirs(notebook_dir, exist_ok=True)</p>
+<h1>Input CSV file path</h1>
+<p>input_csv = os.path.join(data_dir, "chembl_data.csv")</p>
+<h1>Load the data from the CSV file</h1>
+<p>try:
+    df = pd.read_csv(input_csv)
+    print(f"Data loaded successfully from {input_csv}")
+except Exception as e:
+    print(f"Error loading data from CSV: {e}")
+    exit(1)</p>
+<h1>Print the first few rows of the DataFrame to verify</h1>
+<p>print(df.head())</p>
+<h1>Function to calculate molecular weight</h1>
+<p>def calculate_mw(mol):
+    return Descriptors.MolWt(mol)</p>
+<h1>Function to calculate LogP</h1>
+<p>def calculate_logp(mol):
+    return Descriptors.MolLogP(mol)</p>
+<h1>Function to calculate Hydrogen Bond Donors</h1>
+<p>def calculate_hbd(mol):
+    return Descriptors.NumHDonors(mol)</p>
+<h1>Function to calculate Hydrogen Bond Acceptors</h1>
+<p>def calculate_hba(mol):
+    return Descriptors.NumHAcceptors(mol)</p>
+<h1>Convert molfile strings to RDKit Mol objects and handle potential errors</h1>
+<p>def create_mol_object(molfile):
+    try:
+        mol = Chem.MolFromMolBlock(molfile)
+        if mol is None:
+            return None  # Handle cases where MolFromMolBlock fails
+        return mol
+    except Exception as e:
+        print(f"Error creating Mol object: {e}")
+        return None</p>
+<h1>Apply the function to create Mol objects</h1>
+<p>df['ROMol'] = df['molfile'].apply(create_mol_object)</p>
+<h1>Drop rows where ROMol is None (invalid structures)</h1>
+<p>df = df.dropna(subset=['ROMol'])</p>
+<h1>Calculate molecular descriptors</h1>
+<p>df['Molecular_Weight'] = df['ROMol'].apply(calculate_mw)
+df['LogP'] = df['ROMol'].apply(calculate_logp)
+df['HBD'] = df['ROMol'].apply(calculate_hbd)
+df['HBA'] = df['ROMol'].apply(calculate_hba)</p>
+<h1>Convert IC50 values to pIC50</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] / 1e9)  # Convert nM to Molar and then to pIC50</p>
+<h1>Display the DataFrame with calculated descriptors</h1>
+<p>print(df.head())</p>
+<h1>Prepare data for modeling</h1>
+<p>X = df[['Molecular_Weight', 'LogP', 'HBD', 'HBA']]
+y = df['pIC50']</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a linear regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions on the test set</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>4. Running the Code</strong></p>
+<ol>
+<li><strong>Database Setup:</strong>  Ensure your PostgreSQL database is running and accessible at the specified IP address and port.</li>
+<li><strong>SQL Execution:</strong> Run the <code>Topic_CheMBL_35_13_extract_data.sql</code> script in pgAdmin.  This will <em>not</em> create a file, but populate the data to pandas dataframe.</li>
+<li><strong>Jupyter Notebook:</strong> Open the <code>Topic_CheMBL_35_13_1_data_extraction.ipynb</code> notebook in Jupyter.  Run the cells sequentially. This will connect to your database, extract the data, and save it as <code>chembl_data.csv</code> in the <code>data</code> directory.</li>
+<li><strong>Feature Generation and Modeling:</strong> Open the <code>Topic_CheMBL_35_13_2_feature_generation_and_model.ipynb</code> notebook.  Run the cells sequentially. This will load the CSV file, calculate molecular descriptors, train a linear regression model, and evaluate its performance.</li>
+</ol>
+<p><strong>5. Example Expansions</strong></p>
+<p>Here are 5 example expansions based on your code to show case some advanced usages:</p>
+<p><strong>Example 1: Feature Selection</strong></p>
+<ul>
+<li><strong>Goal:</strong>  Use feature selection to improve the linear regression model.</li>
+<li><strong>Changes to <code>Topic_CheMBL_35_13_2_feature_generation_and_model.ipynb</code>:</strong></li>
+</ul>
+<p>```python
+from sklearn.feature_selection import SelectKBest, f_regression</p>
+<h1>Feature selection using SelectKBest</h1>
+<p>selector = SelectKBest(score_func=f_regression, k=3)  # Select top 3 features
+X_new = selector.fit_transform(X, y)</p>
+<h1>Get the indices of the selected features</h1>
+<p>selected_indices = selector.get_support(indices=True)
+selected_features = X.columns[selected_indices]</p>
+<p>print("Selected features:", selected_features)</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X_new, y, test_size=0.2, random_state=42)</p>
+<h1>Train a linear regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions on the test set</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>Example 2: Using Different Regression Models</strong></p>
+<ul>
+<li><strong>Goal:</strong>  Compare the performance of linear regression with a Random Forest Regressor.</li>
+<li><strong>Changes to <code>Topic_CheMBL_35_13_2_feature_generation_and_model.ipynb</code>:</strong></li>
+</ul>
+<p>```python
+from sklearn.ensemble import RandomForestRegressor</p>
+<h1>Train a Random Forest Regressor model</h1>
+<p>rf_model = RandomForestRegressor(n_estimators=100, random_state=42)  # Adjust parameters as needed
+rf_model.fit(X_train, y_train)</p>
+<h1>Make predictions on the test set</h1>
+<p>y_pred_rf = rf_model.predict(X_test)</p>
+<h1>Evaluate the Random Forest model</h1>
+<p>mse_rf = mean_squared_error(y_test, y_pred_rf)
+r2_rf = r2_score(y_test, y_pred_rf)</p>
+<p>print("Random Forest Results:")
+print(f"Mean Squared Error: {mse_rf}")
+print(f"R-squared: {r2_rf}")
+```</p>
+<p><strong>Example 3:  Activity Cliff Detection</strong></p>
+<ul>
+<li><strong>Goal:</strong> Identify pairs of compounds with similar structures but significantly different activities (activity cliffs).  Requires a structural similarity calculation.</li>
+<li><strong>Changes to <code>Topic_CheMBL_35_13_2_feature_generation_and_model.ipynb</code>:</strong></li>
+</ul>
+<p>```python
+from rdkit.Chem import AllChem
+from rdkit.DataStructs import FingerprintSimilarity</p>
+<h1>Calculate Morgan fingerprints (ECFP4)</h1>
+<p>def calculate_fingerprint(mol):
+    return AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=2048)</p>
+<p>df['Fingerprint'] = df['ROMol'].apply(calculate_fingerprint)</p>
+<h1>Function to calculate Tanimoto similarity</h1>
+<p>def calculate_tanimoto_similarity(fp1, fp2):
+    return FingerprintSimilarity(fp1, fp2)</p>
+<h1>Calculate similarity between all pairs of compounds (can be slow for large datasets)</h1>
+<p>similarity_matrix = np.zeros((len(df), len(df)))
+for i in range(len(df)):
+    for j in range(i + 1, len(df)):
+        similarity = calculate_tanimoto_similarity(df['Fingerprint'][i], df['Fingerprint'][j])
+        similarity_matrix[i, j] = similarity
+        similarity_matrix[j, i] = similarity</p>
+<h1>Define a similarity threshold and a activity difference threshold</h1>
+<p>similarity_threshold = 0.8
+activity_difference_threshold = 1  # pIC50 units</p>
+<h1>Identify potential activity cliffs</h1>
+<p>activity_cliffs = []
+for i in range(len(df)):
+    for j in range(i + 1, len(df)):
+        similarity = similarity_matrix[i, j]
+        activity_difference = abs(df['pIC50'][i] - df['pIC50'][j])
+        if similarity &gt;= similarity_threshold and activity_difference &gt;= activity_difference_threshold:
+            activity_cliffs.append(((df['chembl_id'][i], df['pIC50'][i]), (df['chembl_id'][j], df['pIC50'][j]), similarity))</p>
+<p>print("Potential Activity Cliffs:")
+for cliff in activity_cliffs:
+    print(f"Compound 1: {cliff[0]}, Compound 2: {cliff[1]}, Similarity: {cliff[2]}")
+```</p>
+<p><strong>Example 4:  Substructure Searching</strong></p>
+<ul>
+<li><strong>Goal:</strong>  Identify compounds containing a specific substructure (e.g., a common scaffold).</li>
+<li><strong>Changes to <code>Topic_CheMBL_35_13_2_feature_generation_and_model.ipynb</code>:</strong></li>
+</ul>
+<p>```python
+from rdkit.Chem import MolFromSmarts</p>
+<h1>Define the SMARTS pattern for the substructure</h1>
+<p>substructure_smarts = 'c1ccccc1'  # Example: Benzene ring
+substructure = MolFromSmarts(substructure_smarts)</p>
+<h1>Function to check if a molecule contains the substructure</h1>
+<p>def contains_substructure(mol, substructure):
+    if mol is None or substructure is None:
+        return False
+    return mol.HasSubstructMatch(substructure)</p>
+<h1>Identify compounds containing the substructure</h1>
+<p>df['Contains_Substructure'] = df['ROMol'].apply(lambda mol: contains_substructure(mol, substructure))</p>
+<h1>Filter the DataFrame to show only compounds containing the substructure</h1>
+<p>substructure_compounds = df[df['Contains_Substructure']]</p>
+<p>print("Compounds containing the substructure:")
+print(substructure_compounds[['chembl_id', 'pIC50']])
+```</p>
+<p><strong>Example 5:  ADMET Property Prediction (using a pre-trained model)</strong></p>
+<ul>
+<li><strong>Goal:</strong>  Predict ADMET (Absorption, Distribution, Metabolism, Excretion, Toxicity) properties for the compounds.  This requires a pre-trained model (e.g., from DeepChem or a custom model). This example shows a placeholder for where you would load and use the model.</li>
+<li><strong>Changes to <code>Topic_CheMBL_35_13_2_feature_generation_and_model.ipynb</code>:</strong></li>
+</ul>
+<p>```python</p>
+<h1>Placeholder for ADMET property prediction (replace with your actual model and data)</h1>
+<h1>from deepchem.models import Model  # Example using DeepChem</h1>
+<h1>Load a pre-trained ADMET model (replace with the actual path to your model)</h1>
+<h1>admet_model_path = 'path/to/your/admet_model'</h1>
+<h1>admet_model = Model.load(admet_model_path)</h1>
+<h1>Function to predict ADMET properties</h1>
+<p>def predict_admet_properties(mol):
+    # Convert RDKit Mol object to input format required by the ADMET model
+    # Example: Convert to SMILES and then featurize using the model's featurizer
+    smiles = Chem.MolToSmiles(mol)
+    #features = admet_model.featurizer([smiles])  # Assuming the model has a featurizer attribute</p>
+<pre><code># Make predictions using the ADMET model
+#admet_predictions = admet_model.predict(features) #Model.predict requires Numpy array-like inputs, where each element is a sample
+
+# Return the predicted ADMET properties as a dictionary
+#return admet_predictions
+return None #added to be error-free
+</code></pre>
+<h1>Apply the ADMET property prediction function to each molecule</h1>
+<p>df['ADMET_Predictions'] = df['ROMol'].apply(predict_admet_properties)</p>
+<p>print(df.head())
+```</p>
+<p><strong>Important Considerations</strong></p>
+<ul>
+<li><strong>RDKit Installation:</strong> Make sure you have RDKit installed in your Jupyter notebook environment (<code>conda install -c conda-forge rdkit</code>).</li>
+<li><strong>Scikit-learn:</strong> Update scikit-learn (<code>pip install --upgrade scikit-learn</code>) to avoid the <code>squared=False</code> error.  If upgrading is not feasible, remove the <code>squared=False</code> argument from <code>mean_squared_error</code>.</li>
+<li><strong>Database Connection:</strong> Double-check your database credentials and ensure the database server is running and accessible from your notebook environment.</li>
+<li><strong>Error Handling:</strong>  Add more robust error handling to your code, especially when dealing with external data sources or complex calculations.</li>
+<li><strong>Performance:</strong>  For larger datasets, consider using more efficient data structures and algorithms.  Pandas can become slow for very large datasets.</li>
+<li><strong>Virtual Environments:</strong> Use virtual environments (e.g., <code>conda env create -f environment.yml</code>) to manage dependencies and ensure reproducibility.</li>
+<li><strong>Molfile Parsing:</strong> Ensure that the <code>molfile</code> data in your ChEMBL database is correctly formatted. Invalid <code>molfile</code> entries can cause errors in RDKit.</li>
+</ul>
+<p><strong>In Summary (En Français):</strong></p>
+<p>Ce plan vous guide à travers l'analyse des données ChEMBL 35 en utilisant RDKit et en suivant un modèle AIMLops. Il comprend :</p>
+<ol>
+<li><strong>Analyse du Modèle:</strong> Une vue d'ensemble du pipeline d'analyse de bioactivité typique.</li>
+<li><strong>Correction des Erreurs:</strong> Solutions pour les erreurs SQL (conversion du type de données) et Python (mise à jour de scikit-learn ou suppression du paramètre <code>squared=False</code>).</li>
+<li><strong>Exemples de Code:</strong> Des exemples SQL (pour extraire les données) et Python (pour le calcul des descripteurs moléculaires et la modélisation).</li>
+<li><strong>Instructions d'Exécution:</strong>  Les étapes pour exécuter le code dans un environnement Jupyter Notebook.</li>
+<li><strong>Exemples d'Extension:</strong> Cinq exemples de code supplémentaires pour montrer l'usage de feature selection, de modèles de régression différents, la détection de "activity cliff", la recherche de sous-structures et la prédiction des propriétés ADMET.</li>
+</ol>
+<p>N'oubliez pas de remplacer les identifiants de base de données et les noms de fichiers par vos propres valeurs. Assurez-vous que RDKit et scikit-learn sont correctement installés dans votre environnement. Ajoutez une gestion d'erreur robuste pour gérer les problèmes potentiels.</p>
+<p>Good luck with your project!  Let me know if you have more questions.</p>
+        </body>
+        </html>
+        

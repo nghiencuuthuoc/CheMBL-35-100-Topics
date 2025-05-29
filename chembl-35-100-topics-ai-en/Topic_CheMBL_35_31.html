@@ -1,0 +1,292 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_31</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: 3D target structure availability from PDB</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project using RDKit, following an AIMLops template. You're having some issues with SQL syntax and scikit-learn versioning, and you want to filter the data to 100 rows for faster processing. You want to create 5 different codes following ""Topic_CheMBL_35_31""
+Here's a breakdown of the analysis, code examples, and explanations in both English and Vietnamese.</p>
+<p><strong>Analysis Model Overview</strong></p>
+<p>The general analysis model will revolve around exploring the Chembl 35 data to extract relevant information about drug-like molecules. This will likely involve the following steps:</p>
+<ol>
+<li><strong>Data Extraction:</strong>  Querying the Chembl 35 database using SQL to retrieve relevant data. This will likely focus on activity data, compound structures (SMILES strings), and potentially target information.  We'll filter this data to a manageable size (100 rows).</li>
+<li><strong>Data Preprocessing:</strong>  Cleaning and preparing the data for analysis. This includes handling missing values, converting SMILES strings to RDKit molecule objects, and potentially calculating molecular descriptors.</li>
+<li><strong>Feature Engineering:</strong> Generating molecular descriptors using RDKit. These descriptors represent various structural and physicochemical properties of the molecules and will be used as features for analysis.</li>
+<li><strong>Data Analysis &amp; Modeling (Example Dependent):</strong> The type of analysis will depend on the specific question you're trying to answer.  This could involve:<ul>
+<li><strong>Exploratory Data Analysis (EDA):</strong>  Visualizing the distribution of molecular descriptors and activity values to identify trends and patterns.</li>
+<li><strong>Structure-Activity Relationship (SAR) Analysis:</strong>  Identifying correlations between molecular descriptors and activity values to understand how changes in molecular structure affect activity.</li>
+<li><strong>Machine Learning Modeling:</strong>  Building predictive models to predict activity based on molecular descriptors. This could involve regression models (e.g., linear regression, random forests) or classification models (e.g., logistic regression, support vector machines).</li>
+</ul>
+</li>
+<li><strong>Interpretation and Reporting:</strong>  Interpreting the results of the analysis and reporting the findings in a clear and concise manner.</li>
+</ol>
+<p><strong>Error Analysis and Solutions</strong></p>
+<ul>
+<li>
+<p><strong>Error a: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p>This error occurs because the <code>~</code> operator in PostgreSQL is used for regular expression matching, and it seems like <code>act.standard_value</code> is of numeric type. You can't directly use regular expressions on numeric columns.</p>
+<p><strong>Solution:</strong> You need to cast the <code>standard_value</code> to text before using the regular expression.</p>
+</li>
+<li>
+<p><strong>Error b: <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<p>This error indicates you're using an older version of scikit-learn. The <code>squared=False</code> parameter was introduced in a later version.</p>
+<p><strong>Solution:</strong>  There are two options:
+1.  <strong>Upgrade scikit-learn:</strong>  The recommended solution is to upgrade your scikit-learn version to the latest version.  You can do this using pip: <code>pip install -U scikit-learn</code>
+2.  <strong>Calculate RMSE manually:</strong> If you cannot upgrade scikit-learn, you can calculate the Root Mean Squared Error (RMSE) manually by taking the square root of the mean squared error.</p>
+</li>
+</ul>
+<p><strong>Topic Code: Topic_CheMBL_35_31</strong></p>
+<p><strong>Topic Name: Exploration of Activity Data and Molecular Properties for a Subset of Chembl 35</strong></p>
+<p><strong>Code Examples (5 Examples)</strong></p>
+<p>I'll provide five code examples focusing on different aspects of data extraction, processing, and analysis.  All examples will be limited to 100 rows for efficiency.</p>
+<p><strong>Example 1:  Extracting Activity Data and SMILES (SQL and Python)</strong></p>
+<ul>
+<li><strong>SQL (extract_data.sql):</strong>  This script extracts activity data (specifically IC50 values) and SMILES strings for a specific target.</li>
+</ul>
+<p><code>sql
+-- extract_data.sql
+SELECT
+    cmp.chembl_id,
+    cmp.canonical_smiles,
+    act.standard_value,
+    act.standard_units,
+    act.assay_id
+FROM
+    compound_structures cmp
+JOIN
+    activities act ON cmp.molregno = act.molregno
+JOIN
+    assays ass ON act.assay_id = ass.assay_id
+WHERE
+    ass.target_chembl_id = 'CHEMBL182'  -- Example: EGFR target
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value::text ~ '^[0-9\.]+$'  -- Corrected line, convert to text for regex
+LIMIT 100;</code></p>
+<ul>
+<li><strong>Python (Topic_CheMBL_35_31_1_data_extraction.ipynb):</strong> This notebook reads the CSV file generated by the SQL script, displays the data and performs elementary filtering.</li>
+</ul>
+<p>```python</p>
+<h1>Topic_CheMBL_35_31_1_data_extraction.ipynb</h1>
+<p>import pandas as pd
+import os</p>
+<p>base_path = "."  # Assuming the notebook is in the base directory
+data_file = os.path.join(base_path, "data", "extracted_data.csv") # Ensure 'extracted_data.csv' matches your filename</p>
+<p>try:
+    df = pd.read_csv(data_file)
+    print(df.head())
+    print(df.info())
+except FileNotFoundError:
+    print(f"Error: File not found at {data_file}.  Make sure the SQL script has been run and the data saved to this location.")</p>
+<h1>Filter data to where standard_value is not null</h1>
+<p>df = df[df['standard_value'].notna()]</p>
+<h1>Filter data to where standard_units equals to nM</h1>
+<p>df = df[df['standard_units'] == 'nM']
+print(df.info())
+```</p>
+<p><strong>Explanation (English):</strong></p>
+<p>The SQL script extracts data for a specific target ('CHEMBL182' – EGFR is used as an example, replace with your target).  It joins the <code>compound_structures</code>, <code>activities</code>, and <code>assays</code> tables to retrieve the CHEMBL ID, SMILES string, IC50 value, units, and assay ID.  The corrected <code>act.standard_value::text ~ '^[0-9\.]+$'</code> line casts the numeric <code>standard_value</code> to text so we can use a regular expression to ensure it is a valid number.  The <code>LIMIT 100</code> clause restricts the result set to the first 100 rows.  The Python notebook reads the CSV data into a Pandas DataFrame, displays the first few rows, and prints information about the data types and missing values. Elementary data filtering is done to further clean up the data.</p>
+<p><strong>Explanation (Vietnamese):</strong></p>
+<p>Script SQL trích xuất dữ liệu cho một mục tiêu cụ thể ('CHEMBL182' – EGFR được sử dụng làm ví dụ, hãy thay thế bằng mục tiêu của bạn). Nó kết hợp các bảng <code>compound_structures</code>, <code>activities</code> và <code>assays</code> để truy xuất CHEMBL ID, chuỗi SMILES, giá trị IC50, đơn vị và ID xét nghiệm. Dòng <code>act.standard_value::text ~ '^[0-9\.]+$'</code> đã được sửa đổi chuyển đổi <code>standard_value</code> số thành văn bản để chúng ta có thể sử dụng biểu thức chính quy để đảm bảo nó là một số hợp lệ.  Mệnh đề <code>LIMIT 100</code> giới hạn tập kết quả chỉ còn 100 hàng đầu tiên.  Notebook Python đọc dữ liệu CSV vào DataFrame Pandas, hiển thị một vài hàng đầu tiên và in thông tin về các kiểu dữ liệu và các giá trị bị thiếu. Bộ lọc dữ liệu sơ cấp được thực hiện để làm sạch thêm dữ liệu.</p>
+<p><strong>Example 2:  Converting SMILES to RDKit Molecules and Calculating MW (Molecular Weight)</strong></p>
+<ul>
+<li><strong>Python (Topic_CheMBL_35_31_2_rdkit_mol_mw.ipynb):</strong>  This notebook converts SMILES strings to RDKit molecule objects and calculates the molecular weight for each molecule.</li>
+</ul>
+<p>```python</p>
+<h1>Topic_CheMBL_35_31_2_rdkit_mol_mw.ipynb</h1>
+<p>import pandas as pd
+import os
+from rdkit import Chem
+from rdkit.Chem import Descriptors</p>
+<p>base_path = "."
+data_file = os.path.join(base_path, "data", "extracted_data.csv")</p>
+<p>try:
+    df = pd.read_csv(data_file)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_file}.  Make sure you run the SQL script and save the data.")
+    exit()</p>
+<h1>Function to convert SMILES to RDKit molecule and calculate MW</h1>
+<p>def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<h1>Apply the function to the 'canonical_smiles' column</h1>
+<p>df['molecular_weight'] = df['canonical_smiles'].apply(calculate_mw)</p>
+<p>print(df[['chembl_id', 'canonical_smiles', 'molecular_weight']].head())
+```</p>
+<p><strong>Explanation (English):</strong></p>
+<p>This notebook reads the CSV file containing the SMILES strings.  It defines a function <code>calculate_mw</code> that takes a SMILES string as input, converts it to an RDKit molecule object using <code>Chem.MolFromSmiles()</code>, and then calculates the molecular weight using <code>Descriptors.MolWt()</code>. The function handles cases where the SMILES string is invalid (returns <code>None</code> in that case).  Finally, it applies this function to the <code>canonical_smiles</code> column of the DataFrame and stores the results in a new column called <code>molecular_weight</code>.</p>
+<p><strong>Explanation (Vietnamese):</strong></p>
+<p>Notebook này đọc tệp CSV chứa các chuỗi SMILES. Nó định nghĩa một hàm <code>calculate_mw</code> lấy chuỗi SMILES làm đầu vào, chuyển đổi nó thành đối tượng phân tử RDKit bằng <code>Chem.MolFromSmiles()</code> và sau đó tính toán trọng lượng phân tử bằng <code>Descriptors.MolWt()</code>. Hàm xử lý các trường hợp chuỗi SMILES không hợp lệ (trả về <code>None</code> trong trường hợp đó). Cuối cùng, nó áp dụng hàm này cho cột <code>canonical_smiles</code> của DataFrame và lưu trữ kết quả trong một cột mới có tên là <code>molecular_weight</code>.</p>
+<p><strong>Example 3:  Calculating LogP (Partition Coefficient)</strong></p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_31_3_rdkit_logp.ipynb</h1>
+<p>import pandas as pd
+import os
+from rdkit import Chem
+from rdkit.Chem import Crippen</p>
+<p>base_path = "."
+data_file = os.path.join(base_path, "data", "extracted_data.csv")</p>
+<p>try:
+    df = pd.read_csv(data_file)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_file}.  Make sure you run the SQL script and save the data.")
+    exit()</p>
+<h1>Function to convert SMILES to RDKit molecule and calculate LogP</h1>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Crippen.MolLogP(mol)
+    else:
+        return None</p>
+<h1>Apply the function to the 'canonical_smiles' column</h1>
+<p>df['logp'] = df['canonical_smiles'].apply(calculate_logp)</p>
+<p>print(df[['chembl_id', 'canonical_smiles', 'logp']].head())
+```</p>
+<p><strong>Explanation (English):</strong></p>
+<p>Very similar to Example 2, this calculates the LogP (partition coefficient) using RDKit's <code>Crippen.MolLogP</code> function. LogP is a measure of the molecule's lipophilicity (tendency to dissolve in fats, oils, and nonpolar solvents).  The rest of the code follows the same structure as Example 2.</p>
+<p><strong>Explanation (Vietnamese):</strong></p>
+<p>Rất giống với Ví dụ 2, ví dụ này tính toán LogP (hệ số phân vùng) bằng hàm <code>Crippen.MolLogP</code> của RDKit. LogP là một thước đo khả năng ưa lipid của phân tử (xu hướng hòa tan trong chất béo, dầu và dung môi không phân cực). Phần còn lại của mã tuân theo cấu trúc tương tự như Ví dụ 2.</p>
+<p><strong>Example 4:  Structure-Activity Relationship (SAR) - Simple Correlation Analysis</strong></p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_31_4_sar_correlation.ipynb</h1>
+<p>import pandas as pd
+import os
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np</p>
+<p>base_path = "."
+data_file = os.path.join(base_path, "data", "extracted_data.csv")</p>
+<p>try:
+    df = pd.read_csv(data_file)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_file}.  Make sure you run the SQL script and save the data.")
+    exit()</p>
+<h1>Remove rows with NaN values</h1>
+<p>df = df.dropna()</p>
+<h1>Ensure standard_value is numeric</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'])</p>
+<h1>Function to convert SMILES to RDKit molecule and calculate MW</h1>
+<p>def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<h1>Apply the function to the 'canonical_smiles' column</h1>
+<p>df['molecular_weight'] = df['canonical_smiles'].apply(calculate_mw)</p>
+<h1>Calculate the correlation between "molecular_weight" and "standard_value"</h1>
+<p>correlation = df['molecular_weight'].corr(df['standard_value'])
+print(f"Correlation between Molecular Weight and IC50: {correlation}")</p>
+<h1>Optional: Scatter plot to visualize the relationship</h1>
+<p>import matplotlib.pyplot as plt
+plt.scatter(df['molecular_weight'], df['standard_value'])
+plt.xlabel("Molecular Weight")
+plt.ylabel("IC50 (nM)")
+plt.title("Molecular Weight vs. IC50")
+plt.show()
+```</p>
+<p><strong>Explanation (English):</strong></p>
+<p>This notebook performs a simple SAR analysis by calculating the correlation between molecular weight and IC50 values.  It first reads the data, calculates molecular weight, and then uses the <code>corr()</code> method to calculate the Pearson correlation coefficient between the two columns.  A scatter plot is also generated to visualize the relationship.  Remember that correlation does not equal causation, but it can provide clues about potential relationships between molecular properties and activity. The code also handles rows with missing values (<code>dropna()</code>) and ensure 'standard_value' column is numeric before calculating the correlation.</p>
+<p><strong>Explanation (Vietnamese):</strong></p>
+<p>Notebook này thực hiện phân tích SAR đơn giản bằng cách tính toán mối tương quan giữa trọng lượng phân tử và giá trị IC50. Đầu tiên, nó đọc dữ liệu, tính toán trọng lượng phân tử, sau đó sử dụng phương thức <code>corr()</code> để tính hệ số tương quan Pearson giữa hai cột. Một biểu đồ phân tán cũng được tạo để trực quan hóa mối quan hệ. Hãy nhớ rằng mối tương quan không tương đương với quan hệ nhân quả, nhưng nó có thể cung cấp manh mối về các mối quan hệ tiềm năng giữa các thuộc tính phân tử và hoạt động. Mã cũng xử lý các hàng có giá trị bị thiếu (<code>dropna()</code>) và đảm bảo cột 'standard_value' là số trước khi tính toán mối tương quan.</p>
+<p><strong>Example 5:  Data Visualisation using seaborn library</strong></p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_31_5_data_visualisation.ipynb</h1>
+<p>import pandas as pd
+import os
+import seaborn as sns
+import matplotlib.pyplot as plt
+from rdkit import Chem
+from rdkit.Chem import Descriptors</p>
+<p>base_path = "."
+data_file = os.path.join(base_path, "data", "extracted_data.csv")</p>
+<p>try:
+    df = pd.read_csv(data_file)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_file}.  Make sure you run the SQL script and save the data.")
+    exit()</p>
+<h1>Remove rows with NaN values</h1>
+<p>df = df.dropna()</p>
+<h1>Ensure standard_value is numeric</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'])</p>
+<h1>Function to convert SMILES to RDKit molecule and calculate MW</h1>
+<p>def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<h1>Apply the function to the 'canonical_smiles' column</h1>
+<p>df['molecular_weight'] = df['canonical_smiles'].apply(calculate_mw)</p>
+<h1>Scatter Plot using Seaborn</h1>
+<p>sns.scatterplot(x='molecular_weight', y='standard_value', data=df)
+plt.title('Molecular Weight vs. Standard Value')
+plt.xlabel('Molecular Weight')
+plt.ylabel('Standard Value')
+plt.show()</p>
+<h1>Histogram of Standard Values</h1>
+<p>sns.histplot(df['standard_value'], kde=True) # kde adds a kernel density estimate
+plt.title('Distribution of Standard Values')
+plt.xlabel('Standard Value')
+plt.ylabel('Frequency')
+plt.show()</p>
+<h1>Box Plot of Molecular Weight</h1>
+<p>sns.boxplot(x=df['molecular_weight'])
+plt.title('Box Plot of Molecular Weight')
+plt.xlabel('Molecular Weight')
+plt.show()
+```</p>
+<p><strong>Explanation (English):</strong></p>
+<p>This notebook utilizes the <code>seaborn</code> library to create more sophisticated visualizations of the data.  It generates a scatter plot (similar to Example 4 but using Seaborn for better aesthetics), a histogram to show the distribution of standard values (IC50), and a box plot to summarize the distribution of molecular weights. Seaborn provides a high-level interface for creating informative and visually appealing statistical graphics.</p>
+<p><strong>Explanation (Vietnamese):</strong></p>
+<p>Notebook này sử dụng thư viện <code>seaborn</code> để tạo ra các hình ảnh trực quan tinh vi hơn về dữ liệu. Nó tạo ra một biểu đồ phân tán (tương tự như Ví dụ 4 nhưng sử dụng Seaborn để có tính thẩm mỹ tốt hơn), một biểu đồ tần suất để hiển thị sự phân bố của các giá trị chuẩn (IC50) và một biểu đồ hộp để tóm tắt sự phân bố của trọng lượng phân tử. Seaborn cung cấp một giao diện cấp cao để tạo ra đồ họa thống kê trực quan hấp dẫn và đầy thông tin.</p>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>Database Connection:</strong>  These examples assume you have already set up a connection to your Chembl 35 database using <code>psycopg2</code> or a similar library.  You'll need to adapt the SQL connection code based on your specific setup.</li>
+<li><strong>File Paths:</strong>  Make sure the file paths in the Python notebooks are correct.  Adapt <code>base_path</code> and <code>data_file</code> as needed.</li>
+<li><strong>Dependencies:</strong> Ensure you have the necessary libraries installed: <code>pandas</code>, <code>rdkit</code>, <code>matplotlib</code>, and <code>seaborn</code>.  You can install them using <code>pip install pandas rdkit matplotlib seaborn</code>.</li>
+<li><strong>Target Selection:</strong>  Remember to replace <code>'CHEMBL182'</code> in the SQL script with the correct CHEMBL ID for your target of interest.</li>
+<li><strong>Error Handling:</strong> These examples provide basic error handling, but you should add more robust error handling for production code.</li>
+<li><strong>Data Cleaning:</strong> Real-world data often requires more extensive cleaning and preprocessing. Be prepared to handle missing values, outliers, and inconsistencies in your data.</li>
+<li><strong>Units Conversion:</strong> Always be mindful of units.  Ensure that activity values are in consistent units before performing any analysis. You may need to convert units if necessary.</li>
+<li><strong>Statistics understanding:</strong> Make sure you understand the basics of the statistic method to implement</li>
+</ul>
+<p>These examples provide a starting point for your Chembl 35 data analysis project.  Remember to adapt the code to your specific research question and data. Good luck!</p>
+        </body>
+        </html>
+        

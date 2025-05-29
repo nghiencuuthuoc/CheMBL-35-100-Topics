@@ -1,0 +1,561 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_6</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Sàng lọc ảo dựa trên các target trong ChEMBL</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 này. Với vai trò là chuyên gia nghiên cứu và phát triển dược học, tôi sẽ tập trung vào việc cung cấp các phân tích, hướng dẫn và mã nguồn (SQL và Python) chi tiết, dễ hiểu để bạn có thể tận dụng tối đa dữ liệu ChEMBL 35 cho nghiên cứu phát triển thuốc của mình.</p>
+<p><strong>Tổng quan dự án và mục tiêu:</strong></p>
+<p>Dựa trên thông tin bạn cung cấp, chúng ta sẽ thực hiện các bước sau:</p>
+<ol>
+<li><strong>Kết nối và truy vấn dữ liệu từ cơ sở dữ liệu ChEMBL 35 (PostgreSQL):</strong> Sử dụng thông tin đăng nhập bạn cung cấp để truy cập dữ liệu cần thiết.</li>
+<li><strong>Tiền xử lý dữ liệu:</strong> Làm sạch và chuẩn hóa dữ liệu để đảm bảo chất lượng cho các phân tích tiếp theo.</li>
+<li><strong>Phân tích dữ liệu:</strong> Sử dụng RDKit để tính toán các descriptor phân tử và kết hợp với dữ liệu hoạt tính sinh học từ ChEMBL để xây dựng mô hình dự đoán.</li>
+<li><strong>Lưu trữ và quản lý dữ liệu:</strong> Sử dụng định dạng CSV để lưu trữ dữ liệu đã xử lý, tuân thủ cấu trúc thư mục theo chuẩn AIMLOps.</li>
+<li><strong>Xây dựng mô hình:</strong> Sử dụng scikit-learn để xây dựng mô hình dự đoán hoạt tính.</li>
+<li><strong>Đánh giá mô hình:</strong> Sử dụng các metrics phù hợp để đánh giá hiệu năng của mô hình.</li>
+</ol>
+<p><strong>Phân tích chủ đề Topic_CheMBL_35_6</strong></p>
+<p>Chủ đề này không được định nghĩa rõ ràng. Để đưa ra phân tích cụ thể, tôi cần biết chủ đề Topic_CheMBL_35_6 tập trung vào vấn đề gì (ví dụ: dự đoán hoạt tính của một target cụ thể, phân tích mối quan hệ cấu trúc-hoạt tính (SAR), v.v.). Tuy nhiên, tôi sẽ cung cấp một ví dụ tổng quát về quy trình phân tích dữ liệu ChEMBL để bạn tham khảo.</p>
+<p><strong>Ví dụ tổng quát: Dự đoán hoạt tính ức chế của hợp chất đối với một target (ví dụ: Kinase X)</strong></p>
+<p><strong>1. Mô hình phân tích:</strong></p>
+<ul>
+<li><strong>Mục tiêu:</strong> Xây dựng mô hình dự đoán khả năng ức chế Kinase X của một hợp chất dựa trên cấu trúc phân tử của nó.</li>
+<li><strong>Dữ liệu:</strong><ul>
+<li>Dữ liệu hoạt tính sinh học (ví dụ: IC50) của các hợp chất đối với Kinase X từ cơ sở dữ liệu ChEMBL.</li>
+<li>Cấu trúc phân tử của các hợp chất (SMILES).</li>
+</ul>
+</li>
+<li><strong>Phương pháp:</strong><ul>
+<li><strong>Tính toán descriptor phân tử:</strong> Sử dụng RDKit để tính toán các descriptor (ví dụ: MW, LogP, HBD, HBA) từ cấu trúc SMILES.</li>
+<li><strong>Xây dựng mô hình:</strong> Sử dụng thuật toán học máy (ví dụ: Random Forest, Support Vector Machine) để xây dựng mô hình dự đoán IC50 dựa trên các descriptor đã tính toán.</li>
+</ul>
+</li>
+<li><strong>Đánh giá mô hình:</strong> Sử dụng các metrics như RMSE, R-squared, AUC để đánh giá hiệu năng của mô hình trên tập kiểm tra.</li>
+</ul>
+<p><strong>2. Hướng dẫn song ngữ (Vietnamese - English):</strong></p>
+<ul>
+<li>
+<p><strong>Kết nối đến cơ sở dữ liệu ChEMBL (Connect to ChEMBL database):</strong></p>
+<ul>
+<li><em>Tiếng Việt:</em> Sử dụng thư viện <code>psycopg2</code> để kết nối đến cơ sở dữ liệu PostgreSQL ChEMBL 35.</li>
+<li><em>English:</em> Use the <code>psycopg2</code> library to connect to the ChEMBL 35 PostgreSQL database.</li>
+<li>
+<p><strong>Truy vấn dữ liệu hoạt tính và cấu trúc (Query activity and structure data):</strong></p>
+</li>
+<li>
+<p><em>Tiếng Việt:</em> Viết câu lệnh SQL để truy vấn dữ liệu hoạt tính (ví dụ: IC50) của các hợp chất đối với Kinase X và cấu trúc SMILES của chúng.</p>
+</li>
+<li><em>English:</em> Write an SQL query to retrieve activity data (e.g., IC50) of compounds against Kinase X and their SMILES structures.</li>
+<li>
+<p><strong>Tính toán descriptor phân tử (Calculate molecular descriptors):</strong></p>
+</li>
+<li>
+<p><em>Tiếng Việt:</em> Sử dụng RDKit để tính toán các descriptor phân tử từ cấu trúc SMILES.</p>
+</li>
+<li><em>English:</em> Use RDKit to calculate molecular descriptors from SMILES structures.</li>
+<li>
+<p><strong>Xây dựng mô hình học máy (Build machine learning model):</strong></p>
+</li>
+<li>
+<p><em>Tiếng Việt:</em> Sử dụng scikit-learn để xây dựng mô hình dự đoán IC50 dựa trên các descriptor đã tính toán.</p>
+</li>
+<li><em>English:</em> Use scikit-learn to build a model to predict IC50 based on the calculated descriptors.</li>
+<li>
+<p><strong>Đánh giá mô hình (Evaluate the model):</strong></p>
+</li>
+<li>
+<p><em>Tiếng Việt:</em> Sử dụng các metrics như RMSE, R-squared để đánh giá hiệu năng của mô hình.</p>
+</li>
+<li><em>English:</em> Use metrics like RMSE, R-squared to evaluate the model's performance.</li>
+</ul>
+</li>
+</ul>
+<p><strong>3. Mã nguồn (SQL &amp; Python):</strong></p>
+<p><strong>SQL (Lấy 100 dòng dữ liệu):</strong></p>
+<p>```sql
+-- English: Query to retrieve 100 activity data points and their corresponding SMILES for Kinase X
+-- Vietnamese: Truy vấn để lấy 100 dữ liệu hoạt tính và cấu trúc SMILES tương ứng cho Kinase X</p>
+<p>SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.pref_name = 'Kinase X'  -- Thay 'Kinase X' bằng tên target thực tế
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0
+    AND act.standard_relation = '='
+    AND act.standard_value ~ '^[0-9.]+$' --Lọc giá trị số (Khắc phục lỗi a)
+LIMIT 100;
+```</p>
+<p><strong>Lưu ý về lỗi SQL:</strong></p>
+<p>Lỗi <code>ERROR: operator does not exist: numeric ~ unknown</code> xảy ra do PostgreSQL không thể so sánh trực tiếp kiểu dữ liệu <code>numeric</code> với một biểu thức regular expression (kiểu <code>unknown</code>). Để khắc phục, bạn có thể sử dụng hàm <code>CAST</code> để chuyển đổi cột <code>standard_value</code> sang kiểu <code>TEXT</code> trước khi so sánh với regular expression, hoặc sử dụng <code>SIMILAR TO</code> thay vì <code>~</code>.  Tuy nhiên, cách tốt nhất là lọc trước để đảm bảo cột <code>standard_value</code> chỉ chứa giá trị số.  Câu lệnh trên đã được sửa để đảm bảo rằng chỉ các giá trị số mới được chọn.</p>
+<p><strong>Python (Jupyter Notebook):</strong></p>
+<p>```python</p>
+<h1>-<em>- coding: utf-8 -</em>-</h1>
+<p>import os
+import psycopg2
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Cấu hình kết nối database (Database connection configuration)</h1>
+<p>db_params = {
+    'host': '192.168.206.136',
+    'user': 'rd',
+    'password': 'rd',
+    'database': 'chembl_35'
+}</p>
+<h1>Đường dẫn cơ sở (Base path)</h1>
+<p>base_path = '../data'</p>
+<h1>Tên file CSV (CSV filename)</h1>
+<p>csv_filename = 'kinase_x_data.csv'
+csv_filepath = os.path.join(base_path, csv_filename)</p>
+<p>def fetch_data_from_chembl(db_params, query, csv_filepath):
+    """
+    Fetches data from ChEMBL database using the provided SQL query and saves it to a CSV file.
+    Args:
+        db_params (dict): Dictionary containing database connection parameters.
+        query (str): SQL query to execute.
+        csv_filepath (str): Path to save the fetched data as CSV.
+    Returns:
+        pandas.DataFrame: DataFrame containing the fetched data.
+    """
+    try:
+        conn = psycopg2.connect(**db_params)
+        df = pd.read_sql_query(query, conn)
+        df.to_csv(csv_filepath, index=False)
+        conn.close()
+        print(f"Data saved to {csv_filepath}")
+        return df
+    except psycopg2.Error as e:
+        print(f"Error connecting to database: {e}")
+        return None</p>
+<p>def calculate_descriptors(smiles):
+    """Calculates molecular descriptors using RDKit.</p>
+<pre><code>Args:
+    smiles (str): SMILES string of the molecule.
+
+Returns:
+    dict: A dictionary of calculated descriptors. Returns None if the molecule is invalid.
+"""
+mol = Chem.MolFromSmiles(smiles)
+if mol is None:
+    return None
+
+descriptors = {}
+descriptors["MolLogP"] = Descriptors.MolLogP(mol)
+descriptors["MolWt"] = Descriptors.MolWt(mol)
+descriptors["NumHAcceptors"] = Descriptors.NumHAcceptors(mol)
+descriptors["NumHDonors"] = Descriptors.NumHDonors(mol)
+descriptors["TPSA"] = Descriptors.TPSA(mol)
+return descriptors
+</code></pre>
+<p>def prepare_data(df):
+    """Prepares the data for machine learning.</p>
+<pre><code>Args:
+    df (pandas.DataFrame): DataFrame containing SMILES and activity data.
+
+Returns:
+    pandas.DataFrame: DataFrame containing molecular descriptors and activity values.
+"""
+# Apply descriptor calculation and handle errors
+descriptors_list = []
+for smiles in df['canonical_smiles']:
+    descriptors = calculate_descriptors(smiles)
+    if descriptors is not None:
+        descriptors_list.append(descriptors)
+    else:
+        descriptors_list.append(None)  # Append None for invalid SMILES
+
+# Create a DataFrame from the descriptor list
+descriptors_df = pd.DataFrame(descriptors_list)
+
+# Concatenate descriptors with the original DataFrame
+df = pd.concat([df, descriptors_df], axis=1)
+
+# Drop rows with NaN values in descriptors (invalid SMILES)
+df = df.dropna(subset=descriptors_df.columns)
+
+# Convert standard_value to numeric, handling errors
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value'])  # Drop rows where conversion failed
+
+return df
+</code></pre>
+<p>def train_and_evaluate_model(df):
+    """Trains and evaluates a Random Forest Regressor model.</p>
+<pre><code>Args:
+    df (pandas.DataFrame): DataFrame containing descriptors and activity values.
+"""
+# Prepare features (X) and target (y)
+X = df[['MolLogP', 'MolWt', 'NumHAcceptors', 'NumHDonors', 'TPSA']]
+y = np.log10(df['standard_value'])  # Convert IC50 to pIC50
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Feature scaling
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Train the Random Forest Regressor model
+model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Evaluate the model
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+</code></pre>
+<h1>SQL query to fetch data (limit to 100 rows)</h1>
+<p>query = """
+SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.pref_name = 'Kinase X'  -- Replace 'Kinase X' with the actual target name
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0
+    AND act.standard_relation = '='
+    AND act.standard_value ~ '^[0-9.]+$'
+LIMIT 100;
+"""</p>
+<h1>Lấy dữ liệu từ Chembl và lưu vào file CSV</h1>
+<p>df = fetch_data_from_chembl(db_params, query, csv_filepath)</p>
+<h1>Chuẩn bị dữ liệu</h1>
+<p>if df is not None:
+    df = prepare_data(df)</p>
+<pre><code># Huấn luyện và đánh giá mô hình
+train_and_evaluate_model(df)
+</code></pre>
+<p>```</p>
+<p><strong>Lưu ý về lỗi Python:</strong></p>
+<ol>
+<li><strong>Phiên bản scikit-learn cũ:</strong> Nếu bạn gặp lỗi <code>squared=False</code> trong <code>mean_squared_error</code>, hãy cập nhật scikit-learn lên phiên bản mới nhất bằng lệnh <code>pip install -U scikit-learn</code>. Nếu không thể cập nhật, hãy bỏ tham số <code>squared=False</code> (mặc định là <code>True</code>, trả về MSE thay vì RMSE). Trong code trên, tôi đã bỏ tham số này để tương thích với các phiên bản scikit-learn cũ.</li>
+<li><strong>Xử lý lỗi SMILES:</strong> Code trên đã bao gồm phần xử lý lỗi khi tính toán descriptor từ SMILES. Nếu một SMILES không hợp lệ, chương trình sẽ bỏ qua dòng đó.</li>
+</ol>
+<p><strong>4. Ví dụ mã nguồn (SQL &amp; Python) mẫu:</strong></p>
+<p>Dưới đây là 5 ví dụ về các truy vấn SQL và mã Python khác nhau bạn có thể sử dụng:</p>
+<p><strong>Ví dụ 1: Lấy dữ liệu hoạt tính cho một loạt các targets</strong></p>
+<ul>
+<li><strong>SQL:</strong></li>
+</ul>
+<p>```sql
+-- English: Get activity data for a list of targets
+-- Vietnamese: Lấy dữ liệu hoạt tính cho một danh sách các targets</p>
+<p>SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units,
+    td.pref_name AS target_name
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.pref_name IN ('Kinase X', 'Enzyme Y', 'Receptor Z')  -- Thay đổi tên targets tùy ý
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0
+    AND act.standard_relation = '='
+LIMIT 100;
+```</p>
+<ul>
+<li><strong>Python:</strong> (Sử dụng kết quả truy vấn trên để phân tích SAR đơn giản)</li>
+</ul>
+<p>```python
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Draw</p>
+<p>def visualize_compounds_by_activity(df, target_name, num_compounds=4):
+    """Visualizes compounds with high and low activity for a given target.</p>
+<pre><code>Args:
+    df (pandas.DataFrame): DataFrame containing SMILES, activity, and target name.
+    target_name (str): Name of the target to visualize.
+    num_compounds (int): Number of compounds to visualize for each activity group.
+"""
+target_df = df[df['target_name'] == target_name].copy()
+if target_df.empty:
+    print(f"No data found for target: {target_name}")
+    return
+
+# Convert IC50 to numeric, handling errors
+target_df['standard_value'] = pd.to_numeric(target_df['standard_value'], errors='coerce')
+target_df.dropna(subset=['standard_value'], inplace=True)
+
+# Sort by activity (IC50)
+target_df = target_df.sort_values(by='standard_value')
+
+# Get top and bottom compounds
+top_compounds = target_df.head(num_compounds)
+bottom_compounds = target_df.tail(num_compounds)
+
+# Create molecule objects
+top_mols = [Chem.MolFromSmiles(s) for s in top_compounds['canonical_smiles']]
+bottom_mols = [Chem.MolFromSmiles(s) for s in bottom_compounds['canonical_smiles']]
+
+# Draw molecules
+img_top = Draw.MolsToGridImage(top_mols, molsPerRow=num_compounds,
+                                legends=[f"IC50: {v:.2f} nM" for v in top_compounds['standard_value']],
+                                subImgSize=(200, 200),
+                                title=f"Top {num_compounds} most active compounds for {target_name}")
+
+img_bottom = Draw.MolsToGridImage(bottom_mols, molsPerRow=num_compounds,
+                                   legends=[f"IC50: {v:.2f} nM" for v in bottom_compounds['standard_value']],
+                                   subImgSize=(200, 200),
+                                   title=f"Top {num_compounds} least active compounds for {target_name}")
+
+return img_top, img_bottom
+</code></pre>
+<h1>Assuming you have a DataFrame 'df' with the SQL query results</h1>
+<h1>Example usage:</h1>
+<h1>img_top, img_bottom = visualize_compounds_by_activity(df, 'Kinase X')</h1>
+<h1>img_top  # Display the top compounds</h1>
+<h1>img_bottom  # Display the bottom compounds</h1>
+<p>```</p>
+<p><strong>Ví dụ 2: Tính toán và phân tích phân bố descriptor</strong></p>
+<ul>
+<li><strong>SQL:</strong> (Sử dụng lại truy vấn ở trên để lấy SMILES)</li>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python
+import pandas as pd
+import matplotlib.pyplot as plt
+from rdkit import Chem
+from rdkit.Chem import Descriptors</p>
+<p>def calculate_descriptors(smiles):
+    """Calculates molecular descriptors using RDKit."""
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None</p>
+<pre><code>descriptors = {}
+descriptors["MolLogP"] = Descriptors.MolLogP(mol)
+descriptors["MolWt"] = Descriptors.MolWt(mol)
+return descriptors
+</code></pre>
+<p>def analyze_descriptor_distribution(df):
+    """Calculates descriptors and plots their distribution.</p>
+<pre><code>Args:
+    df (pandas.DataFrame): DataFrame containing SMILES.
+"""
+descriptors = []
+for smiles in df['canonical_smiles']:
+    desc = calculate_descriptors(smiles)
+    if desc:
+        descriptors.append(desc)
+
+descriptors_df = pd.DataFrame(descriptors)
+descriptors_df.hist()
+plt.show()
+</code></pre>
+<h1>Example usage:</h1>
+<h1>analyze_descriptor_distribution(df)</h1>
+<p>```</p>
+<p><strong>Ví dụ 3: Lọc dữ liệu theo khoảng giá trị hoạt tính</strong></p>
+<ul>
+<li><strong>SQL:</strong></li>
+</ul>
+<p>```sql
+-- English: Filter data by activity range
+-- Vietnamese: Lọc dữ liệu theo khoảng giá trị hoạt tính</p>
+<p>SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.pref_name = 'Kinase X'
+    AND act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value BETWEEN 10 AND 100  -- Lọc IC50 từ 10 nM đến 100 nM
+    AND act.standard_relation = '='
+LIMIT 100;
+```</p>
+<ul>
+<li><strong>Python:</strong> (Không cần, vì đã lọc bằng SQL)</li>
+</ul>
+<p><strong>Ví dụ 4: Tìm các hợp chất có khung cấu trúc tương tự</strong></p>
+<ul>
+<li><strong>SQL:</strong> (Không thể thực hiện trực tiếp, cần Python để tạo fingerprints)</li>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.DataStructs import FingerprintSimilarity
+import pandas as pd</p>
+<p>def find_similar_compounds(df, smiles_query, num_results=5):
+    """Finds compounds in the DataFrame that are structurally similar to a query compound.</p>
+<pre><code>Args:
+    df (pandas.DataFrame): DataFrame containing SMILES.
+    smiles_query (str): SMILES string of the query compound.
+    num_results (int): Number of similar compounds to return.
+
+Returns:
+    pandas.DataFrame: DataFrame containing the most similar compounds.
+"""
+mol_query = Chem.MolFromSmiles(smiles_query)
+if mol_query is None:
+    print("Invalid SMILES for query compound")
+    return None
+
+fp_query = AllChem.GetMorganFingerprint(mol_query, radius=2)  # Morgan fingerprint
+
+similarities = []
+for smiles in df['canonical_smiles']:
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        similarities.append(0.0)  # Assign similarity of 0 to invalid SMILES
+        continue
+    fp = AllChem.GetMorganFingerprint(mol, radius=2)
+    similarity = FingerprintSimilarity(fp_query, fp)
+    similarities.append(similarity)
+
+df['similarity'] = similarities
+df_sorted = df.sort_values(by='similarity', ascending=False)
+return df_sorted.head(num_results)
+</code></pre>
+<h1>Example Usage:</h1>
+<h1>query_smiles = "CCOc1ccccc1C(=O)Oc2ccccc2C(=O)O"  # Example SMILES</h1>
+<h1>similar_compounds = find_similar_compounds(df, query_smiles)</h1>
+<h1>print(similar_compounds)</h1>
+<p>```</p>
+<p><strong>Ví dụ 5:  Kết hợp dữ liệu ChEMBL với dữ liệu bên ngoài (ví dụ: dữ liệu độc tính)</strong></p>
+<ul>
+<li><strong>SQL:</strong> (Lấy dữ liệu ChEMBL)</li>
+</ul>
+<p>```sql
+-- English: Get activity data for specific compounds
+-- Vietnamese: Lấy dữ liệu hoạt tính cho các hợp chất cụ thể</p>
+<p>SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_value,
+    act.standard_units
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    target_dictionary td ON act.tid = td.tid
+WHERE
+    td.pref_name = 'Kinase X'
+    AND act.standard_type = 'IC50'
+    AND md.chembl_id IN ('CHEMBL1', 'CHEMBL2', 'CHEMBL3')  -- Thay đổi chembl_id tùy ý
+LIMIT 100;
+```</p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python
+import pandas as pd</p>
+<p>def merge_with_toxicity_data(chembl_df, toxicity_file):
+    """Merges ChEMBL data with external toxicity data.</p>
+<pre><code>Args:
+    chembl_df (pandas.DataFrame): DataFrame containing ChEMBL data (e.g., activity, SMILES).
+    toxicity_file (str): Path to the toxicity data file (e.g., CSV).
+
+Returns:
+    pandas.DataFrame: Merged DataFrame.
+"""
+toxicity_df = pd.read_csv(toxicity_file)  # Assuming toxicity data is in CSV
+merged_df = pd.merge(chembl_df, toxicity_df, on='molregno', how='left')  # Assuming 'molregno' is the common identifier
+return merged_df
+</code></pre>
+<h1>Example Usage:</h1>
+<h1>toxicity_data_file = 'toxicity_data.csv'  # Replace with your file path</h1>
+<h1>merged_data = merge_with_toxicity_data(df, toxicity_data_file)</h1>
+<h1>print(merged_data)</h1>
+<p>```</p>
+<p><strong>Lưu ý quan trọng:</strong></p>
+<ul>
+<li>Hãy thay thế các tên target, ID hợp chất, đường dẫn file, v.v. trong các ví dụ trên bằng dữ liệu thực tế của bạn.</li>
+<li>Các ví dụ này chỉ là điểm khởi đầu. Bạn có thể tùy chỉnh và mở rộng chúng để phù hợp với nhu cầu cụ thể của dự án.</li>
+<li>Đảm bảo rằng bạn đã cài đặt tất cả các thư viện cần thiết (psycopg2, RDKit, scikit-learn, pandas, matplotlib).</li>
+</ul>
+<p>Tôi hy vọng những phân tích, hướng dẫn và ví dụ này sẽ giúp bạn bắt đầu dự án phân tích dữ liệu ChEMBL 35 của mình một cách hiệu quả. Nếu bạn có bất kỳ câu hỏi nào hoặc cần hỗ trợ thêm, đừng ngần ngại hỏi! Chúc bạn thành công!</p>
+        </body>
+        </html>
+        

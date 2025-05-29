@@ -1,0 +1,305 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_47</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Comparing clinical vs. preclinical molecules</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project using RDKit and need help structuring your code within an AIMLops template, addressing specific errors, and limiting the data size for development.</p>
+<p>Let's break down the process and provide code snippets to address your needs.  I will provide both English and (where applicable) Bahasa Indonesia explanations.</p>
+<p><strong>1. Analysis Model Overview</strong></p>
+<p>The general flow of your project will be:</p>
+<ul>
+<li><strong>Data Extraction (SQL):</strong> Extract relevant data from the Chembl 35 database, specifically focusing on activity data. The SQL query will filter for compounds with activity values, limit the results to 100 rows, and save the results to a CSV file.</li>
+<li><strong>Data Loading and Cleaning (Python):</strong> Load the CSV file into a Pandas DataFrame.</li>
+<li><strong>Feature Engineering (Python):</strong> Use RDKit to generate molecular descriptors (features) from the SMILES strings.</li>
+<li><strong>Data Preprocessing (Python):</strong> Handle missing values, scale features (if necessary), and split the data into training and testing sets.</li>
+<li><strong>Model Building and Evaluation (Python):</strong> Choose a regression model (e.g., Linear Regression, Random Forest Regression) to predict activity values. Evaluate the model's performance using metrics like Mean Squared Error (MSE) or R-squared.</li>
+<li><strong>Model Refinement (Python):</strong>  Fine-tune model parameters for better performance</li>
+</ul>
+<p><strong>2. Code Implementation (SQL &amp; Python)</strong></p>
+<p><strong>2.1 SQL Code (for pgAdmin and CSV Export)</strong></p>
+<p>This SQL query addresses the error you're seeing: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code> by casting <code>standard_value</code> to TEXT before using the regular expression.  We're also adding a <code>LIMIT</code> clause to restrict the number of rows.</p>
+<p>```sql
+-- File: ../data/chembl_35_activity_data.csv</p>
+<p>SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type = 'IC50'  -- Example: Filter for IC50 values
+    AND act.standard_units = 'nM'  -- Example: Filter for nM units
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::TEXT ~ '^[0-9.]+$' -- Cast to TEXT to allow regex match
+LIMIT 100;
+```</p>
+<ul>
+<li><strong>Explanation (English):</strong><ul>
+<li>Selects relevant columns (molecule ID, SMILES, activity type, activity value, units).</li>
+<li>Joins tables to link molecules, structures, and activity data.</li>
+<li>Filters for a specific activity type (e.g., IC50) and units (e.g., nM).</li>
+<li>Ensures <code>standard_value</code> is not NULL and is a number using a regular expression check <em>after</em> explicitly casting to TEXT to allow it to work.</li>
+<li>Limits the result set to 100 rows.</li>
+</ul>
+</li>
+<li><strong>Penjelasan (Bahasa Indonesia):</strong><ul>
+<li>Memilih kolom-kolom yang relevan (ID molekul, SMILES, tipe aktivitas, nilai aktivitas, satuan).</li>
+<li>Menggabungkan tabel-tabel untuk menghubungkan molekul, struktur, dan data aktivitas.</li>
+<li>Memfilter untuk tipe aktivitas tertentu (contohnya, IC50) dan satuan (contohnya, nM).</li>
+<li>Memastikan bahwa <code>standard_value</code> tidak NULL dan merupakan angka menggunakan pemeriksaan ekspresi reguler <em>setelah</em> dikonversi secara eksplisit ke TEXT agar berfungsi.</li>
+<li>Membatasi hasil menjadi 100 baris.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Steps to run the SQL code:</strong></p>
+<ol>
+<li>Open pgAdmin and connect to your <code>chembl_35</code> database using the provided credentials (ip: 192.168.206.136, user: rd, pass: rd).</li>
+<li>Open a new query window.</li>
+<li>Paste the SQL code into the query window.</li>
+<li>Execute the query.</li>
+<li>Right-click on the result set and select "Copy All Rows".</li>
+<li>Paste the data into a text file and save it as <code>chembl_35_activity_data.csv</code> in your <code>../data/</code> directory.  Alternatively, you can use pgAdmin's export functionality if available.</li>
+</ol>
+<p><strong>2.2 Python Code (Jupyter Notebook)</strong></p>
+<p>```python</p>
+<h1>File: notebook/Topic_CheMBL_35_47_1_data_preparation.ipynb</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler  #Import StandardScaler</p>
+<h1>Define the base path according to AIMLops structure</h1>
+<p>base_path = ".."  # Assuming the notebook is in the 'notebook' directory
+data_path = os.path.join(base_path, "data", "chembl_35_activity_data.csv")
+model_path = os.path.join(base_path, "model")</p>
+<h1>Create model directory if it doesn't exist</h1>
+<p>os.makedirs(model_path, exist_ok=True)</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}.  Make sure the CSV file exists.")
+    exit()</p>
+<h1>Display the first few rows of the DataFrame</h1>
+<p>print(df.head())</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])</p>
+<h1>Convert standard_value to numeric, handling potential errors</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value'])</p>
+<h1>Keep only needed columns</h1>
+<p>df = df[['canonical_smiles', 'standard_value']]</p>
+<h1>RDKit Feature Generation</h1>
+<p>def generate_features(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return [Descriptors.MolWt(mol), Descriptors.MolLogP(mol), Descriptors.NumHAcceptors(mol), Descriptors.NumHDonors(mol)] # Example features
+    else:
+        return None</p>
+<p>df['features'] = df['canonical_smiles'].apply(generate_features)
+df = df.dropna(subset=['features'])</p>
+<h1>Convert features to a DataFrame</h1>
+<p>feature_names = ['MolWt', 'MolLogP', 'NumHAcceptors', 'NumHDonors']
+features_df = pd.DataFrame(df['features'].tolist(), columns=feature_names)
+df = pd.concat([df, features_df], axis=1)
+df = df.drop(columns=['features', 'canonical_smiles'])</p>
+<h1>Splitting the data</h1>
+<p>X = df[['MolWt', 'MolLogP', 'NumHAcceptors', 'NumHDonors']]
+y = df['standard_value']</p>
+<h1>Data Scaling (important for some models like Linear Regression)</h1>
+<p>scaler = StandardScaler()
+X = scaler.fit_transform(X)</p>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Model Training</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Model Evaluation</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Save the model (optional)</h1>
+<p>import joblib
+joblib.dump(model, os.path.join(model_path, 'linear_regression_model.pkl'))</p>
+<h1>Load the model (optional)</h1>
+<p>loaded_model = joblib.load(os.path.join(model_path, 'linear_regression_model.pkl'))
+print("Loaded model:", loaded_model)
+```</p>
+<ul>
+<li>
+<p><strong>Explanation (English):</strong></p>
+<ul>
+<li><strong>Import Libraries:</strong> Imports necessary libraries (Pandas, RDKit, scikit-learn).</li>
+<li><strong>Define Paths:</strong> Defines file paths using <code>os.path.join</code> for better portability and adherence to your AIMLops structure.</li>
+<li><strong>Load Data:</strong> Loads the CSV data into a Pandas DataFrame. Handles the case where the file might not be found.</li>
+<li><strong>Data Cleaning:</strong>  Removes rows with missing SMILES strings or standard values. Converts the standard value to numeric.</li>
+<li><strong>Feature Generation:</strong> Uses RDKit to generate molecular descriptors (features) from SMILES strings. This example uses <code>MolWt</code>, <code>MolLogP</code>, <code>NumHAcceptors</code>, and <code>NumHDonors</code>. Add more features as needed.</li>
+<li><strong>Data Splitting:</strong> Splits the data into training and testing sets.</li>
+<li><strong>Data Scaling:</strong> Scales the input features using <code>StandardScaler</code> to have zero mean and unit variance.  This is crucial for algorithms sensitive to feature scaling (like Linear Regression, SVMs, etc.).</li>
+<li><strong>Model Training:</strong> Trains a Linear Regression model.</li>
+<li><strong>Model Evaluation:</strong> Evaluates the model using Mean Squared Error (MSE) and R-squared.</li>
+<li><strong>Save and Load Model:</strong> Using <code>joblib</code> to save the model.</li>
+</ul>
+</li>
+<li>
+<p><strong>Penjelasan (Bahasa Indonesia):</strong></p>
+<ul>
+<li><strong>Impor Pustaka:</strong> Mengimpor pustaka yang diperlukan (Pandas, RDKit, scikit-learn).</li>
+<li><strong>Definisikan Path:</strong> Mendefinisikan path file menggunakan <code>os.path.join</code> untuk portabilitas yang lebih baik dan kepatuhan terhadap struktur AIMLops Anda.</li>
+<li><strong>Muat Data:</strong> Memuat data CSV ke dalam Pandas DataFrame. Menangani kasus di mana file mungkin tidak ditemukan.</li>
+<li><strong>Pembersihan Data:</strong> Menghapus baris dengan string SMILES atau nilai standar yang hilang. Mengonversi nilai standar menjadi numerik.</li>
+<li><strong>Pembuatan Fitur:</strong> Menggunakan RDKit untuk menghasilkan deskriptor molekul (fitur) dari string SMILES. Contoh ini menggunakan <code>MolWt</code>, <code>MolLogP</code>, <code>NumHAcceptors</code>, dan <code>NumHDonors</code>. Tambahkan lebih banyak fitur sesuai kebutuhan.</li>
+<li><strong>Pembagian Data:</strong> Membagi data menjadi set pelatihan dan pengujian.</li>
+<li><strong>Penskalaan Data:</strong> Menggunakan <code>StandardScaler</code> untuk menskalakan fitur input supaya memiliki mean nol dan varians satuan. Ini sangat penting untuk algoritma yang sensitif terhadap penskalaan fitur (seperti Regresi Linier, SVM, dll.).</li>
+<li><strong>Pelatihan Model:</strong> Melatih model Regresi Linier.</li>
+<li><strong>Evaluasi Model:</strong> Mengevaluasi model menggunakan Mean Squared Error (MSE) dan R-squared.</li>
+<li><strong>Simpan dan Muat Model:</strong> Menggunakan <code>joblib</code> untuk menyimpan model.</li>
+</ul>
+</li>
+</ul>
+<p><strong>2.3 Addressing the <code>squared=False</code> Error:</strong></p>
+<p>The error <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code> arises if you are using an older version of scikit-learn.  The <code>squared=False</code> parameter was introduced in a later version.</p>
+<p>The easiest solution is to <em>remove</em> the <code>squared=False</code> argument entirely.  The default behavior is to return the MSE (Mean Squared Error), which is the square root of the RMSE (Root Mean Squared Error).  If you specifically need RMSE, you can calculate it manually:</p>
+<p>```python</p>
+<h1>Model Evaluation</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)  # Calculate RMSE manually
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"Root Mean Squared Error: {rmse}") # Show RMSE
+print(f"R-squared: {r2}")
+```</p>
+<p>Alternatively, update your scikit-learn version:</p>
+<p><code>bash
+pip install --upgrade scikit-learn</code></p>
+<p><strong>3. AIMLops Folder Structure</strong></p>
+<p>Your code already reflects the suggested AIMLops structure:</p>
+<ul>
+<li><code>../data/</code>:  Contains the <code>chembl_35_activity_data.csv</code> file.</li>
+<li><code>../notebook/</code>: Contains the Jupyter Notebook files (<code>Topic_CheMBL_35_47_1_data_preparation.ipynb</code>, <code>Topic_CheMBL_35_47_2_model_training.ipynb</code>, etc.).</li>
+<li><code>../model/</code>:  Will contain the saved model file (<code>linear_regression_model.pkl</code>).</li>
+</ul>
+<p><strong>4.  Example Notebooks</strong></p>
+<p>Here are five example notebook files with their intended focus:</p>
+<ol>
+<li><strong><code>Topic_CheMBL_35_47_1_data_preparation.ipynb</code>:</strong> (As provided above) Focuses on data loading, cleaning, and feature engineering using RDKit.  Saves the processed data (optional).</li>
+<li><strong><code>Topic_CheMBL_35_47_2_model_training.ipynb</code>:</strong> Loads the processed data, trains a regression model (Linear Regression, Random Forest, etc.), and evaluates its performance.  Saves the trained model.</li>
+<li><strong><code>Topic_CheMBL_35_47_3_model_evaluation.ipynb</code>:</strong> Loads the trained model, evaluates it on a held-out test set, and generates performance metrics (MSE, R-squared, plots).</li>
+<li><strong><code>Topic_CheMBL_35_47_4_feature_selection.ipynb</code>:</strong> Explores different feature selection techniques (e.g., SelectKBest, Recursive Feature Elimination) to identify the most relevant features for the model.</li>
+<li><strong><code>Topic_CheMBL_35_47_5_parameter_tuning.ipynb</code>:</strong> Uses techniques like GridSearchCV or RandomizedSearchCV to optimize the hyperparameters of the chosen model.</li>
+</ol>
+<p><strong>Example content for <code>Topic_CheMBL_35_47_2_model_training.ipynb</code>:</strong></p>
+<p>```python</p>
+<h1>File: notebook/Topic_CheMBL_35_47_2_model_training.ipynb</h1>
+<p>import os
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor  # Example model
+from sklearn.metrics import mean_squared_error, r2_score
+import joblib
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Define paths</h1>
+<p>base_path = ".."
+data_path = os.path.join(base_path, "data", "chembl_35_activity_data.csv")
+model_path = os.path.join(base_path, "model")</p>
+<h1>Load the data (assuming data_preparation notebook saved a processed CSV)</h1>
+<p>df = pd.read_csv(data_path)</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])</p>
+<h1>Convert standard_value to numeric, handling potential errors</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value'])</p>
+<h1>Keep only needed columns</h1>
+<p>df = df[['canonical_smiles', 'standard_value']]</p>
+<h1>RDKit Feature Generation</h1>
+<p>def generate_features(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return [Descriptors.MolWt(mol), Descriptors.MolLogP(mol), Descriptors.NumHAcceptors(mol), Descriptors.NumHDonors(mol)] # Example features
+    else:
+        return None</p>
+<p>df['features'] = df['canonical_smiles'].apply(generate_features)
+df = df.dropna(subset=['features'])</p>
+<h1>Convert features to a DataFrame</h1>
+<p>feature_names = ['MolWt', 'MolLogP', 'NumHAcceptors', 'NumHDonors']
+features_df = pd.DataFrame(df['features'].tolist(), columns=feature_names)
+df = pd.concat([df, features_df], axis=1)
+df = df.drop(columns=['features', 'canonical_smiles'])</p>
+<h1>Splitting the data</h1>
+<p>X = df[['MolWt', 'MolLogP', 'NumHAcceptors', 'NumHDonors']]
+y = df['standard_value']</p>
+<h1>Data Scaling (important for some models like Linear Regression)</h1>
+<p>scaler = StandardScaler()
+X = scaler.fit_transform(X)</p>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Model Training (Random Forest Example)</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)  # Example: 100 trees
+model.fit(X_train, y_train)</p>
+<h1>Model Evaluation</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Save the model</h1>
+<p>joblib.dump(model, os.path.join(model_path, 'random_forest_model.pkl'))
+```</p>
+<p><strong>5. Important Considerations</strong></p>
+<ul>
+<li><strong>Error Handling:</strong> Implement robust error handling in your code (e.g., <code>try...except</code> blocks) to catch potential issues during data loading, feature generation, or model training.</li>
+<li><strong>Feature Selection:</strong> Experiment with different feature selection techniques to improve model performance and reduce overfitting.</li>
+<li><strong>Model Selection:</strong>  Try different regression models (e.g., Linear Regression, Random Forest, Support Vector Regression) and compare their performance.</li>
+<li><strong>Hyperparameter Tuning:</strong>  Optimize the hyperparameters of your chosen model using techniques like GridSearchCV or RandomizedSearchCV.</li>
+<li><strong>Data Visualization:</strong> Use visualizations (e.g., scatter plots, histograms) to explore the data and gain insights into relationships between features and activity values.</li>
+<li><strong>Logging:</strong> Implement logging to track the progress of your experiments and debug any issues.</li>
+<li><strong>Version Control:</strong> Use a version control system like Git to track changes to your code and collaborate with others.</li>
+</ul>
+<p>By following these guidelines and adapting the code snippets to your specific needs, you should be able to successfully run your Chembl 35 data analysis project within the AIMLops framework. Remember to adjust the code and techniques based on your specific research goals and the characteristics of your data. Good luck!</p>
+        </body>
+        </html>
+        

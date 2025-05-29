@@ -1,0 +1,470 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_90</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Gộp ChEMBL với dữ liệu nhà cung cấp hóa chất</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 này. Với vai trò là một chuyên gia R&amp;D dược học, tôi hiểu tầm quan trọng của việc khai thác thông tin từ cơ sở dữ liệu lớn như ChEMBL để tìm kiếm và phát triển các loại thuốc mới. Chúng ta sẽ cùng nhau xây dựng một quy trình phân tích hiệu quả, tuân thủ theo chuẩn AIMLOps template và giải quyết các vấn đề phát sinh.</p>
+<p><strong>Tổng quan dự án:</strong></p>
+<p>Dự án này tập trung vào việc phân tích dữ liệu từ cơ sở dữ liệu ChEMBL 35, sử dụng PostgreSQL (psql) làm hệ quản trị cơ sở dữ liệu và RDKit để xử lý thông tin hóa học. Chúng ta sẽ trích xuất dữ liệu bằng các truy vấn SQL, lưu trữ dưới dạng file CSV và sau đó sử dụng Jupyter Notebook với Python để phân tích và trực quan hóa dữ liệu.</p>
+<p><strong>1. Phân tích mô hình phân tích (Analysis Model):</strong></p>
+<p>Mô hình phân tích của chúng ta sẽ bao gồm các bước chính sau:</p>
+<ul>
+<li><strong>Data Extraction (Trích xuất dữ liệu):</strong> Sử dụng SQL queries để trích xuất thông tin liên quan từ cơ sở dữ liệu ChEMBL 35. Chúng ta sẽ tập trung vào các bảng như <code>activities</code>, <code>molecule_dictionary</code>, <code>compound_structures</code>,...</li>
+<li><strong>Data Cleaning and Preprocessing (Làm sạch và tiền xử lý dữ liệu):</strong><ul>
+<li>Loại bỏ các giá trị bị thiếu hoặc không hợp lệ.</li>
+<li>Chuyển đổi dữ liệu về định dạng phù hợp (ví dụ: chuyển đổi giá trị IC50 từ dạng chuỗi sang số).</li>
+<li>Chuẩn hóa dữ liệu (ví dụ: chuẩn hóa SMILES strings).</li>
+</ul>
+</li>
+<li><strong>Feature Engineering (Xây dựng đặc trưng):</strong> Sử dụng RDKit để tính toán các đặc trưng hóa học từ cấu trúc phân tử (ví dụ: molecular weight, logP, số lượng hydrogen bond donors/acceptors).</li>
+<li><strong>Exploratory Data Analysis (EDA - Phân tích khám phá dữ liệu):</strong> Sử dụng các kỹ thuật thống kê và trực quan hóa để hiểu rõ hơn về dữ liệu, tìm kiếm các mối quan hệ và xu hướng tiềm năng.</li>
+<li><strong>Modeling (Xây dựng mô hình):</strong> Xây dựng các mô hình dự đoán (ví dụ: mô hình dự đoán hoạt tính sinh học) bằng cách sử dụng các thuật toán machine learning như linear regression, random forest, support vector machines,...</li>
+<li><strong>Model Evaluation (Đánh giá mô hình):</strong> Đánh giá hiệu năng của mô hình bằng các metrics phù hợp (ví dụ: R-squared, RMSE, AUC).</li>
+</ul>
+<p><strong>2. Hướng dẫn song ngữ (Bilingual Guide):</strong></p>
+<p><strong>2.1. Kết nối cơ sở dữ liệu PostgreSQL (Connecting to PostgreSQL Database):</strong></p>
+<ul>
+<li><strong>Tiếng Việt:</strong> Sử dụng thư viện <code>psycopg2</code> trong Python để kết nối đến cơ sở dữ liệu PostgreSQL.</li>
+<li><strong>English:</strong> Use the <code>psycopg2</code> library in Python to connect to the PostgreSQL database.</li>
+</ul>
+<p>```python</p>
+<h1>Tiếng Việt: Ví dụ kết nối cơ sở dữ liệu</h1>
+<h1>English: Example of connecting to the database</h1>
+<p>import psycopg2</p>
+<p>try:
+    conn = psycopg2.connect(
+        host="192.168.206.136",
+        database="chembl_35",
+        user="rd",
+        password="rd")</p>
+<pre><code>cur = conn.cursor()
+print("Kết nối thành công đến PostgreSQL")
+print("Successfully connected to PostgreSQL")
+</code></pre>
+<p>except psycopg2.Error as e:
+    print(f"Lỗi kết nối: {e}")
+    print(f"Connection error: {e}")
+finally:
+    if conn:
+        cur.close()
+        conn.close()
+        print("Ngắt kết nối PostgreSQL")
+        print("PostgreSQL connection closed")
+```</p>
+<p><strong>2.2. Trích xuất dữ liệu bằng SQL (Extracting Data using SQL):</strong></p>
+<ul>
+<li><strong>Tiếng Việt:</strong> Sử dụng các câu lệnh SQL <code>SELECT</code>, <code>JOIN</code>, <code>WHERE</code> để trích xuất dữ liệu từ các bảng khác nhau trong cơ sở dữ liệu ChEMBL.</li>
+<li><strong>English:</strong> Use SQL statements like <code>SELECT</code>, <code>JOIN</code>, <code>WHERE</code> to extract data from different tables in the ChEMBL database.</li>
+</ul>
+<p><code>sql
+-- Tiếng Việt: Ví dụ truy vấn SQL
+-- English: Example SQL query
+SELECT md.chembl_id,
+       cs.canonical_smiles,
+       act.standard_type,
+       act.standard_value,
+       act.standard_units
+FROM activities act
+JOIN molecule_dictionary md ON act.molregno = md.molregno
+JOIN compound_structures cs ON md.molregno = cs.molregno
+WHERE act.standard_type = 'IC50'
+  AND act.standard_units = 'nM'
+LIMIT 100;</code></p>
+<p><strong>2.3. Sử dụng RDKit để tính toán đặc trưng (Using RDKit for Feature Calculation):</strong></p>
+<ul>
+<li><strong>Tiếng Việt:</strong> Sử dụng thư viện RDKit để chuyển đổi SMILES strings thành các đối tượng phân tử và tính toán các đặc trưng hóa học.</li>
+<li><strong>English:</strong> Use the RDKit library to convert SMILES strings into molecule objects and calculate chemical features.</li>
+</ul>
+<p>```python</p>
+<h1>Tiếng Việt: Ví dụ sử dụng RDKit</h1>
+<h1>English: Example of using RDKit</h1>
+<p>from rdkit import Chem
+from rdkit.Chem import Descriptors</p>
+<p>def calculate_features(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        mw = Descriptors.MolWt(mol)
+        logp = Descriptors.MolLogP(mol)
+        # Tính toán thêm các đặc trưng khác
+        return mw, logp
+    else:
+        return None, None</p>
+<h1>Ví dụ sử dụng hàm</h1>
+<h1>Example usage</h1>
+<p>smiles = 'CC(=O)Oc1ccccc1C(=O)O'
+mw, logp = calculate_features(smiles)
+print(f"Molecular Weight: {mw}, LogP: {logp}")
+```</p>
+<p><strong>3. Code SQL, Python (English):</strong></p>
+<p><strong>3.1. SQL (for data extraction):</strong></p>
+<p><code>sql
+-- SQL query to extract data for analysis
+SELECT md.chembl_id,
+       cs.canonical_smiles,
+       act.standard_type,
+       act.standard_value,
+       act.standard_units
+FROM activities act
+JOIN molecule_dictionary md ON act.molregno = md.molregno
+JOIN compound_structures cs ON md.molregno = cs.molregno
+WHERE act.standard_type = 'IC50'
+  AND act.standard_units = 'nM'
+  AND act.standard_value IS NOT NULL  -- Add this line to filter out NULL values
+LIMIT 100;</code></p>
+<p><strong>Lưu ý sửa lỗi SQL:</strong> Lỗi <code>ERROR: operator does not exist: numeric ~ unknown</code> xảy ra do bạn đang cố gắng so sánh một cột kiểu số (<code>act.standard_value</code>) với một chuỗi (<code>'^[0-9\.]+$'</code>).  Trong PostgreSQL, bạn không cần sử dụng regular expression để kiểm tra xem một cột kiểu số có phải là số hay không. Thay vào đó, hãy đảm bảo rằng cột <code>standard_value</code> không chứa giá trị NULL và có thể chuyển đổi thành kiểu số.</p>
+<p><strong>3.2. Python (for data analysis and feature engineering):</strong></p>
+<p>```python
+import pandas as pd
+import psycopg2
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np</p>
+<h1>Database connection details</h1>
+<p>db_host = "192.168.206.136"
+db_name = "chembl_35"
+db_user = "rd"
+db_pass = "rd"</p>
+<h1>Function to connect to PostgreSQL</h1>
+<p>def connect_to_db():
+    try:
+        conn = psycopg2.connect(
+            host=db_host,
+            database=db_name,
+            user=db_user,
+            password=db_pass)
+        return conn
+    except psycopg2.Error as e:
+        print(f"Error connecting to PostgreSQL: {e}")
+        return None</p>
+<h1>Function to execute SQL query and return data as a Pandas DataFrame</h1>
+<p>def execute_sql_query(conn, sql_query):
+    try:
+        df = pd.read_sql_query(sql_query, conn)
+        return df
+    except Exception as e:
+        print(f"Error executing SQL query: {e}")
+        return None</p>
+<h1>Function to calculate RDKit features</h1>
+<p>def calculate_rdkit_features(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is not None:
+            mw = Descriptors.MolWt(mol)
+            logp = Descriptors.MolLogP(mol)
+            hbd = Descriptors.NumHDonors(mol)
+            hba = Descriptors.NumHAcceptors(mol)
+            # You can add more descriptors here
+            return mw, logp, hbd, hba
+        else:
+            return None, None, None, None
+    except:
+        return None, None, None, None</p>
+<h1>Main analysis script</h1>
+<p>def main():
+    # SQL query to extract data
+    sql_query = """
+        SELECT md.chembl_id,
+               cs.canonical_smiles,
+               act.standard_type,
+               act.standard_value,
+               act.standard_units
+        FROM activities act
+        JOIN molecule_dictionary md ON act.molregno = md.molregno
+        JOIN compound_structures cs ON md.molregno = cs.molregno
+        WHERE act.standard_type = 'IC50'
+          AND act.standard_units = 'nM'
+          AND act.standard_value IS NOT NULL
+        LIMIT 100;
+    """</p>
+<pre><code># Connect to the database
+conn = connect_to_db()
+if conn is None:
+    return
+
+# Execute the SQL query
+df = execute_sql_query(conn, sql_query)
+conn.close()
+
+if df is None:
+    return
+
+# Print the first few rows of the DataFrame
+print("Original Data:")
+print(df.head())
+
+# Calculate RDKit features
+df[['mw', 'logp', 'hbd', 'hba']] = df['canonical_smiles'].apply(lambda x: pd.Series(calculate_rdkit_features(x)))
+
+# Handle missing values after RDKit calculation
+df.replace([np.inf, -np.inf], np.nan, inplace=True)
+df.dropna(inplace=True)
+
+# Convert standard_value to numeric
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df.dropna(subset=['standard_value'], inplace=True)
+
+
+# Print the DataFrame with calculated features
+print("\nData with RDKit Features:")
+print(df.head())
+
+# Basic EDA (Exploratory Data Analysis)
+print("\nDescriptive Statistics:")
+print(df.describe())
+</code></pre>
+<p>if <strong>name</strong> == "<strong>main</strong>":
+    main()
+```</p>
+<p><strong>Lưu ý về phiên bản scikit-learn:</strong> Nếu bạn gặp lỗi <code>TypeError: mean_squared_error() got an unexpected keyword argument 'squared'</code>, hãy đảm bảo rằng bạn đang sử dụng phiên bản scikit-learn mới hơn. Nếu không, bạn có thể loại bỏ tham số <code>squared=False</code> (tham số này chỉ có trong các phiên bản mới hơn).</p>
+<p><strong>4. Ví dụ code SQL và Python (Code Examples):</strong></p>
+<p>Dưới đây là 5 ví dụ code SQL và Python để bạn tham khảo:</p>
+<p><strong>Ví dụ 1: Trích xuất thông tin về các hợp chất có hoạt tính trên một target cụ thể (Extracting compound information with activity on a specific target):</strong></p>
+<ul>
+<li><strong>SQL:</strong></li>
+</ul>
+<p><code>sql
+SELECT md.chembl_id,
+       cs.canonical_smiles,
+       act.standard_value
+FROM activities act
+JOIN molecule_dictionary md ON act.molregno = md.molregno
+JOIN compound_structures cs ON md.molregno = cs.molregno
+WHERE act.standard_type = 'IC50'
+  AND act.standard_units = 'nM'
+  AND act.target_chembl_id = 'CHEMBL205' -- Replace with your target
+LIMIT 100;</code></p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python
+import pandas as pd
+import psycopg2</p>
+<p>def get_compounds_by_target(target_id, limit=100):
+    conn = psycopg2.connect(host=db_host, database=db_name, user=db_user, password=db_pass)
+    sql_query = f"""
+        SELECT md.chembl_id,
+               cs.canonical_smiles,
+               act.standard_value
+        FROM activities act
+        JOIN molecule_dictionary md ON act.molregno = md.molregno
+        JOIN compound_structures cs ON md.molregno = cs.molregno
+        WHERE act.standard_type = 'IC50'
+          AND act.standard_units = 'nM'
+          AND act.target_chembl_id = '{target_id}'
+        LIMIT {limit};
+    """
+    df = pd.read_sql_query(sql_query, conn)
+    conn.close()
+    return df</p>
+<p>target_chembl_id = 'CHEMBL205'
+compounds_df = get_compounds_by_target(target_chembl_id)
+print(compounds_df.head())
+```</p>
+<p><strong>Ví dụ 2: Tính toán số lượng hợp chất cho mỗi target (Calculate the number of compounds for each target):</strong></p>
+<ul>
+<li><strong>SQL:</strong></li>
+</ul>
+<p><code>sql
+SELECT target_chembl_id, COUNT(DISTINCT molregno) AS num_compounds
+FROM activities
+WHERE standard_type = 'IC50'
+GROUP BY target_chembl_id
+ORDER BY num_compounds DESC
+LIMIT 10;</code></p>
+<ul>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python
+import pandas as pd
+import psycopg2</p>
+<p>def count_compounds_per_target(limit=10):
+    conn = psycopg2.connect(host=db_host, database=db_name, user=db_user, password=db_pass)
+    sql_query = f"""
+        SELECT target_chembl_id, COUNT(DISTINCT molregno) AS num_compounds
+        FROM activities
+        WHERE standard_type = 'IC50'
+        GROUP BY target_chembl_id
+        ORDER BY num_compounds DESC
+        LIMIT {limit};
+    """
+    df = pd.read_sql_query(sql_query, conn)
+    conn.close()
+    return df</p>
+<p>target_counts_df = count_compounds_per_target()
+print(target_counts_df.head())
+```</p>
+<p><strong>Ví dụ 3: Phân tích phân bố giá trị IC50 (Analyze IC50 value distribution):</strong></p>
+<ul>
+<li><strong>SQL:</strong> (Không cần thiết, có thể thực hiện trực tiếp trong Python sau khi trích xuất dữ liệu)</li>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python
+import pandas as pd
+import psycopg2
+import matplotlib.pyplot as plt
+import numpy as np</p>
+<p>def analyze_ic50_distribution(limit=100):
+    conn = psycopg2.connect(host=db_host, database=db_name, user=db_user, password=db_pass)
+    sql_query = f"""
+        SELECT standard_value
+        FROM activities
+        WHERE standard_type = 'IC50'
+          AND standard_units = 'nM'
+          AND standard_value IS NOT NULL
+        LIMIT {limit};
+    """
+    df = pd.read_sql_query(sql_query, conn)
+    conn.close()</p>
+<pre><code># Convert to numeric and drop NaN values
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df.dropna(subset=['standard_value'], inplace=True)
+
+# Take the logarithm of IC50 values
+df['pIC50'] = -np.log10(df['standard_value'] / 1e9)  # Convert nM to M
+
+plt.hist(df['pIC50'], bins=30)
+plt.xlabel('pIC50')
+plt.ylabel('Frequency')
+plt.title('Distribution of pIC50 Values')
+plt.show()
+</code></pre>
+<p>analyze_ic50_distribution()
+```</p>
+<p><strong>Ví dụ 4: Tính toán các descriptor vật lý hóa học và xem xét tương quan (Calculate physicochemical descriptors and explore correlations):</strong></p>
+<ul>
+<li><strong>SQL:</strong> (Như ví dụ 1 để lấy SMILES)</li>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python
+import pandas as pd
+import psycopg2
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import matplotlib.pyplot as plt</p>
+<p>def analyze_descriptor_correlations(limit=100):
+    conn = psycopg2.connect(host=db_host, database=db_name, user=db_user, password=db_pass)
+    sql_query = f"""
+        SELECT cs.canonical_smiles
+        FROM activities act
+        JOIN molecule_dictionary md ON act.molregno = md.molregno
+        JOIN compound_structures cs ON md.molregno = cs.molregno
+        WHERE act.standard_type = 'IC50'
+          AND act.standard_units = 'nM'
+        LIMIT {limit};
+    """
+    df = pd.read_sql_query(sql_query, conn)
+    conn.close()</p>
+<pre><code>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol), Descriptors.MolLogP(mol)
+    return None, None
+
+df['MW'], df['LogP'] = zip(*df['canonical_smiles'].apply(calculate_descriptors))
+df.dropna(inplace=True)
+
+plt.scatter(df['MW'], df['LogP'])
+plt.xlabel('Molecular Weight')
+plt.ylabel('LogP')
+plt.title('Correlation between MW and LogP')
+plt.show()
+</code></pre>
+<p>analyze_descriptor_correlations()
+```</p>
+<p><strong>Ví dụ 5: Xây dựng mô hình dự đoán hoạt tính (Build a simple activity prediction model):</strong></p>
+<ul>
+<li><strong>SQL:</strong> (Như ví dụ 1 để lấy SMILES và IC50)</li>
+<li><strong>Python:</strong></li>
+</ul>
+<p>```python
+import pandas as pd
+import psycopg2
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+import numpy as np</p>
+<p>def build_activity_prediction_model(limit=100):
+    conn = psycopg2.connect(host=db_host, database=db_name, user=db_user, password=db_pass)
+    sql_query = f"""
+        SELECT cs.canonical_smiles, act.standard_value
+        FROM activities act
+        JOIN molecule_dictionary md ON act.molregno = md.molregno
+        JOIN compound_structures cs ON md.molregno = cs.molregno
+        WHERE act.standard_type = 'IC50'
+          AND act.standard_units = 'nM'
+          AND act.standard_value IS NOT NULL
+        LIMIT {limit};
+    """
+    df = pd.read_sql_query(sql_query, conn)
+    conn.close()</p>
+<pre><code>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolWt(mol), Descriptors.MolLogP(mol)
+    return None, None
+
+df['MW'], df['LogP'] = zip(*df['canonical_smiles'].apply(calculate_descriptors))
+df.dropna(inplace=True)
+df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df.dropna(subset=['standard_value'], inplace=True)
+
+X = df[['MW', 'LogP']]
+y = -np.log10(df['standard_value'] / 1e9) # pIC50
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+print(f'Mean Squared Error: {mse}')
+</code></pre>
+<p>build_activity_prediction_model()
+```</p>
+<p><strong>Lưu ý quan trọng:</strong></p>
+<ul>
+<li><strong>Đường dẫn (Paths):</strong> Luôn sử dụng <code>os.path.join(base_path, ...)</code> để đảm bảo tính tương thích của code trên các hệ điều hành khác nhau.</li>
+<li><strong>Xử lý lỗi (Error Handling):</strong> Bổ sung các khối <code>try...except</code> để xử lý các lỗi có thể xảy ra trong quá trình kết nối cơ sở dữ liệu, tính toán đặc trưng, hoặc xây dựng mô hình.</li>
+<li><strong>Logging:</strong> Sử dụng thư viện <code>logging</code> để ghi lại các thông tin quan trọng trong quá trình chạy code.</li>
+<li><strong>AIMLOps Template:</strong> Đảm bảo rằng code của bạn tuân thủ theo cấu trúc thư mục và quy ước đặt tên file của AIMLOps template.</li>
+</ul>
+<p>Tôi hy vọng những hướng dẫn và ví dụ này sẽ giúp bạn bắt đầu dự án của mình một cách thuận lợi. Nếu bạn có bất kỳ câu hỏi nào khác, đừng ngần ngại hỏi!</p>
+        </body>
+        </html>
+        

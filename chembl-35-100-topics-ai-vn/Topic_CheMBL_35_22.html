@@ -1,0 +1,649 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_22</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Phân tích ligand nhắm GPCR</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được tham gia vào dự án phân tích dữ liệu ChEMBL 35 của bạn. Dựa trên thông tin bạn cung cấp và những yêu cầu cụ thể, tôi sẽ giúp bạn xây dựng quy trình phân tích dữ liệu hiệu quả, tập trung vào việc giải quyết các vấn đề bạn gặp phải và tuân thủ theo template AIMLOps.</p>
+<p><strong>Tổng quan về quy trình phân tích</strong></p>
+<p>Chúng ta sẽ thực hiện các bước sau:</p>
+<ol>
+<li><strong>Data Extraction (Trích xuất dữ liệu):</strong> Sử dụng SQL để truy vấn dữ liệu từ cơ sở dữ liệu ChEMBL 35 và lưu vào file CSV. Chú ý xử lý lỗi <code>operator does not exist: numeric ~ unknown</code>.</li>
+<li><strong>Data Preprocessing (Tiền xử lý dữ liệu):</strong> Đọc file CSV, làm sạch và chuẩn hóa dữ liệu bằng RDKit và các thư viện Python khác.</li>
+<li><strong>Feature Engineering (Xây dựng đặc trưng):</strong> Tạo các đặc trưng hóa học (chemical features) từ SMILES strings sử dụng RDKit.</li>
+<li><strong>Model Building (Xây dựng mô hình):</strong> Xây dựng mô hình học máy (ví dụ: regression) để dự đoán hoạt tính của các hợp chất.</li>
+<li><strong>Model Evaluation (Đánh giá mô hình):</strong> Đánh giá hiệu năng của mô hình và tinh chỉnh nếu cần.</li>
+</ol>
+<p><strong>1. Phân tích mô hình (Model Analysis)</strong></p>
+<p>Mô hình phân tích sẽ tập trung vào việc xây dựng một mô hình dự đoán hoạt tính (activity) của các hợp chất dựa trên cấu trúc hóa học của chúng. Cụ thể, chúng ta sẽ sử dụng mô hình hồi quy (regression model) để dự đoán giá trị hoạt tính (ví dụ: IC50, Ki).</p>
+<ul>
+<li><strong>Input (Đầu vào):</strong> SMILES strings (biểu diễn cấu trúc hóa học) của các hợp chất.</li>
+<li><strong>Process (Quy trình):</strong><ul>
+<li>Sử dụng RDKit để chuyển đổi SMILES strings thành các đặc trưng số (numerical features) như fingerprints, descriptors.</li>
+<li>Sử dụng các thuật toán hồi quy (ví dụ: Linear Regression, Random Forest, XGBoost) để xây dựng mô hình dự đoán.</li>
+</ul>
+</li>
+<li><strong>Output (Đầu ra):</strong> Mô hình dự đoán giá trị hoạt tính của hợp chất dựa trên cấu trúc hóa học.</li>
+</ul>
+<p><strong>2. Hướng dẫn song ngữ (Bilingual Instructions)</strong></p>
+<p><strong>2.1. SQL Code (Mã SQL)</strong></p>
+<ul>
+<li><strong>Purpose:</strong> Extract data from ChEMBL database and save to CSV file. (Mục đích: Trích xuất dữ liệu từ cơ sở dữ liệu ChEMBL và lưu vào file CSV.)</li>
+<li><strong>Explanation:</strong> The following SQL code retrieves compound information and activity data, addressing the error related to numeric comparison. (Giải thích: Mã SQL sau truy xuất thông tin hợp chất và dữ liệu hoạt tính, giải quyết lỗi liên quan đến so sánh số.)</li>
+</ul>
+<p>```sql
+-- English
+-- Extracting data from ChEMBL database</p>
+<p>SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE act.standard_type = 'IC50'
+  AND act.standard_units = 'nM'
+  AND act.standard_value IS NOT NULL
+  AND act.standard_value::text ~ '^[0-9.]+$' -- Check if the value is numeric
+LIMIT 100;</p>
+<p>-- Vietnamese
+-- Trích xuất dữ liệu từ cơ sở dữ liệu ChEMBL</p>
+<p>SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE act.standard_type = 'IC50'
+  AND act.standard_units = 'nM'
+  AND act.standard_value IS NOT NULL
+  AND act.standard_value::text ~ '^[0-9.]+$' -- Kiểm tra xem giá trị có phải là số không
+LIMIT 100;
+```</p>
+<p><strong>Giải thích lỗi và cách khắc phục:</strong></p>
+<p>Lỗi <code>ERROR: operator does not exist: numeric ~ unknown</code> xảy ra do PostgreSQL không thể so sánh trực tiếp kiểu dữ liệu <code>numeric</code> với một biểu thức regular expression (kiểu <code>unknown</code>). Để khắc phục, chúng ta cần ép kiểu dữ liệu <code>standard_value</code> về kiểu <code>text</code> trước khi so sánh bằng <code>~</code> (regular expression matching).</p>
+<p><strong>2.2. Python Code (Mã Python)</strong></p>
+<ul>
+<li><strong>Purpose:</strong> Load data from CSV, preprocess data using RDKit, and build a regression model. (Mục đích: Tải dữ liệu từ CSV, tiền xử lý dữ liệu bằng RDKit và xây dựng mô hình hồi quy.)</li>
+<li><strong>Explanation:</strong> The following Python code loads data, converts SMILES to features, and builds a linear regression model. It also addresses the scikit-learn version issue. (Giải thích: Mã Python sau tải dữ liệu, chuyển đổi SMILES thành đặc trưng và xây dựng mô hình hồi quy tuyến tính. Nó cũng giải quyết vấn đề phiên bản scikit-learn.)</li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error</p>
+<h1>Define base path</h1>
+<p>base_path = "../data"
+csv_file = "chembl_data.csv" # Replace with your actual file name
+csv_path = os.path.join(base_path, csv_file)</p>
+<h1>Load data from CSV</h1>
+<p>try:
+    df = pd.read_csv(csv_path)
+except FileNotFoundError:
+    print(f"Error: The file {csv_path} was not found.")
+    exit()</p>
+<h1>Data Preprocessing</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])</p>
+<h1>Convert SMILES to features using RDKit (Morgan Fingerprints)</h1>
+<p>def smiles_to_features(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        fp = AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=1024)
+        return list(fp)
+    else:
+        return None</p>
+<p>df['features'] = df['canonical_smiles'].apply(smiles_to_features)
+df = df.dropna(subset=['features'])</p>
+<h1>Prepare data for modeling</h1>
+<p>X = list(df['features'])
+y = df['standard_value'].astype(float)</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Build and train the Linear Regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>try:
+    mse = mean_squared_error(y_test, y_pred, squared=False) # Try with squared=False first
+except TypeError:
+    mse = mean_squared_error(y_test, y_pred) # If squared=False is not supported</p>
+<p>print(f"Mean Squared Error: {mse}")</p>
+<h1>Vietnamese</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error</p>
+<h1>Định nghĩa đường dẫn cơ sở</h1>
+<p>base_path = "../data"
+csv_file = "chembl_data.csv" # Thay thế bằng tên file thực tế của bạn
+csv_path = os.path.join(base_path, csv_file)</p>
+<h1>Tải dữ liệu từ CSV</h1>
+<p>try:
+    df = pd.read_csv(csv_path)
+except FileNotFoundError:
+    print(f"Lỗi: Không tìm thấy file {csv_path}.")
+    exit()</p>
+<h1>Tiền xử lý dữ liệu</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])</p>
+<h1>Chuyển đổi SMILES thành đặc trưng sử dụng RDKit (Morgan Fingerprints)</h1>
+<p>def smiles_to_features(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        fp = AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=1024)
+        return list(fp)
+    else:
+        return None</p>
+<p>df['features'] = df['canonical_smiles'].apply(smiles_to_features)
+df = df.dropna(subset=['features'])</p>
+<h1>Chuẩn bị dữ liệu cho mô hình</h1>
+<p>X = list(df['features'])
+y = df['standard_value'].astype(float)</p>
+<h1>Chia dữ liệu thành tập huấn luyện và tập kiểm tra</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Xây dựng và huấn luyện mô hình hồi quy tuyến tính</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Dự đoán</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Đánh giá mô hình</h1>
+<p>try:
+    mse = mean_squared_error(y_test, y_pred, squared=False) # Thử với squared=False trước
+except TypeError:
+    mse = mean_squared_error(y_test, y_pred) # Nếu squared=False không được hỗ trợ</p>
+<p>print(f"Sai số bình phương trung bình: {mse}")
+```</p>
+<p><strong>Giải thích lỗi và cách khắc phục:</strong></p>
+<ul>
+<li><strong><code>squared=False</code> in <code>mean_squared_error</code>:</strong>  Phiên bản cũ của scikit-learn không hỗ trợ tham số <code>squared=False</code> trong hàm <code>mean_squared_error</code>. Để khắc phục, chúng ta sử dụng một khối <code>try...except</code> để thử sử dụng <code>squared=False</code> trước. Nếu lỗi <code>TypeError</code> xảy ra, chúng ta sẽ sử dụng <code>mean_squared_error</code> mà không có tham số <code>squared=False</code>.</li>
+<li><strong>Xử lý <code>FileNotFoundError</code>:</strong> Đoạn code đã được bổ sung khối <code>try...except</code> để bắt lỗi <code>FileNotFoundError</code> khi file CSV không tồn tại.</li>
+</ul>
+<p><strong>3. Ví dụ Code (Code Examples)</strong></p>
+<p>Dưới đây là 5 ví dụ code SQL và Python mẫu để bạn tham khảo:</p>
+<p><strong>3.1. SQL Examples</strong></p>
+<ol>
+<li><strong>Extract data for a specific target (Lấy dữ liệu cho một mục tiêu cụ thể):</strong></li>
+</ol>
+<p>```sql
+-- English
+SELECT md.molregno, cs.canonical_smiles, act.standard_value
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+JOIN activities act ON md.molregno = act.molregno
+JOIN target_dictionary td ON act.tid = td.tid
+WHERE td.target_name = 'CHEMBL205' -- Replace with your target name
+AND act.standard_type = 'IC50'
+AND act.standard_units = 'nM'
+AND act.standard_value IS NOT NULL
+AND act.standard_value::text ~ '^[0-9.]+$'
+LIMIT 100;</p>
+<p>-- Vietnamese
+SELECT md.molregno, cs.canonical_smiles, act.standard_value
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+JOIN activities act ON md.molregno = act.molregno
+JOIN target_dictionary td ON act.tid = td.tid
+WHERE td.target_name = 'CHEMBL205' -- Thay thế bằng tên mục tiêu của bạn
+AND act.standard_type = 'IC50'
+AND act.standard_units = 'nM'
+AND act.standard_value IS NOT NULL
+AND act.standard_value::text ~ '^[0-9.]+$'
+LIMIT 100;
+```</p>
+<ol>
+<li><strong>Extract data for a specific assay (Lấy dữ liệu cho một assay cụ thể):</strong></li>
+</ol>
+<p>```sql
+-- English
+SELECT md.molregno, cs.canonical_smiles, act.standard_value
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+JOIN activities act ON md.molregno = act.molregno
+JOIN assays a ON act.assay_id = a.assay_id
+WHERE a.description LIKE '%acetylcholinesterase%' -- Replace with your assay description
+AND act.standard_type = 'IC50'
+AND act.standard_units = 'nM'
+AND act.standard_value IS NOT NULL
+AND act.standard_value::text ~ '^[0-9.]+$'
+LIMIT 100;</p>
+<p>-- Vietnamese
+SELECT md.molregno, cs.canonical_smiles, act.standard_value
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+JOIN activities act ON md.molregno = act.molregno
+JOIN assays a ON act.assay_id = a.assay_id
+WHERE a.description LIKE '%acetylcholinesterase%' -- Thay thế bằng mô tả assay của bạn
+AND act.standard_type = 'IC50'
+AND act.standard_units = 'nM'
+AND act.standard_value IS NOT NULL
+AND act.standard_value::text ~ '^[0-9.]+$'
+LIMIT 100;
+```</p>
+<ol>
+<li><strong>Extract data with a specific activity range (Lấy dữ liệu với một khoảng giá trị hoạt tính cụ thể):</strong></li>
+</ol>
+<p>```sql
+-- English
+SELECT md.molregno, cs.canonical_smiles, act.standard_value
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+JOIN activities act ON md.molregno = act.molregno
+WHERE act.standard_type = 'IC50'
+AND act.standard_units = 'nM'
+AND act.standard_value BETWEEN 10 AND 100 -- Replace with your activity range
+AND act.standard_value IS NOT NULL
+AND act.standard_value::text ~ '^[0-9.]+$'
+LIMIT 100;</p>
+<p>-- Vietnamese
+SELECT md.molregno, cs.canonical_smiles, act.standard_value
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+JOIN activities act ON md.molregno = act.molregno
+WHERE act.standard_type = 'IC50'
+AND act.standard_units = 'nM'
+AND act.standard_value BETWEEN 10 AND 100 -- Thay thế bằng khoảng giá trị hoạt tính của bạn
+AND act.standard_value IS NOT NULL
+AND act.standard_value::text ~ '^[0-9.]+$'
+LIMIT 100;
+```</p>
+<ol>
+<li><strong>Extract data and order by activity (Lấy dữ liệu và sắp xếp theo hoạt tính):</strong></li>
+</ol>
+<p>```sql
+-- English
+SELECT md.molregno, cs.canonical_smiles, act.standard_value
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+JOIN activities act ON md.molregno = act.molregno
+WHERE act.standard_type = 'IC50'
+AND act.standard_units = 'nM'
+AND act.standard_value IS NOT NULL
+AND act.standard_value::text ~ '^[0-9.]+$'
+ORDER BY act.standard_value ASC -- or DESC for descending order
+LIMIT 100;</p>
+<p>-- Vietnamese
+SELECT md.molregno, cs.canonical_smiles, act.standard_value
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+JOIN activities act ON md.molregno = act.molregno
+WHERE act.standard_type = 'IC50'
+AND act.standard_units = 'nM'
+AND act.standard_value IS NOT NULL
+AND act.standard_value::text ~ '^[0-9.]+$'
+ORDER BY act.standard_value ASC -- hoặc DESC để sắp xếp giảm dần
+LIMIT 100;
+```</p>
+<ol>
+<li><strong>Extract distinct compounds (Lấy các hợp chất khác nhau):</strong></li>
+</ol>
+<p>```sql
+-- English
+SELECT DISTINCT cs.canonical_smiles
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+JOIN activities act ON md.molregno = act.molregno
+WHERE act.standard_type = 'IC50'
+AND act.standard_units = 'nM'
+AND act.standard_value IS NOT NULL
+AND act.standard_value::text ~ '^[0-9.]+$'
+LIMIT 100;</p>
+<p>-- Vietnamese
+SELECT DISTINCT cs.canonical_smiles
+FROM molecule_dictionary md
+JOIN compound_structures cs ON md.molregno = cs.molregno
+JOIN activities act ON md.molregno = act.molregno
+WHERE act.standard_type = 'IC50'
+AND act.standard_units = 'nM'
+AND act.standard_value IS NOT NULL
+AND act.standard_value::text ~ '^[0-9.]+$'
+LIMIT 100;
+```</p>
+<p><strong>3.2. Python Examples</strong></p>
+<ol>
+<li><strong>Calculate and visualize molecular weight (Tính toán và trực quan hóa khối lượng phân tử):</strong></li>
+</ol>
+<p>```python</p>
+<h1>English</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import matplotlib.pyplot as plt
+import os</p>
+<p>base_path = "../data"
+csv_file = "chembl_data.csv"
+csv_path = os.path.join(base_path, csv_file)</p>
+<p>df = pd.read_csv(csv_path)
+df = df.dropna(subset=['canonical_smiles'])</p>
+<p>def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<p>df['mol_weight'] = df['canonical_smiles'].apply(calculate_mw)
+df = df.dropna(subset=['mol_weight'])</p>
+<p>plt.hist(df['mol_weight'], bins=50)
+plt.xlabel('Molecular Weight')
+plt.ylabel('Frequency')
+plt.title('Distribution of Molecular Weight')
+plt.show()</p>
+<h1>Vietnamese</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import matplotlib.pyplot as plt
+import os</p>
+<p>base_path = "../data"
+csv_file = "chembl_data.csv"
+csv_path = os.path.join(base_path, csv_file)</p>
+<p>df = pd.read_csv(csv_path)
+df = df.dropna(subset=['canonical_smiles'])</p>
+<p>def calculate_mw(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<p>df['mol_weight'] = df['canonical_smiles'].apply(calculate_mw)
+df = df.dropna(subset=['mol_weight'])</p>
+<p>plt.hist(df['mol_weight'], bins=50)
+plt.xlabel('Khối lượng phân tử')
+plt.ylabel('Tần số')
+plt.title('Phân bố khối lượng phân tử')
+plt.show()
+```</p>
+<ol>
+<li><strong>Calculate LogP (Tính toán LogP):</strong></li>
+</ol>
+<p>```python</p>
+<h1>English</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import os</p>
+<p>base_path = "../data"
+csv_file = "chembl_data.csv"
+csv_path = os.path.join(base_path, csv_file)</p>
+<p>df = pd.read_csv(csv_path)
+df = df.dropna(subset=['canonical_smiles'])</p>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Descriptors.MolLogP(mol)
+    else:
+        return None</p>
+<p>df['logp'] = df['canonical_smiles'].apply(calculate_logp)
+df = df.dropna(subset=['logp'])
+print(df[['canonical_smiles', 'logp']].head())</p>
+<h1>Vietnamese</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import os</p>
+<p>base_path = "../data"
+csv_file = "chembl_data.csv"
+csv_path = os.path.join(base_path, csv_file)</p>
+<p>df = pd.read_csv(csv_path)
+df = df.dropna(subset=['canonical_smiles'])</p>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Descriptors.MolLogP(mol)
+    else:
+        return None</p>
+<p>df['logp'] = df['canonical_smiles'].apply(calculate_logp)
+df = df.dropna(subset=['logp'])
+print(df[['canonical_smiles', 'logp']].head())
+```</p>
+<ol>
+<li><strong>Calculate TPSA (Tính toán TPSA):</strong></li>
+</ol>
+<p>```python</p>
+<h1>English</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import os</p>
+<p>base_path = "../data"
+csv_file = "chembl_data.csv"
+csv_path = os.path.join(base_path, csv_file)</p>
+<p>df = pd.read_csv(csv_path)
+df = df.dropna(subset=['canonical_smiles'])</p>
+<p>def calculate_tpsa(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Descriptors.TPSA(mol)
+    else:
+        return None</p>
+<p>df['tpsa'] = df['canonical_smiles'].apply(calculate_tpsa)
+df = df.dropna(subset=['tpsa'])
+print(df[['canonical_smiles', 'tpsa']].head())</p>
+<h1>Vietnamese</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import os</p>
+<p>base_path = "../data"
+csv_file = "chembl_data.csv"
+csv_path = os.path.join(base_path, csv_file)</p>
+<p>df = pd.read_csv(csv_path)
+df = df.dropna(subset=['canonical_smiles'])</p>
+<p>def calculate_tpsa(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Descriptors.TPSA(mol)
+    else:
+        return None</p>
+<p>df['tpsa'] = df['canonical_smiles'].apply(calculate_tpsa)
+df = df.dropna(subset=['tpsa'])
+print(df[['canonical_smiles', 'tpsa']].head())
+```</p>
+<ol>
+<li><strong>Calculate the number of hydrogen bond donors and acceptors (Tính toán số lượng chất cho và nhận liên kết hydro):</strong></li>
+</ol>
+<p>```python</p>
+<h1>English</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import os</p>
+<p>base_path = "../data"
+csv_file = "chembl_data.csv"
+csv_path = os.path.join(base_path, csv_file)</p>
+<p>df = pd.read_csv(csv_path)
+df = df.dropna(subset=['canonical_smiles'])</p>
+<p>def calculate_hbd(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Descriptors.NumHDonors(mol)
+    else:
+        return None</p>
+<p>def calculate_hba(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Descriptors.NumHAcceptors(mol)
+    else:
+        return None</p>
+<p>df['hbd'] = df['canonical_smiles'].apply(calculate_hbd)
+df['hba'] = df['canonical_smiles'].apply(calculate_hba)</p>
+<p>df = df.dropna(subset=['hbd', 'hba'])
+print(df[['canonical_smiles', 'hbd', 'hba']].head())</p>
+<h1>Vietnamese</h1>
+<p>import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import os</p>
+<p>base_path = "../data"
+csv_file = "chembl_data.csv"
+csv_path = os.path.join(base_path, csv_file)</p>
+<p>df = pd.read_csv(csv_path)
+df = df.dropna(subset=['canonical_smiles'])</p>
+<p>def calculate_hbd(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Descriptors.NumHDonors(mol)
+    else:
+        return None</p>
+<p>def calculate_hba(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Descriptors.NumHAcceptors(mol)
+    else:
+        return None</p>
+<p>df['hbd'] = df['canonical_smiles'].apply(calculate_hbd)
+df['hba'] = df['canonical_smiles'].apply(calculate_hba)</p>
+<p>df = df.dropna(subset=['hbd', 'hba'])
+print(df[['canonical_smiles', 'hbd', 'hba']].head())
+```</p>
+<ol>
+<li><strong>Train a Random Forest Regressor model (Huấn luyện mô hình Random Forest Regressor):</strong></li>
+</ol>
+<p>```python</p>
+<h1>English</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error</p>
+<h1>Define base path</h1>
+<p>base_path = "../data"
+csv_file = "chembl_data.csv" # Replace with your actual file name
+csv_path = os.path.join(base_path, csv_file)</p>
+<h1>Load data from CSV</h1>
+<p>try:
+    df = pd.read_csv(csv_path)
+except FileNotFoundError:
+    print(f"Error: The file {csv_path} was not found.")
+    exit()</p>
+<h1>Data Preprocessing</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])</p>
+<h1>Convert SMILES to features using RDKit (Morgan Fingerprints)</h1>
+<p>def smiles_to_features(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        fp = AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=1024)
+        return list(fp)
+    else:
+        return None</p>
+<p>df['features'] = df['canonical_smiles'].apply(smiles_to_features)
+df = df.dropna(subset=['features'])</p>
+<h1>Prepare data for modeling</h1>
+<p>X = list(df['features'])
+y = df['standard_value'].astype(float)</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Build and train the Random Forest Regressor model</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")</p>
+<h1>Vietnamese</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error</p>
+<h1>Định nghĩa đường dẫn cơ sở</h1>
+<p>base_path = "../data"
+csv_file = "chembl_data.csv" # Thay thế bằng tên file thực tế của bạn
+csv_path = os.path.join(base_path, csv_file)</p>
+<h1>Tải dữ liệu từ CSV</h1>
+<p>try:
+    df = pd.read_csv(csv_path)
+except FileNotFoundError:
+    print(f"Lỗi: Không tìm thấy file {csv_path}.")
+    exit()</p>
+<h1>Tiền xử lý dữ liệu</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value'])</p>
+<h1>Chuyển đổi SMILES thành đặc trưng sử dụng RDKit (Morgan Fingerprints)</h1>
+<p>def smiles_to_features(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        fp = AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=1024)
+        return list(fp)
+    else:
+        return None</p>
+<p>df['features'] = df['canonical_smiles'].apply(smiles_to_features)
+df = df.dropna(subset=['features'])</p>
+<h1>Chuẩn bị dữ liệu cho mô hình</h1>
+<p>X = list(df['features'])
+y = df['standard_value'].astype(float)</p>
+<h1>Chia dữ liệu thành tập huấn luyện và tập kiểm tra</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Xây dựng và huấn luyện mô hình Random Forest Regressor</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)</p>
+<h1>Dự đoán</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Đánh giá mô hình</h1>
+<p>mse = mean_squared_error(y_test, y_pred)</p>
+<p>print(f"Sai số bình phương trung bình: {mse}")
+```</p>
+<p><strong>Lưu ý quan trọng:</strong></p>
+<ul>
+<li>Hãy thay thế <code>"chembl_data.csv"</code> bằng tên file CSV thực tế của bạn.</li>
+<li>Đảm bảo bạn đã cài đặt tất cả các thư viện cần thiết (pandas, rdkit, scikit-learn, matplotlib).</li>
+<li>Điều chỉnh các tham số của mô hình (ví dụ: <code>n_estimators</code> trong <code>RandomForestRegressor</code>) để đạt được hiệu năng tốt nhất.</li>
+</ul>
+<p>Tôi hy vọng những hướng dẫn và ví dụ này sẽ giúp bạn tiến xa hơn trong dự án của mình. Nếu bạn có bất kỳ câu hỏi nào, đừng ngần ngại hỏi!</p>
+        </body>
+        </html>
+        

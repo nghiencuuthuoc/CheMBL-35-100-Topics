@@ -1,0 +1,291 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_91</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Case study: JAK inhibitors from ChEMBL</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project using RDKit, following an AIMLops-style directory structure, and encountering specific issues related to SQL and scikit-learn versions. Your goal is to extract a manageable subset (100 rows) of data and perform some analysis.</p>
+<p>Here's a breakdown of the analysis, code examples (SQL and Python), and solutions to your errors, all tailored to the "Topic_CheMBL_35_91" convention:</p>
+<p><strong>1. Analysis of the Analysis Model</strong></p>
+<p>The project aims to extract and analyze data from the Chembl 35 database related to bioactivity.  A typical workflow includes:</p>
+<ul>
+<li><strong>Data Extraction (SQL):</strong>  This involves querying the Chembl database to retrieve relevant information like compound structures (SMILES), target information, and bioactivity data (e.g., IC50, Ki values). The query should filter for relevant data, likely based on specific targets, assays, or activity types.</li>
+<li><strong>Data Preprocessing (Python/RDKit):</strong>  RDKit is used to process the SMILES strings, generate molecular fingerprints, calculate descriptors, and prepare the data for machine learning models.  This step often includes handling missing values, outliers, and data normalization.</li>
+<li><strong>Exploratory Data Analysis (Python):</strong> Understanding dataset structure. This helps to uncover patterns, anomalies, or relationships.</li>
+<li><strong>Model Building (Python/Scikit-learn):</strong> Machine learning models (e.g., regression, classification) are used to predict bioactivity based on the calculated descriptors. Common models include linear regression, random forests, and support vector machines.</li>
+<li><strong>Model Evaluation (Python/Scikit-learn):</strong> The models are evaluated using appropriate metrics (e.g., R-squared, RMSE for regression; accuracy, AUC for classification) on a held-out test set.</li>
+<li><strong>Interpretation and Visualization (Python):</strong>  Results are visualized and interpreted to understand the factors driving bioactivity.  This might involve generating scatter plots, histograms, or visualizing molecular structures with activity information.</li>
+</ul>
+<p>The analysis will likely involve establishing relationships between chemical structures and their biological activity.</p>
+<p><strong>2. SQL Code (Topic_CheMBL_35_91_1.sql)</strong></p>
+<p>This SQL script extracts a limited number of data (100 rows) from the Chembl database, specifically focusing on activities with standard values.</p>
+<p>```sql
+-- Topic_CheMBL_35_91_1.sql</p>
+<p>-- Connect to the chembl_35 database
+\c chembl_35 rd rd 192.168.206.136</p>
+<p>-- Extract relevant data with a limit of 100 rows
+SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.assay_id
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type IN ('IC50', 'Ki', 'Kd') -- Filter for relevant activity types
+    AND act.standard_value IS NOT NULL -- Ensure standard value exists
+    AND act.standard_units = 'nM' -- Filter for standard units
+    AND act.standard_value::text ~ '^[0-9.]+$' -- Corrected numeric check
+LIMIT 100;</p>
+<p>-- Save the output to a CSV file
+\copy (SELECT
+    md.molregno,
+    cs.canonical_smiles,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.assay_id
+FROM
+    molecule_dictionary md
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+JOIN
+    activities act ON md.molregno = act.molregno
+WHERE
+    act.standard_type IN ('IC50', 'Ki', 'Kd') -- Filter for relevant activity types
+    AND act.standard_value IS NOT NULL -- Ensure standard value exists
+    AND act.standard_units = 'nM' -- Filter for standard units
+    AND act.standard_value::text ~ '^[0-9.]+$' -- Corrected numeric check
+LIMIT 100) TO '../data/chembl_35_subset.csv' WITH CSV HEADER;</p>
+<p>-- Explanation:
+-- *   <code>\c chembl_35 rd rd 192.168.206.136</code>: Connects to the database.
+-- *   <code>SELECT ... FROM ...</code>: Selects the desired columns from the tables.
+-- *   <code>JOIN</code>: Joins tables based on <code>molregno</code> (molecule registration number).
+-- *   <code>WHERE</code>: Filters the data based on activity type, existence of standard value, and units.
+-- *   <code>LIMIT 100</code>: Restricts the output to 100 rows.
+-- *   <code>\copy ... TO ...</code>: Saves the query result to a CSV file.  Make sure the path <code>../data/chembl_35_subset.csv</code> is valid relative to where you run the <code>psql</code> command.</p>
+<p>```</p>
+<p><strong>Correction for SQL Error (a): <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p>The issue is that the <code>~</code> operator (regular expression match) cannot be directly applied to a <code>numeric</code> type. To fix this, cast the <code>standard_value</code> to <code>text</code> before applying the regular expression.</p>
+<p><code>sql
+AND act.standard_value::text ~ '^[0-9\.]+$'</code></p>
+<p>This casts the <code>standard_value</code> to a text string, allowing the regular expression to match. The regex <code>^[0-9\.]+$</code> ensures that the value consists only of digits and periods.</p>
+<p><strong>Run this script in pgAdmin.</strong> This will create the <code>chembl_35_subset.csv</code> file in your <code>../data/</code> directory.</p>
+<p><strong>3. Python Code (Topic_CheMBL_35_91_2.ipynb)</strong></p>
+<p>This Jupyter Notebook code reads the CSV file, processes the data using RDKit, calculates descriptors, and performs a simple analysis.</p>
+<p>```python</p>
+<h1>Topic_CheMBL_35_91_2.ipynb</h1>
+<p>import pandas as pd
+import numpy as np
+import os
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from rdkit.Chem import AllChem
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt</p>
+<h1>Define the base path (important for AIMLops structure)</h1>
+<p>base_path = os.path.dirname(os.getcwd()) # Go up one level to the project root
+data_path = os.path.join(base_path, 'data', 'chembl_35_subset.csv') # Full path to the CSV</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+    print(f"Data loaded successfully from: {data_path}")
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}. Make sure the SQL script has been run and the file exists.")
+    exit()</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value']) # Remove rows with missing SMILES or values
+df = df[df['standard_value'] &gt; 0] # Remove non-positive values (important for log transform)
+df = df.drop_duplicates(subset=['canonical_smiles']) # Remove duplicate SMILES entries</p>
+<h1>Convert standard_value to pIC50 (or pKi, pKd)</h1>
+<p>df['pActivity'] = -np.log10(df['standard_value'] * 1e-9)  # Convert nM to M, then to pActivity</p>
+<h1>RDKit Descriptor Calculation</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    try:
+        AllChem.Compute2DCoords(mol)  # Ensure 2D coordinates are computed
+        descriptors = {desc_name: desc_func(mol) for desc_name, desc_func in Descriptors.descList}
+        return descriptors
+    except Exception as e:
+        print(f"Error calculating descriptors for {smiles}: {e}")
+        return None</p>
+<p>df['descriptors'] = df['canonical_smiles'].apply(calculate_descriptors)</p>
+<h1>Handle missing descriptors</h1>
+<p>df = df.dropna(subset=['descriptors'])</p>
+<h1>Convert descriptors to DataFrame</h1>
+<p>descriptors_df = pd.DataFrame(df['descriptors'].tolist(), index=df.index)
+df = pd.concat([df, descriptors_df], axis=1)</p>
+<h1>Select features and target</h1>
+<p>X = df.iloc[:, 12:]  # Select all descriptor columns (adjust index if needed)
+y = df['pActivity']</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Model Training</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Model Evaluation</h1>
+<p>y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Visualization (Example)</h1>
+<p>plt.scatter(y_test, y_pred)
+plt.xlabel("Actual pActivity")
+plt.ylabel("Predicted pActivity")
+plt.title("Actual vs. Predicted pActivity")
+plt.show()
+```</p>
+<p><strong>Explanation:</strong></p>
+<ol>
+<li><strong>Import Libraries:</strong> Imports necessary libraries.</li>
+<li><strong>File Path:</strong>  Constructs the full file path using <code>os.path.join</code> to adhere to the AIMLops directory structure.  This is crucial for portability and maintainability.</li>
+<li><strong>Data Loading:</strong> Loads the CSV data using <code>pandas</code>. Includes error handling for the case where the file is not found.</li>
+<li><strong>Data Cleaning:</strong><ul>
+<li>Removes rows with missing SMILES strings or standard values.</li>
+<li>Removes duplicate SMILES to avoid bias in the model.</li>
+<li>Removes non-positive standard_value to prepare for logarithmic transformation.</li>
+</ul>
+</li>
+<li><strong>pActivity Calculation:</strong> Converts <code>standard_value</code> (assumed to be in nM) to pActivity (e.g., pIC50) using <code>-log10(value * 1e-9)</code>.</li>
+<li><strong>Descriptor Calculation:</strong><ul>
+<li>Defines a function <code>calculate_descriptors</code> that takes a SMILES string as input and returns a dictionary of RDKit descriptors.</li>
+<li>Applies the function to the <code>canonical_smiles</code> column to create a new 'descriptors' column.</li>
+</ul>
+</li>
+<li><strong>Handle Missing Descriptors:</strong>
+    *Remove rows with missing descriptors</li>
+<li><strong>Descriptor DataFrame:</strong><ul>
+<li>Extracts the calculated descriptors from the dictionary format into a Pandas DataFrame (<code>descriptors_df</code>).</li>
+<li>Concatenates the descriptor DataFrame with the original DataFrame.</li>
+</ul>
+</li>
+<li><strong>Feature and Target Selection:</strong> Selects the descriptor columns (adjust index if necessary) as features (X) and <code>pActivity</code> as the target variable (y).</li>
+<li><strong>Data Splitting:</strong> Splits the data into training and testing sets.</li>
+<li><strong>Model Training:</strong> Creates a linear regression model and trains it on the training data.</li>
+<li><strong>Model Evaluation:</strong> Predicts pActivity values for the test set and calculates the mean squared error (MSE) and R-squared.</li>
+<li><strong>Visualization:</strong> Creates a scatter plot of actual vs. predicted pActivity values.</li>
+</ol>
+<p><strong>Correction for Python Error (b): <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<p>The <code>squared=False</code> parameter was added to <code>mean_squared_error</code> in a later version of scikit-learn.  Since you can't upgrade (as per your instructions), the solution is to take the square root of the MSE to get the RMSE (Root Mean Squared Error):</p>
+<p>```python
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)  # Calculate RMSE
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"Root Mean Squared Error: {rmse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>Important Notes:</strong></p>
+<ul>
+<li><strong>Directory Structure:</strong>  Double-check that the paths used in <code>os.path.join</code> are correct for your AIMLops project structure. This is critical for reproducibility. The example assumes that the notebook is located one level deep within the project directory.</li>
+<li><strong>Descriptor Selection:</strong> You might want to experiment with different sets of descriptors.  Not all descriptors are relevant for every problem.</li>
+<li><strong>Model Selection:</strong> Linear regression is a simple starting point. Try other models like Random Forest, Gradient Boosting, or Support Vector Machines, which may perform better.</li>
+<li><strong>Feature Scaling:</strong> Consider scaling your features (e.g., using <code>StandardScaler</code> from scikit-learn) before training the model. This can improve the performance of some machine-learning algorithms.</li>
+<li><strong>Error Handling:</strong> The code includes basic error handling for file loading and descriptor calculation.  Add more robust error handling as needed.</li>
+<li><strong>Virtual Environment:</strong>  It is <em>highly</em> recommended to use a virtual environment (e.g., <code>venv</code>, <code>conda</code>) to manage your Python dependencies. This will prevent conflicts between different projects.</li>
+</ul>
+<p><strong>4. Code in English and Chinese:</strong></p>
+<p><strong>English:</strong></p>
+<ul>
+<li>The SQL script extracts compound data and bioactivity information from the ChEMBL database.</li>
+<li>The Python script calculates molecular descriptors using RDKit.</li>
+<li>A Linear Regression model is trained to predict bioactivity based on the descriptors.</li>
+<li>The model's performance is evaluated using Mean Squared Error and R-squared.</li>
+</ul>
+<p><strong>Chinese:</strong></p>
+<ul>
+<li>SQL脚本从ChEMBL数据库提取化合物数据和生物活性信息。</li>
+<li>Python脚本使用RDKit计算分子描述符。</li>
+<li>训练线性回归模型，以基于描述符预测生物活性。</li>
+<li>使用均方误差和R平方评估模型的性能。</li>
+</ul>
+<p><strong>5.  5 Examples of Analysis/Tasks you can perform</strong></p>
+<p>Here are 5 examples of more specific tasks you can perform with this data:</p>
+<ol>
+<li>
+<p><strong>Predict pIC50 of a novel compound:</strong> Given a SMILES string of a new compound, calculate its descriptors and use your trained model to predict its pIC50 value.  This is a classic virtual screening application.</p>
+<p><code>python
+new_smiles = 'Cc1ccccc1C(=O)O' # Example SMILES
+new_mol = Chem.MolFromSmiles(new_smiles)
+if new_mol is not None:
+    new_descriptors = calculate_descriptors(new_smiles)
+    if new_descriptors is not None:
+        new_descriptors_df = pd.DataFrame([new_descriptors])
+        # Ensure the new descriptors DataFrame has the same columns as the training data
+        missing_cols = set(X_train.columns) - set(new_descriptors_df.columns)
+        for c in missing_cols:
+            new_descriptors_df[c] = 0  # Or use a more appropriate imputation method
+        new_descriptors_df = new_descriptors_df[X_train.columns]  # Ensure correct column order
+        predicted_pIC50 = model.predict(new_descriptors_df)[0]
+        print(f"Predicted pIC50 for {new_smiles}: {predicted_pIC50}")
+    else:
+        print(f"Could not calculate descriptors for {new_smiles}")
+else:
+    print(f"Invalid SMILES string: {new_smiles}")</code></p>
+</li>
+<li>
+<p><strong>Identify the most important descriptors for bioactivity:</strong>  Examine the coefficients of your linear regression model to determine which descriptors have the largest impact on the predicted pIC50.  This can provide insights into the structural features that drive activity.</p>
+<p><code>python
+coefficients = pd.DataFrame({'Descriptor': X_train.columns, 'Coefficient': model.coef_})
+coefficients['Absolute_Coefficient'] = abs(coefficients['Coefficient'])
+coefficients = coefficients.sort_values('Absolute_Coefficient', ascending=False)
+print("Top 10 Most Important Descriptors:")
+print(coefficients.head(10))</code></p>
+</li>
+<li>
+<p><strong>Build a QSAR model for a specific target:</strong> Filter your data to only include compounds that target a specific protein or enzyme. Then, build a QSAR (Quantitative Structure-Activity Relationship) model specifically for that target. This will likely result in a more accurate model than a general QSAR model.  The <code>act.assay_id</code> field in the SQL query can be used for this filtering.</p>
+</li>
+<li>
+<p><strong>Compare different machine learning models:</strong>  Evaluate the performance of different machine learning algorithms (e.g., Random Forest, SVM) on your data.  Compare their performance metrics (e.g., MSE, R-squared) to determine which model performs best. Remember to tune hyperparameters using cross-validation.</p>
+</li>
+<li>
+<p><strong>Visualize the chemical space:</strong>  Use dimensionality reduction techniques (e.g., PCA, t-SNE) to visualize the chemical space of your compounds based on their descriptors. Color-code the points by pIC50 value to see if there are any clusters of active compounds.</p>
+</li>
+</ol>
+<p>By following these steps and examples, you should be able to successfully perform your Chembl 35 data analysis project, address the errors you were encountering, and gain valuable insights from the data. Remember to adapt the code to your specific needs and project requirements.  Good luck!</p>
+        </body>
+        </html>
+        

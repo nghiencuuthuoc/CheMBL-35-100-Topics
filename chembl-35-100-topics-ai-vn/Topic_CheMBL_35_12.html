@@ -1,0 +1,442 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_12</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Sàng lọc thuốc tác động hệ thần kinh trung ương</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 sử dụng RDKit. Với vai trò là một chuyên gia R&amp;D dược học, tôi hiểu rõ tầm quan trọng của việc phân tích dữ liệu một cách hiệu quả để khám phá và phát triển thuốc mới.</p>
+<p>Dưới đây là phân tích chi tiết, hướng dẫn song ngữ, code mẫu SQL và Python, cùng với 5 ví dụ cụ thể, tập trung vào việc xử lý lỗi bạn gặp phải và tối ưu hóa quy trình làm việc theo chuẩn AIMLOps.</p>
+<p><strong>1. Phân tích Mô hình Phân tích (Analysis Model)</strong></p>
+<p>Mục tiêu của bạn là phân tích dữ liệu ChEMBL 35 để tìm ra các mối tương quan giữa cấu trúc hóa học của các hợp chất và hoạt tính sinh học của chúng. Đây là một bài toán QSAR (Quantitative Structure-Activity Relationship) điển hình.</p>
+<p><strong>Các bước chính trong mô hình phân tích:</strong></p>
+<ol>
+<li><strong>Thu thập và Chuẩn bị Dữ liệu (Data Acquisition and Preparation):</strong><ul>
+<li>Trích xuất dữ liệu từ cơ sở dữ liệu ChEMBL 35 (sử dụng SQL).</li>
+<li>Làm sạch và tiền xử lý dữ liệu (loại bỏ dữ liệu trùng lặp, xử lý giá trị thiếu, chuẩn hóa đơn vị).</li>
+</ul>
+</li>
+<li><strong>Tính toán Đặc trưng Phân tử (Molecular Feature Calculation):</strong><ul>
+<li>Sử dụng RDKit để tính toán các đặc trưng phân tử (ví dụ: trọng lượng phân tử, logP, số lượng liên kết, diện tích bề mặt).</li>
+</ul>
+</li>
+<li><strong>Lựa chọn Đặc trưng (Feature Selection):</strong><ul>
+<li>Chọn các đặc trưng phân tử quan trọng nhất có liên quan đến hoạt tính sinh học (sử dụng các phương pháp thống kê hoặc học máy).</li>
+</ul>
+</li>
+<li><strong>Xây dựng Mô hình (Model Building):</strong><ul>
+<li>Xây dựng mô hình QSAR bằng các thuật toán học máy (ví dụ: hồi quy tuyến tính, SVM, Random Forest).</li>
+</ul>
+</li>
+<li><strong>Đánh giá Mô hình (Model Evaluation):</strong><ul>
+<li>Đánh giá hiệu suất của mô hình trên tập dữ liệu kiểm tra (sử dụng các chỉ số như R-squared, RMSE, AUC).</li>
+</ul>
+</li>
+<li><strong>Diễn giải Mô hình (Model Interpretation):</strong><ul>
+<li>Diễn giải mô hình để hiểu các yếu tố cấu trúc nào ảnh hưởng đến hoạt tính sinh học.</li>
+</ul>
+</li>
+</ol>
+<p><strong>2. Hướng dẫn Song ngữ (Bilingual Guide)</strong></p>
+<ul>
+<li><strong>Data Extraction (Trích xuất dữ liệu):</strong> Use SQL queries to extract relevant data from the ChEMBL database.<ul>
+<li>Sử dụng truy vấn SQL để trích xuất dữ liệu liên quan từ cơ sở dữ liệu ChEMBL.</li>
+</ul>
+</li>
+<li><strong>Data Cleaning (Làm sạch dữ liệu):</strong> Remove duplicates, handle missing values, and standardize units.<ul>
+<li>Loại bỏ dữ liệu trùng lặp, xử lý giá trị thiếu và chuẩn hóa đơn vị.</li>
+</ul>
+</li>
+<li><strong>Feature Calculation (Tính toán đặc trưng):</strong> Use RDKit to calculate molecular descriptors (e.g., molecular weight, logP).<ul>
+<li>Sử dụng RDKit để tính toán các đặc trưng phân tử (ví dụ: trọng lượng phân tử, logP).</li>
+</ul>
+</li>
+<li><strong>Model Building (Xây dựng mô hình):</strong> Train machine learning models to predict biological activity.<ul>
+<li>Xây dựng mô hình học máy để dự đoán hoạt tính sinh học.</li>
+</ul>
+</li>
+<li><strong>Model Evaluation (Đánh giá mô hình):</strong> Evaluate model performance using appropriate metrics (e.g., R-squared, RMSE).<ul>
+<li>Đánh giá hiệu suất của mô hình bằng các chỉ số phù hợp (ví dụ: R-squared, RMSE).</li>
+</ul>
+</li>
+</ul>
+<p><strong>3. Code SQL và Python (SQL and Python Code)</strong></p>
+<p><strong>SQL (để trích xuất dữ liệu):</strong></p>
+<p><code>sql
+-- English
+-- Extract 100 data from chembl_35
+SELECT
+    act.molregno,
+    act.standard_value,
+    act.standard_units,
+    act.assay_id,
+    md.molfile
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0
+    AND act.standard_value &lt; 10000 -- Filter values
+    --AND act.standard_value ~ '^[0-9\.]+$'  -- Removed this line because it causes errors
+LIMIT 100;</code></p>
+<p><code>sql
+-- Vietnamese
+-- Trích xuất 100 dòng dữ liệu từ chembl_35
+SELECT
+    act.molregno,
+    act.standard_value,
+    act.standard_units,
+    act.assay_id,
+    md.molfile
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+WHERE
+    act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value &gt; 0
+    AND act.standard_value &lt; 10000 -- Lọc giá trị
+    --AND act.standard_value ~ '^[0-9\.]+$'  -- Đã xóa dòng này vì gây ra lỗi
+LIMIT 100;</code></p>
+<p><strong>Lý do loại bỏ <code>act.standard_value ~ '^[0-9\.]+$'</code>:</strong> Lỗi <code>operator does not exist: numeric ~ unknown</code> xảy ra vì toán tử <code>~</code> được sử dụng để so sánh chuỗi với regular expression, nhưng <code>act.standard_value</code> là kiểu số (numeric). Để khắc phục, bạn có thể bỏ qua điều kiện này (nếu bạn chắc chắn rằng dữ liệu đã được làm sạch) hoặc chuyển đổi <code>act.standard_value</code> thành kiểu chuỗi trước khi so sánh (nhưng điều này có thể không cần thiết).</p>
+<p><strong>Python (sử dụng RDKit):</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Define base path</h1>
+<p>base_path = "../data"</p>
+<h1>Load data from CSV</h1>
+<p>csv_file = "chembl_35_data.csv"  # Replace with your actual file name
+data = pd.read_csv(os.path.join(base_path, csv_file))</p>
+<h1>Handle missing molfile values</h1>
+<p>data = data.dropna(subset=['molfile'])</p>
+<h1>Function to calculate molecular descriptors</h1>
+<p>def calculate_descriptors(molfile):
+    mol = Chem.MolFromMolBlock(molfile)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MW'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Chem.Crippen.MolLogP(mol)
+    descriptors['HBD'] = Chem.Lipinski.NumHDonors(mol)
+    descriptors['HBA'] = Chem.Lipinski.NumHAcceptors(mol)
+    return descriptors</p>
+<h1>Apply descriptor calculation</h1>
+<p>data['descriptors'] = data['molfile'].apply(calculate_descriptors)
+data = data.dropna(subset=['descriptors'])</p>
+<h1>Convert descriptors to DataFrame</h1>
+<p>data = pd.concat([data.drop(['descriptors'], axis=1), data['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Convert standard_value to numeric, handling errors</h1>
+<p>data['standard_value'] = pd.to_numeric(data['standard_value'], errors='coerce')
+data = data.dropna(subset=['standard_value'])</p>
+<h1>Prepare data for modeling</h1>
+<p>X = data[['MW', 'LogP', 'HBD', 'HBA']]  # Use selected descriptors
+y = np.log10(data['standard_value'])  # log transform target variable</p>
+<h1>Data scaling</h1>
+<p>scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)</p>
+<h1>Train a linear regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p>```python</p>
+<h1>Vietnamese</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Định nghĩa đường dẫn gốc</h1>
+<p>base_path = "../data"</p>
+<h1>Tải dữ liệu từ file CSV</h1>
+<p>csv_file = "chembl_35_data.csv"  # Thay thế bằng tên file của bạn
+data = pd.read_csv(os.path.join(base_path, csv_file))</p>
+<h1>Xử lý giá trị molfile bị thiếu</h1>
+<p>data = data.dropna(subset=['molfile'])</p>
+<h1>Hàm tính toán các descriptor phân tử</h1>
+<p>def calculate_descriptors(molfile):
+    mol = Chem.MolFromMolBlock(molfile)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MW'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Chem.Crippen.MolLogP(mol)
+    descriptors['HBD'] = Chem.Lipinski.NumHDonors(mol)
+    descriptors['HBA'] = Chem.Lipinski.NumHAcceptors(mol)
+    return descriptors</p>
+<h1>Áp dụng tính toán descriptor</h1>
+<p>data['descriptors'] = data['molfile'].apply(calculate_descriptors)
+data = data.dropna(subset=['descriptors'])</p>
+<h1>Chuyển đổi descriptor thành DataFrame</h1>
+<p>data = pd.concat([data.drop(['descriptors'], axis=1), data['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Chuyển đổi standard_value sang kiểu số, xử lý lỗi</h1>
+<p>data['standard_value'] = pd.to_numeric(data['standard_value'], errors='coerce')
+data = data.dropna(subset=['standard_value'])</p>
+<h1>Chuẩn bị dữ liệu cho mô hình</h1>
+<p>X = data[['MW', 'LogP', 'HBD', 'HBA']]  # Sử dụng các descriptor đã chọn
+y = np.log10(data['standard_value'])  # log transform biến mục tiêu</p>
+<h1>Chuẩn hóa dữ liệu</h1>
+<p>scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)</p>
+<h1>Chia dữ liệu thành tập huấn luyện và kiểm tra</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)</p>
+<h1>Huấn luyện mô hình hồi quy tuyến tính</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Dự đoán</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Đánh giá mô hình</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>4. Ví dụ Code (Code Examples)</strong></p>
+<p><strong>Ví dụ 1: Tính toán nhiều descriptor hơn (Calculating More Descriptors)</strong></p>
+<p><strong>SQL:</strong> (Không thay đổi)</p>
+<p><strong>Python:</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>from rdkit.Chem import AllChem</p>
+<p>def calculate_descriptors(molfile):
+    mol = Chem.MolFromMolBlock(molfile)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MW'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Chem.Crippen.MolLogP(mol)
+    descriptors['HBD'] = Chem.Lipinski.NumHDonors(mol)
+    descriptors['HBA'] = Chem.Lipinski.NumHAcceptors(mol)
+    descriptors['TPSA'] = Chem.QED.properties(mol).PSA
+    descriptors['RotatableBonds'] = Chem.Lipinski.NumRotatableBonds(mol)
+    return descriptors
+```</p>
+<p>```python</p>
+<h1>Vietnamese</h1>
+<p>from rdkit.Chem import AllChem</p>
+<p>def calculate_descriptors(molfile):
+    mol = Chem.MolFromMolBlock(molfile)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MW'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Chem.Crippen.MolLogP(mol)
+    descriptors['HBD'] = Chem.Lipinski.NumHDonors(mol)
+    descriptors['HBA'] = Chem.Lipinski.NumHAcceptors(mol)
+    descriptors['TPSA'] = Chem.QED.properties(mol).PSA
+    descriptors['RotatableBonds'] = Chem.Lipinski.NumRotatableBonds(mol)
+    return descriptors
+```</p>
+<p><strong>Ví dụ 2: Sử dụng Random Forest (Using Random Forest)</strong></p>
+<p><strong>SQL:</strong> (Không thay đổi)</p>
+<p><strong>Python:</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>from sklearn.ensemble import RandomForestRegressor</p>
+<h1>Train a Random Forest model</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42) # you can adjust the hyperparameters of the model, such as n_estimators.
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p>```python</p>
+<h1>Vietnamese</h1>
+<p>from sklearn.ensemble import RandomForestRegressor</p>
+<h1>Huấn luyện mô hình Random Forest</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42) # Bạn có thể điều chỉnh các siêu tham số của mô hình, chẳng hạn như n_estimators.
+model.fit(X_train, y_train)</p>
+<h1>Dự đoán</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Đánh giá mô hình</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>Ví dụ 3: Feature Selection (Lựa chọn Đặc trưng)</strong></p>
+<p><strong>SQL:</strong> (Không thay đổi)</p>
+<p><strong>Python:</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>from sklearn.feature_selection import SelectKBest, f_regression</p>
+<h1>Feature selection using SelectKBest</h1>
+<p>selector = SelectKBest(score_func=f_regression, k=3)
+X_new = selector.fit_transform(X_scaled, y)</p>
+<h1>Get the selected features</h1>
+<p>selected_features = X.columns[selector.get_support()]
+print("Selected Features:", selected_features)</p>
+<h1>Split data into training and testing sets using selected features</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X_new, y, test_size=0.2, random_state=42)</p>
+<h1>Train a linear regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p>```python</p>
+<h1>Vietnamese</h1>
+<p>from sklearn.feature_selection import SelectKBest, f_regression</p>
+<h1>Lựa chọn đặc trưng sử dụng SelectKBest</h1>
+<p>selector = SelectKBest(score_func=f_regression, k=3)
+X_new = selector.fit_transform(X_scaled, y)</p>
+<h1>Lấy các đặc trưng đã chọn</h1>
+<p>selected_features = X.columns[selector.get_support()]
+print("Selected Features:", selected_features)</p>
+<h1>Chia dữ liệu thành tập huấn luyện và kiểm tra sử dụng các đặc trưng đã chọn</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X_new, y, test_size=0.2, random_state=42)</p>
+<h1>Huấn luyện mô hình hồi quy tuyến tính</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Dự đoán</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Đánh giá mô hình</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>Ví dụ 4: Lưu Mô hình (Saving the Model)</strong></p>
+<p><strong>SQL:</strong> (Không thay đổi)</p>
+<p><strong>Python:</strong></p>
+<p>```python</p>
+<h1>English</h1>
+<p>import joblib</p>
+<h1>Train your model (e.g., Linear Regression)</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Save the model to a file</h1>
+<p>model_filename = "linear_regression_model.pkl"
+joblib.dump(model, os.path.join(base_path, model_filename))</p>
+<p>print(f"Model saved to {os.path.join(base_path, model_filename)}")</p>
+<h1>Load the model from the file</h1>
+<p>loaded_model = joblib.load(os.path.join(base_path, model_filename))</p>
+<h1>Use the loaded model to make predictions</h1>
+<p>y_pred = loaded_model.predict(X_test)
+```</p>
+<p>```python</p>
+<h1>Vietnamese</h1>
+<p>import joblib</p>
+<h1>Huấn luyện mô hình của bạn (ví dụ: Hồi quy tuyến tính)</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Lưu mô hình vào một file</h1>
+<p>model_filename = "linear_regression_model.pkl"
+joblib.dump(model, os.path.join(base_path, model_filename))</p>
+<p>print(f"Mô hình đã được lưu vào {os.path.join(base_path, model_filename)}")</p>
+<h1>Tải mô hình từ file</h1>
+<p>loaded_model = joblib.load(os.path.join(base_path, model_filename))</p>
+<h1>Sử dụng mô hình đã tải để dự đoán</h1>
+<p>y_pred = loaded_model.predict(X_test)
+```</p>
+<p><strong>Ví dụ 5: Sử dụng mô hình SVM (Support Vector Machine)</strong></p>
+<p><strong>SQL:</strong> (Không thay đổi)</p>
+<p><strong>Python:</strong>
+```python</p>
+<h1>English</h1>
+<p>from sklearn.svm import SVR</p>
+<h1>Train the SVM model</h1>
+<p>model = SVR(kernel='linear')  # You can also use other kernels like 'rbf', 'poly', etc.
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p>```python</p>
+<h1>Vietnamese</h1>
+<p>from sklearn.svm import SVR</p>
+<h1>Huấn luyện mô hình SVM</h1>
+<p>model = SVR(kernel='linear')  # Bạn cũng có thể sử dụng các kernel khác như 'rbf', 'poly', vv.
+model.fit(X_train, y_train)</p>
+<h1>Dự đoán</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Đánh giá mô hình</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>Lưu ý quan trọng:</strong></p>
+<ul>
+<li><strong>Phiên bản Scikit-learn:</strong> Đảm bảo bạn đang sử dụng phiên bản Scikit-learn mới nhất để hỗ trợ tham số <code>squared=False</code> trong hàm <code>mean_squared_error</code>. Nếu không, hãy loại bỏ tham số này. Trong các phiên bản mới, <code>squared=False</code> không còn cần thiết và mặc định trả về RMSE (Root Mean Squared Error).</li>
+<li><strong>Đường dẫn:</strong> Sử dụng <code>os.path.join(base_path, filename)</code> để đảm bảo tính di động của code.</li>
+<li><strong>Xử lý lỗi:</strong> Luôn kiểm tra và xử lý các lỗi có thể xảy ra trong quá trình tính toán đặc trưng và xây dựng mô hình.</li>
+<li><strong>Chuẩn hóa dữ liệu:</strong> Chuẩn hóa dữ liệu trước khi đưa vào mô hình học máy để cải thiện hiệu suất.</li>
+<li><strong>Lựa chọn mô hình:</strong> Thử nghiệm với nhiều mô hình học máy khác nhau để tìm ra mô hình tốt nhất cho bài toán của bạn.</li>
+<li><strong>Lưu trữ dữ liệu:</strong> Lưu trữ dữ liệu đã xử lý và mô hình đã huấn luyện để tái sử dụng và so sánh.</li>
+</ul>
+<p>Hy vọng những hướng dẫn và ví dụ này sẽ giúp bạn hoàn thành dự án phân tích dữ liệu ChEMBL 35 một cách hiệu quả! Nếu bạn có bất kỳ câu hỏi nào khác, đừng ngần ngại hỏi.</p>
+        </body>
+        </html>
+        

@@ -1,0 +1,348 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_16</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Finding natural product-like molecules</h1>
+<hr />
+<p>Okay, I understand. You're working with ChEMBL 35 data in a well-organized AIMLops project, leveraging RDKit and PostgreSQL. You're facing some specific errors and want a clear guide with SQL and Python code examples. Let's break this down.</p>
+<p><strong>1. Analysis of the Model</strong></p>
+<p>The project aims to analyze ChEMBL 35 data, likely focusing on structure-activity relationships (SAR). You're extracting data via SQL, processing it with RDKit in Python, and likely building a model (implied by using <code>mean_squared_error</code>).  The goal is to connect chemical structures (SMILES strings from ChEMBL) to activity data (IC50, Ki, etc.). This allows you to identify key features that drive activity, design better drugs, and predict the activity of new compounds.</p>
+<ul>
+<li><strong>SQL:</strong> Extracts relevant data from the ChEMBL database.  Crucial for filtering and preparing data for analysis.</li>
+<li><strong>RDKit:</strong> Converts SMILES strings into numerical descriptors (e.g., fingerprints, molecular weight, logP) that machine learning models can understand.  This is called featurization.</li>
+<li><strong>Machine Learning (likely):</strong>  The models learn relationships between the RDKit descriptors and the activity values.  Regression models (like linear regression, random forest, or neural networks) are typically used to predict activity.</li>
+</ul>
+<p>The errors suggest issues with data type handling in SQL and scikit-learn version incompatibilities.  Let's address those.</p>
+<p><strong>2. Code and Guidance</strong></p>
+<p><strong>Folder Structure (Based on AIMLops Template)</strong></p>
+<p><code>project_root/
+├── data/             # Stores data (CSV files extracted from ChEMBL)
+├── notebooks/        # Jupyter notebooks with analysis code
+│   └── Topic_CheMBL_35_16_1_data_extraction_and_preparation.ipynb
+│   └── Topic_CheMBL_35_16_2_model_building_and_evaluation.ipynb
+├── src/              # (Optional) Python modules for reusable code
+├── models/           # (Optional) Saved machine learning models
+├── requirements.txt   # Python dependencies
+└── README.md</code></p>
+<p><strong>2.1 SQL Code (for PostgreSQL) - <code>../data/chembl35_data.csv</code></strong></p>
+<p>```sql
+-- Assuming you want activity data (IC50, Ki, etc.) and associated compound structures.</p>
+<p>-- Limit the number of results to 100 for demonstration purposes.</p>
+<p>SELECT
+    cmp.chembl_id,
+    cmp.pref_name,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.pchembl_value,
+    mol.molfile
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+JOIN
+    compound_structures mol ON cmp.molregno = mol.molregno
+WHERE
+    act.standard_type IN ('IC50', 'Ki', 'EC50')  -- Common activity types
+    AND act.standard_units = 'nM'                 -- Focus on nanomolar activity
+    AND act.standard_value IS NOT NULL            -- Ensure we have activity values
+    -- Corrected regex for numeric values, casting to TEXT for regex matching
+    AND CAST(act.standard_value AS TEXT) ~ '^[0-9.]+$'
+    AND mol.molfile IS NOT NULL                  --Ensure we have structures
+LIMIT 100;
+```</p>
+<p><strong>Explanation of SQL Code:</strong></p>
+<ul>
+<li><strong><code>SELECT ... FROM ... JOIN ... ON ...</code></strong>:  Standard SQL for selecting columns from multiple tables (activities, molecule_dictionary, compound_structures) and joining them based on common identifiers (<code>molregno</code>).</li>
+<li><strong><code>WHERE ...</code></strong>: Filters the data:<ul>
+<li><code>act.standard_type IN ('IC50', 'Ki', 'EC50')</code>: Selects only common activity types.</li>
+<li><code>act.standard_units = 'nM'</code>: Restricts to activities measured in nanomolar units.</li>
+<li><code>act.standard_value IS NOT NULL</code>:  Excludes entries with missing activity values.</li>
+<li><code>CAST(act.standard_value AS TEXT) ~ '^[0-9.]+$'</code> <strong>(Fixes Error A)</strong>: This addresses the error <code>ERROR: operator does not exist: numeric ~ unknown</code>. The <code>~</code> operator is used for regular expression matching in PostgreSQL. The issue was that it wasn't implicitly converting the <code>standard_value</code> (likely a numeric type) to text.  <code>CAST(act.standard_value AS TEXT)</code> explicitly converts the numeric column to text <em>before</em> applying the regular expression.  The regular expression <code>'^[0-9.]+$'</code> checks if the value consists only of digits and periods.</li>
+<li><code>mol.molfile IS NOT NULL</code>: Ensure we have structure</li>
+</ul>
+</li>
+<li><strong><code>LIMIT 100</code></strong>: Restricts the result set to 100 rows.  Remove this line for the full dataset.</li>
+</ul>
+<p><strong>Important:</strong></p>
+<ul>
+<li><strong><code>molfile</code> vs. <code>smiles</code>:</strong>  I used <code>molfile</code> because it's guaranteed to be present, but you might prefer <code>mol.smiles</code>. Adjust the <code>SELECT</code> statement accordingly if you switch to <code>mol.smiles</code>.</li>
+<li><strong>Target Selection:</strong>  You likely want to add another <code>WHERE</code> clause to filter by a specific ChEMBL target (e.g., a specific protein).  You'll need to identify the <code>target_chembl_id</code> from the <code>target_dictionary</code> table and join it to the <code>activities</code> table via <code>target_id</code>.</li>
+</ul>
+<p><strong>How to Run the SQL:</strong></p>
+<ol>
+<li>Open pgAdmin and connect to your database (192.168.206.136, user <code>rd</code>, password <code>rd</code>, database <code>chembl_35</code>).</li>
+<li>Open a new query window.</li>
+<li>Paste the SQL code into the query window.</li>
+<li>Execute the query.</li>
+<li>Export the results as a CSV file named <code>chembl35_data.csv</code> and save it to the <code>data/</code> directory of your project.  pgAdmin has a convenient "Copy with Headers" option which you can then paste into a text file and save as CSV.</li>
+</ol>
+<p><strong>2.2 Python Code (Jupyter Notebooks)</strong></p>
+<p>Here's the Python code, split into two notebooks as per your AIMLops structure.</p>
+<p><strong>Notebook 1: <code>Topic_CheMBL_35_16_1_data_extraction_and_preparation.ipynb</code></strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors
+import numpy as np</p>
+<h1>Define the base path for the project (adjust if needed)</h1>
+<p>base_path = "./"  # Assuming the notebook is in the notebooks/ directory</p>
+<h1>Construct the path to the CSV file</h1>
+<p>data_file_path = os.path.join(base_path, "data", "chembl35_data.csv")</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(data_file_path)
+    print(f"Data loaded successfully from: {data_file_path}")
+except FileNotFoundError:
+    print(f"Error: File not found at {data_file_path}. Make sure the CSV file exists.")
+    exit()</p>
+<h1>Display the first few rows of the DataFrame</h1>
+<p>print(df.head())</p>
+<h1>Function to convert molfile to smiles</h1>
+<p>def molfile_to_smiles(molfile):
+    try:
+        mol = Chem.MolFromMolBlock(molfile)
+        if mol is not None:
+            return Chem.MolToSmiles(mol)
+        else:
+            return None
+    except:
+        return None</p>
+<h1>Apply the molfile to smiles function to the dataframe</h1>
+<p>df['smiles'] = df['molfile'].apply(molfile_to_smiles)</p>
+<h1>Drop rows where SMILES conversion failed</h1>
+<p>df = df.dropna(subset=['smiles'])</p>
+<h1>Basic Data Cleaning and Preparation</h1>
+<h1>Convert standard_value to numeric (handling potential errors)</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')</p>
+<h1>Drop rows where standard_value is NaN after conversion</h1>
+<p>df = df.dropna(subset=['standard_value'])</p>
+<h1>Apply pIC50 transformation function</h1>
+<p>def calculate_pic50(standard_value):
+    pIC50 = 9 - np.log10(standard_value)
+    return pIC50</p>
+<p>df['pIC50'] = df['standard_value'].apply(calculate_pic50)</p>
+<h1>Display updated DataFrame information</h1>
+<p>print(df.info())
+print(df.head())</p>
+<h1>Define a function to calculate RDKit descriptors</h1>
+<p>def calculate_rdkit_descriptors(smiles):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            return None
+        descriptors = {}
+        descriptors['MW'] = Descriptors.MolWt(mol)
+        descriptors['LogP'] = Descriptors.MolLogP(mol)
+        descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+        descriptors['HBD'] = Descriptors.NumHDonors(mol)
+        descriptors['TPSA'] = Descriptors.TPSA(mol)
+        return descriptors
+    except:
+        return None</p>
+<h1>Apply the descriptor calculation function to each SMILES string</h1>
+<p>df['descriptors'] = df['smiles'].apply(calculate_rdkit_descriptors)</p>
+<h1>Handle missing descriptors</h1>
+<p>df = df.dropna(subset=['descriptors'])</p>
+<h1>Convert descriptor dictionary to columns</h1>
+<p>df = pd.concat([df.drop(['descriptors'], axis=1), df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Save processed data to a new CSV file</h1>
+<p>processed_data_path = os.path.join(base_path, "data", "chembl35_processed_data.csv")
+df.to_csv(processed_data_path, index=False)</p>
+<p>print(f"Processed data saved to: {processed_data_path}")
+```</p>
+<p><strong>Notebook 2: <code>Topic_CheMBL_35_16_2_model_building_and_evaluation.ipynb</code></strong></p>
+<p>```python
+import os
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt</p>
+<h1>Define the base path</h1>
+<p>base_path = "./"</p>
+<h1>Construct the path to the processed CSV file</h1>
+<p>processed_data_path = os.path.join(base_path, "data", "chembl35_processed_data.csv")</p>
+<h1>Load the processed data</h1>
+<p>try:
+    df = pd.read_csv(processed_data_path)
+    print(f"Processed data loaded successfully from: {processed_data_path}")
+except FileNotFoundError:
+    print(f"Error: File not found at {processed_data_path}.  Ensure the previous notebook was run successfully.")
+    exit()</p>
+<h1>Data Preparation for Modeling</h1>
+<h1>Select features (descriptors) and target (pIC50)</h1>
+<p>features = ['MW', 'LogP', 'HBA', 'HBD', 'TPSA']  # Example descriptors
+target = 'pIC50'</p>
+<h1>Drop rows with NaN values in selected features and target</h1>
+<p>df = df.dropna(subset=features + [target])</p>
+<p>X = df[features]
+y = df[target]</p>
+<h1>Data scaling</h1>
+<p>scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)</p>
+<h1>Model Building and Training (Linear Regression)</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Model Evaluation</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Calculate performance metrics</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Scatter plot of predictions vs. actual values</h1>
+<p>plt.scatter(y_test, y_pred)
+plt.xlabel("Actual pIC50")
+plt.ylabel("Predicted pIC50")
+plt.title("Actual vs. Predicted pIC50")
+plt.show()</p>
+<h1>Feature Importance (for Linear Regression)</h1>
+<p>coefficients = model.coef_
+feature_importance = pd.DataFrame({'Feature': features, 'Coefficient': coefficients})
+feature_importance = feature_importance.sort_values('Coefficient', ascending=False)
+print("\nFeature Importance:")
+print(feature_importance)
+```</p>
+<p><strong>Explanation of Python Code:</strong></p>
+<ul>
+<li><strong><code>os.path.join(base_path, ...)</code></strong>:  Constructs file paths correctly, relative to the project's base directory.</li>
+<li><strong><code>pandas.read_csv()</code></strong>:  Loads the CSV data into a Pandas DataFrame.</li>
+<li><strong>RDKit:</strong> Used to process the SMILES strings and calculate molecular descriptors.</li>
+<li><strong><code>sklearn.model_selection.train_test_split()</code></strong>: Splits the data into training and testing sets for model evaluation.</li>
+<li><strong><code>sklearn.linear_model.LinearRegression()</code></strong>:  Creates a linear regression model.  You can easily swap this out for other models.</li>
+<li><strong><code>sklearn.metrics.mean_squared_error()</code></strong>, <strong><code>sklearn.metrics.r2_score()</code></strong>: Evaluates the model's performance using Mean Squared Error (MSE) and R-squared.</li>
+<li><strong><code>sklearn.preprocessing.StandardScaler()</code></strong>: Standardizes the features (important for linear models and some other models).</li>
+<li><strong>Data Cleaning:</strong> Removing any cases that are none (nan values).</li>
+</ul>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>Error Handling:</strong>  The code includes <code>try...except</code> blocks to handle potential errors during file loading and SMILES processing.</li>
+<li><strong>Feature Selection:</strong> I've chosen some basic RDKit descriptors (<code>MW</code>, <code>LogP</code>, <code>HBA</code>, <code>HBD</code>, <code>TPSA</code>) as examples.  You'll likely want to experiment with different descriptors and feature selection techniques.</li>
+<li><strong>Model Selection:</strong> Linear regression is a simple model. Consider more complex models like Random Forest, Gradient Boosting, or Neural Networks.</li>
+<li><strong>Cross-Validation:</strong> Use cross-validation techniques (e.g., <code>sklearn.model_selection.cross_val_score</code>) for more robust model evaluation.</li>
+<li><strong>Data Scaling:</strong> The <code>StandardScaler</code> is important for many machine learning algorithms, especially those that use distance-based calculations.</li>
+<li><strong>Reproducibility:</strong> Use <code>random_state</code> in <code>train_test_split</code> for reproducible results.</li>
+<li><strong>Install Libraries</strong>: Make sure you install the libraries via <code>pip install pandas rdkit scikit-learn matplotlib</code>. You can save these packages in a requirements.txt for future use.</li>
+</ul>
+<p><strong>3. Addressing the Errors</strong></p>
+<ul>
+<li><strong>Error A (SQL): <code>ERROR: operator does not exist: numeric ~ unknown</code></strong> -  Fixed by casting the <code>standard_value</code> to <code>TEXT</code> before using the regular expression operator <code>~</code>.  See the corrected SQL code above.</li>
+<li><strong>Error B (Python - Old scikit-learn): <code>squared=False</code> in <code>mean_squared_error</code></strong> - This is no longer a current error. You can remove this parameter. If it persists, upgrade your scikit-learn version (<code>pip install -U scikit-learn</code>).</li>
+</ul>
+<p><strong>4. Example Results (Illustrative)</strong></p>
+<p>After running the code, you might see output like this in your Jupyter Notebook:</p>
+<p><strong>Notebook 1 Output (Data Preparation):</strong></p>
+<p>```
+Data loaded successfully from: ./data/chembl35_data.csv
+        chembl_id pref_name standard_type  standard_value standard_units  pchembl_value  \
+0  CHEMBL1953617       NaN          Ki           50.000000             nM           7.30   ...
+1   CHEMBL422687       NaN          Ki           50.000000             nM           7.30   ...
+2   CHEMBL422687       NaN        IC50           70.794578             nM           7.15   ...
+3  CHEMBL1953617       NaN        IC50           70.794578             nM           7.15   ...
+4  CHEMBL1953617       NaN        IC50           10.000000             nM           8.00   ...</p>
+<pre><code>                                         molfile
+</code></pre>
+<p>0  \n     RDKit          2D\n\n  9  9  0  0  0  0  ...
+1  \n     RDKit          2D\n\n  9  9  0  0  0  0  ...
+2  \n     RDKit          2D\n\n  9  9  0  0  0  0  ...
+3  \n     RDKit          2D\n\n  9  9  0  0  0  0  ...
+4  \n     RDKit          2D\n\n  9  9  0  0  0  0  ...</p>
+<p><class 'pandas.core.frame.DataFrame'>
+RangeIndex: 100 entries, 0 to 99
+Data columns (total 8 columns):
+   chembl_id        100 non-null object
+   pref_name        19 non-null object
+   standard_type    100 non-null object
+   standard_value   100 non-null float64
+   standard_units   100 non-null object
+   pchembl_value    92 non-null float64
+   molfile          100 non-null object
+   smiles           100 non-null object
+dtypes: float64(2), object(6)
+memory usage: 6.3+ KB
+       chembl_id pref_name standard_type  standard_value standard_units  pchembl_value  \
+0  CHEMBL1953617       NaN          Ki           50.000000             nM           7.30   ...
+1   CHEMBL422687       NaN          Ki           50.000000             nM           7.30   ...
+2   CHEMBL422687       NaN        IC50           70.794578             nM           7.15   ...
+3  CHEMBL1953617       NaN        IC50           70.794578             nM           7.15   ...
+4  CHEMBL1953617       NaN        IC50           10.000000             nM           8.00   ...</p>
+<pre><code>                                         molfile  \
+</code></pre>
+<p>0  \n     RDKit          2D\n\n  9  9  0  0  0  0  ...
+1  \n     RDKit          2D\n\n  9  9  0  0  0  0  ...
+2  \n     RDKit          2D\n\n  9  9  0  0  0  0  ...
+3  \n     RDKit          2D\n\n  9  9  0  0  0  0  ...
+4  \n     RDKit          2D\n\n  9  9  0  0  0  0  ...</p>
+<pre><code>                                           smiles
+</code></pre>
+<p>0  Cc1ccccc1CN(Cc1ccccc1)C(=O)N1CCOCC1
+1  Cc1ccccc1CN(Cc1ccccc1)C(=O)N1CCOCC1
+2  Cc1ccccc1CN(Cc1ccccc1)C(=O)N1CCOCC1
+3  Cc1ccccc1CN(Cc1ccccc1)C(=O)N1CCOCC1
+4  Cc1ccccc1CN(Cc1ccccc1)C(=O)N1CCOCC1
+Processed data saved to: ./data/chembl35_processed_data.csv
+```</p>
+<p><strong>Notebook 2 Output (Model Building and Evaluation):</strong></p>
+<p>```
+Processed data loaded successfully from: ./data/chembl35_processed_data.csv
+Mean Squared Error: 0.8542176587247836
+R-squared: 0.3912347890564484</p>
+<p>Feature Importance:
+   Feature  Coefficient
+2     HBA       0.448862
+4    TPSA       0.393045
+1    LogP      -0.124559
+3     HBD      -0.292158
+0      MW      -0.351017
+```</p>
+<p>(And a scatter plot visualizing predicted vs. actual pIC50 values)</p>
+<p><strong>5. Five Example Use Cases:</strong></p>
+<ol>
+<li><strong>Lead Optimization:</strong> Identify compounds with similar structures but differing activities to understand which modifications improve potency.</li>
+<li><strong>Virtual Screening:</strong>  Predict the activity of a large library of virtual compounds before synthesizing them, prioritizing those with the highest predicted activity.</li>
+<li><strong>Target Identification:</strong>  If you have activity data for a compound but don't know its target, analyze its structural features to predict likely protein targets.</li>
+<li><strong>Drug Repurposing:</strong>  Identify existing drugs that might be effective against a new target based on their structural similarity to known active compounds.</li>
+<li><strong>ADMET Prediction:</strong>  Build models to predict Absorption, Distribution, Metabolism, Excretion, and Toxicity (ADMET) properties based on molecular structure, helping to filter out problematic compounds early in the drug discovery process.</li>
+</ol>
+<p>Let me know if you'd like more detailed examples, different code snippets, or help with any specific part of the process. Good luck!</p>
+        </body>
+        </html>
+        

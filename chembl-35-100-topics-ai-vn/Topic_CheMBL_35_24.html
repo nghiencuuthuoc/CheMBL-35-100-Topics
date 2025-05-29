@@ -1,0 +1,294 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_24</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Phân bố các nhóm target trong ChEMBL</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 sử dụng RDKit. Với vai trò là chuyên gia nghiên cứu và phát triển dược học, tôi sẽ cung cấp hướng dẫn chi tiết, song ngữ, code mẫu và phân tích để giúp bạn đạt được mục tiêu nghiên cứu.</p>
+<p><strong>Tổng quan dự án:</strong></p>
+<p>Dự án của bạn tập trung vào việc khai thác dữ liệu từ cơ sở dữ liệu ChEMBL 35, kết hợp với RDKit để hỗ trợ quá trình nghiên cứu và phát triển thuốc. Bạn sử dụng PostgreSQL (psql) để quản lý dữ liệu và Jupyter Notebook để phân tích. Việc tuân thủ cấu trúc thư mục AIMLOps Template là một điểm cộng lớn, giúp dự án có tổ chức và dễ quản lý.</p>
+<p><strong>Các bước thực hiện và hướng dẫn chi tiết:</strong></p>
+<p><strong>1. Chuẩn bị dữ liệu (SQL):</strong></p>
+<ul>
+<li><strong>Mục tiêu:</strong> Lọc và trích xuất dữ liệu cần thiết từ ChEMBL 35.</li>
+<li><strong>Code SQL mẫu (Topic_CheMBL_35_24_1.sql):</strong></li>
+</ul>
+<p>```sql
+-- English
+-- Extracting 100 data points from ChEMBL 35 for activity analysis.
+-- Filters for specific activity types (IC50, Ki) and numeric standard values.</p>
+<p>-- Vietnamese
+-- Trích xuất 100 điểm dữ liệu từ ChEMBL 35 để phân tích hoạt tính.
+-- Lọc theo các loại hoạt tính cụ thể (IC50, Ki) và giá trị chuẩn số.</p>
+<p>SELECT
+    md.chembl_id,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    cmp.canonical_smiles
+FROM
+    molecule_dictionary md
+JOIN
+    activities act ON md.molregno = act.molregno
+JOIN
+    compound_structures cmp ON md.molregno = cmp.molregno
+WHERE
+    act.standard_type IN ('IC50', 'Ki')
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value ~ '^[0-9.]+$' --Fix cho bug
+LIMIT 100;
+```</p>
+<ul>
+<li><strong>Giải thích:</strong><ul>
+<li><code>SELECT</code>: Chọn các cột dữ liệu quan trọng (ChEMBL ID, loại hoạt tính, giá trị chuẩn, đơn vị, SMILES).</li>
+<li><code>FROM</code>: Kết hợp các bảng <code>molecule_dictionary</code>, <code>activities</code>, và <code>compound_structures</code> để lấy thông tin đầy đủ.</li>
+<li><code>WHERE</code>: Lọc dữ liệu theo loại hoạt tính (IC50, Ki) và đảm bảo giá trị chuẩn là số.</li>
+<li><code>LIMIT</code>: Giới hạn số lượng bản ghi để tránh quá tải máy chủ.</li>
+<li><strong>Fix bug</strong>: <code>act.standard_value ~ '^[0-9\.]+$'</code> thay thế cho việc so sánh trực tiếp với kiểu <code>numeric</code>. Biểu thức chính quy này kiểm tra xem giá trị có phải là một số (có thể chứa dấu chấm) hay không.</li>
+</ul>
+</li>
+<li><strong>Lưu ý:</strong><ul>
+<li>Sử dụng <code>psql</code> hoặc pgAdmin để chạy script này trên máy chủ PostgreSQL của bạn.</li>
+<li>Lưu kết quả vào file CSV (ví dụ: <code>../data/chembl_35_activity_data.csv</code>).</li>
+</ul>
+</li>
+</ul>
+<p><strong>2. Phân tích dữ liệu với RDKit (Python):</strong></p>
+<ul>
+<li><strong>Mục tiêu:</strong> Đọc dữ liệu từ file CSV, tiền xử lý, tính toán đặc trưng phân tử và xây dựng mô hình.</li>
+<li><strong>Code Python mẫu (Topic_CheMBL_35_24_2.ipynb):</strong></li>
+</ul>
+<p>```python</p>
+<h1>English</h1>
+<h1>Importing necessary libraries</h1>
+<h1>Reading the CSV data, calculating molecular descriptors, and building a simple model.</h1>
+<h1>Vietnamese</h1>
+<h1>Nhập các thư viện cần thiết</h1>
+<h1>Đọc dữ liệu CSV, tính toán các descriptor phân tử và xây dựng một mô hình đơn giản.</h1>
+<p>import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error</p>
+<h1>Define the base path</h1>
+<p>base_path = ".."  # Assuming the notebook is one level deep inside the project</p>
+<h1>Construct the data path</h1>
+<p>data_path = os.path.join(base_path, "data", "chembl_35_activity_data.csv")</p>
+<h1>Read the CSV file into a pandas DataFrame</h1>
+<p>df = pd.read_csv(data_path)</p>
+<h1>Function to calculate molecular descriptors using RDKit</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    descriptors = {}
+    descriptors['MolWt'] = Descriptors.MolWt(mol)
+    descriptors['LogP'] = Descriptors.MolLogP(mol)
+    descriptors['HBD'] = Descriptors.NumHDonors(mol)
+    descriptors['HBA'] = Descriptors.NumHAcceptors(mol)
+    return descriptors</p>
+<h1>Apply the descriptor calculation to each SMILES string</h1>
+<p>df['descriptors'] = df['canonical_smiles'].apply(calculate_descriptors)</p>
+<h1>Handle missing descriptors (if any)</h1>
+<p>df = df.dropna(subset=['descriptors'])</p>
+<h1>Convert descriptors to DataFrame</h1>
+<p>df_descriptors = pd.DataFrame(df['descriptors'].tolist())</p>
+<h1>Merge descriptors with the original DataFrame</h1>
+<p>df = pd.concat([df, df_descriptors], axis=1)</p>
+<h1>Prepare data for modeling</h1>
+<p>X = df[['MolWt', 'LogP', 'HBD', 'HBA']]  # Feature matrix
+y = df['standard_value']  # Target variable</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a linear regression model</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions on the test set</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+print(f"Mean Squared Error: {mse}")
+```</p>
+<ul>
+<li><strong>Giải thích:</strong><ul>
+<li><strong>Import thư viện:</strong> Nhập các thư viện cần thiết (pandas, RDKit, scikit-learn).</li>
+<li><strong>Đọc dữ liệu:</strong> Đọc file CSV chứa dữ liệu đã trích xuất từ ChEMBL.</li>
+<li><strong>Tính toán đặc trưng phân tử:</strong> Sử dụng RDKit để tính toán các đặc trưng phân tử (ví dụ: MolWt, LogP, HBD, HBA) từ chuỗi SMILES.</li>
+<li><strong>Xử lý dữ liệu thiếu:</strong> Loại bỏ các dòng có giá trị đặc trưng bị thiếu.</li>
+<li><strong>Chuẩn bị dữ liệu cho mô hình:</strong> Chọn các đặc trưng làm biến độc lập (X) và giá trị hoạt tính làm biến phụ thuộc (y).</li>
+<li><strong>Chia dữ liệu:</strong> Chia dữ liệu thành tập huấn luyện và tập kiểm tra.</li>
+<li><strong>Huấn luyện mô hình:</strong> Sử dụng mô hình hồi quy tuyến tính để huấn luyện trên tập huấn luyện.</li>
+<li><strong>Đánh giá mô hình:</strong> Đánh giá hiệu suất của mô hình trên tập kiểm tra bằng cách tính Mean Squared Error (MSE).</li>
+</ul>
+</li>
+</ul>
+<p><strong>3. Sửa lỗi:</strong></p>
+<ul>
+<li><strong>Lỗi SQL:</strong> <code>ERROR: operator does not exist: numeric ~ unknown</code><ul>
+<li><strong>Nguyên nhân:</strong> PostgreSQL không hỗ trợ toán tử <code>~</code> (regular expression match) trực tiếp trên kiểu dữ liệu <code>numeric</code>.</li>
+<li><strong>Giải pháp:</strong> Chuyển đổi giá trị <code>standard_value</code> sang kiểu <code>text</code> trước khi so sánh bằng cách sử dụng <code>CAST(act.standard_value AS TEXT) ~ '^[0-9\.]+$'</code>.</li>
+</ul>
+</li>
+<li><strong>Lỗi Python:</strong> <code>TypeError: mean_squared_error() got an unexpected keyword argument 'squared'</code><ul>
+<li><strong>Nguyên nhân:</strong> Phiên bản scikit-learn cũ không hỗ trợ tham số <code>squared=False</code> trong hàm <code>mean_squared_error</code>.</li>
+<li><strong>Giải pháp:</strong> Nâng cấp scikit-learn lên phiên bản mới hơn (<code>pip install --upgrade scikit-learn</code>) hoặc tính căn bậc hai của MSE để có RMSE (Root Mean Squared Error).</li>
+</ul>
+</li>
+</ul>
+<p><strong>4. Ví dụ code SQL và Python:</strong></p>
+<p><strong>Ví dụ 1: Lọc theo khoảng giá trị hoạt tính:</strong></p>
+<p>```sql
+-- English
+-- Select compounds with IC50 values between 100 and 1000.</p>
+<p>-- Vietnamese
+-- Chọn các hợp chất có giá trị IC50 nằm trong khoảng từ 100 đến 1000.</p>
+<p>SELECT chembl_id, standard_value
+FROM activities act
+JOIN molecule_dictionary md ON act.molregno = md.molregno
+WHERE standard_type = 'IC50' AND standard_value BETWEEN 100 AND 1000
+LIMIT 100;
+```</p>
+<p>```python</p>
+<h1>English</h1>
+<h1>Filter DataFrame for compounds with MolWt between 200 and 400.</h1>
+<h1>Vietnamese</h1>
+<h1>Lọc DataFrame để tìm các hợp chất có MolWt nằm trong khoảng từ 200 đến 400.</h1>
+<p>df_filtered = df[(df['MolWt'] &gt;= 200) &amp; (df['MolWt'] &lt;= 400)]
+print(df_filtered.head())
+```</p>
+<p><strong>Ví dụ 2: Tính số lượng hợp chất theo loại hoạt tính:</strong></p>
+<p>```sql
+-- English
+-- Count the number of compounds for each standard type.</p>
+<p>-- Vietnamese
+-- Đếm số lượng hợp chất cho mỗi loại hoạt tính.</p>
+<p>SELECT standard_type, COUNT(*)
+FROM activities
+GROUP BY standard_type;
+```</p>
+<p>```python</p>
+<h1>English</h1>
+<h1>Calculate and print the average LogP.</h1>
+<h1>Vietnamese</h1>
+<h1>Tính toán và in ra giá trị LogP trung bình.</h1>
+<p>print(f"Average LogP: {df['LogP'].mean()}")
+```</p>
+<p><strong>Ví dụ 3: Kết hợp dữ liệu từ nhiều bảng:</strong></p>
+<p>```sql
+-- English
+-- Retrieve ChEMBL ID, SMILES, and target name for specific activities.</p>
+<p>-- Vietnamese
+-- Lấy ChEMBL ID, SMILES và tên target cho các hoạt tính cụ thể.</p>
+<p>SELECT md.chembl_id, cmp.canonical_smiles, td.pref_name
+FROM molecule_dictionary md
+JOIN activities act ON md.molregno = act.molregno
+JOIN compound_structures cmp ON md.molregno = cmp.molregno
+JOIN target_dictionary td ON act.tid = td.tid
+WHERE act.standard_type = 'IC50'
+LIMIT 100;
+```</p>
+<p>```python</p>
+<h1>English</h1>
+<h1>Create a scatter plot of MolWt vs. LogP.</h1>
+<h1>Vietnamese</h1>
+<h1>Vẽ biểu đồ phân tán của MolWt so với LogP.</h1>
+<p>import matplotlib.pyplot as plt
+plt.scatter(df['MolWt'], df['LogP'])
+plt.xlabel('MolWt')
+plt.ylabel('LogP')
+plt.title('MolWt vs. LogP')
+plt.show()
+```</p>
+<p><strong>Ví dụ 4: Sắp xếp dữ liệu theo giá trị hoạt tính:</strong></p>
+<p>```sql
+-- English
+-- Retrieve ChEMBL ID and standard value, ordered by standard value in ascending order.</p>
+<p>-- Vietnamese
+-- Lấy ChEMBL ID và giá trị chuẩn, sắp xếp theo giá trị chuẩn theo thứ tự tăng dần.</p>
+<p>SELECT md.chembl_id, act.standard_value
+FROM molecule_dictionary md
+JOIN activities act ON md.molregno = act.molregno
+WHERE act.standard_type = 'IC50'
+ORDER BY act.standard_value ASC
+LIMIT 100;
+```</p>
+<p>```python</p>
+<h1>English</h1>
+<h1>Calculate the correlation matrix of the descriptors.</h1>
+<h1>Vietnamese</h1>
+<h1>Tính toán ma trận tương quan của các descriptor.</h1>
+<p>correlation_matrix = df[['MolWt', 'LogP', 'HBD', 'HBA']].corr()
+print(correlation_matrix)
+```</p>
+<p><strong>Ví dụ 5: Lọc dữ liệu theo SMILES:</strong></p>
+<p>```sql
+-- English
+-- Retrieve molecules with SMILES containing a specific substructure.</p>
+<p>-- Vietnamese
+-- Lấy các phân tử có SMILES chứa một cấu trúc con cụ thể.</p>
+<p>SELECT md.chembl_id, cmp.canonical_smiles
+FROM molecule_dictionary md
+JOIN compound_structures cmp ON md.molregno = cmp.molregno
+WHERE cmp.canonical_smiles LIKE '%c1ccccc1%'
+LIMIT 100;
+```</p>
+<p>```python</p>
+<h1>English</h1>
+<h1>Save the filtered DataFrame to a new CSV file.</h1>
+<h1>Vietnamese</h1>
+<h1>Lưu DataFrame đã lọc vào một tệp CSV mới.</h1>
+<p>df_filtered.to_csv(os.path.join(base_path, "data", "filtered_data.csv"), index=False)
+```</p>
+<p><strong>Phân tích mô hình:</strong></p>
+<p>Mô hình hồi quy tuyến tính là một khởi đầu tốt để khám phá mối quan hệ giữa các đặc trưng phân tử và hoạt tính. Tuy nhiên, cần lưu ý rằng:</p>
+<ul>
+<li><strong>Tính tuyến tính:</strong> Mô hình này giả định mối quan hệ tuyến tính giữa các biến, điều này có thể không đúng trong thực tế.</li>
+<li><strong>Đa cộng tuyến:</strong> Các đặc trưng phân tử có thể tương quan với nhau, ảnh hưởng đến độ ổn định của mô hình.</li>
+<li><strong>Phạm vi áp dụng:</strong> Mô hình có thể không dự đoán chính xác cho các hợp chất nằm ngoài phạm vi dữ liệu huấn luyện.</li>
+</ul>
+<p><strong>Các bước tiếp theo:</strong></p>
+<ol>
+<li><strong>Thử nghiệm các mô hình khác:</strong> Sử dụng các mô hình phức tạp hơn như Random Forest, SVM, hoặc Neural Networks.</li>
+<li><strong>Lựa chọn đặc trưng:</strong> Sử dụng các phương pháp lựa chọn đặc trưng để chọn ra các đặc trưng quan trọng nhất.</li>
+<li><strong>Kiểm tra chéo:</strong> Sử dụng kiểm tra chéo để đánh giá độ ổn định của mô hình.</li>
+<li><strong>Giải thích mô hình:</strong> Sử dụng các phương pháp giải thích mô hình (ví dụ: SHAP values) để hiểu rõ hơn về mối quan hệ giữa các đặc trưng và hoạt tính.</li>
+</ol>
+<p>Tôi hy vọng những hướng dẫn và code mẫu này sẽ giúp bạn tiến xa trong dự án. Nếu bạn có bất kỳ câu hỏi nào, đừng ngần ngại hỏi!</p>
+        </body>
+        </html>
+        

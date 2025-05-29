@@ -1,0 +1,298 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_100</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Rare disease drug lead identification</h1>
+<hr />
+<p>Okay, I understand. You're working on a Chembl 35 data analysis project using RDKit and PostgreSQL, following an AIMLops template. You want to extract data, perform analysis, and you've encountered some errors. Let's break down the problem and create a solution.</p>
+<p><strong>1. Analysis Model and Approach</strong></p>
+<p>The goal here is to leverage Chembl 35 data for drug research and development. Given the errors, we'll focus on:</p>
+<ul>
+<li><strong>Data Extraction and Preparation:</strong> Retrieve relevant data from Chembl 35 related to bioactivity data. We'll limit the data extraction to 100 rows for faster processing as requested. We'll address the SQL error related to the regular expression matching.</li>
+<li><strong>Data Transformation:</strong>  Convert SMILES strings into RDKit molecules. Handle potential errors that may occur during the conversion.</li>
+<li><strong>Basic Analysis:</strong>  Demonstrate a simple analysis using the data.  We will focus on exploring the relationship between molecular properties and bioactivity.  Specifically, we'll calculate molecular weight and logP using RDKit and look at their distribution with respect to activity values. We will also deal with the scikit-learn version incompatibility issue.</li>
+</ul>
+<p><strong>2. Code (SQL and Python)</strong></p>
+<p>Here's a breakdown of the SQL and Python code, along with explanations:</p>
+<p><strong>SQL (to extract data and save to CSV):</strong></p>
+<p>```sql
+-- File: ../data/chembl_35_100.csv
+-- This SQL script extracts 100 rows of data from ChEMBL related to bioactivity,
+-- addressing the numeric ~ unknown operator error by using a different approach
+-- to filter numeric data.</p>
+<p>SELECT
+    act.molregno,
+    act.standard_value,
+    act.standard_units,
+    act.standard_type,
+    md.chembl_id,
+    cs.canonical_smiles
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+WHERE
+    act.standard_type = 'IC50'  -- Filter for IC50 values
+    AND act.standard_units = 'nM' -- Filter for nM units
+    AND act.standard_value IS NOT NULL  -- Ensure standard_value is not NULL
+    AND act.standard_value::text ~ '^[0-9.]+$'  -- Check if standard_value is a valid number (alternative to numeric ~ unknown)
+ORDER BY
+    act.molregno
+LIMIT 100;
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Error Handling (SQL):</strong>  The original error <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code>  arises because PostgreSQL's type checking for regular expression matching can be strict. To avoid type issues, we explicitly cast <code>act.standard_value</code> to <code>text</code> using <code>act.standard_value::text</code> before applying the regex check.</li>
+<li><strong>Data Selection:</strong>  We select <code>molregno</code>, <code>standard_value</code>, <code>standard_units</code>, <code>standard_type</code>, <code>chembl_id</code>, and <code>canonical_smiles</code>. These fields provide information about the molecule, its activity, and its chemical structure.</li>
+<li><strong>Filtering:</strong> We filter for <code>IC50</code> values measured in <code>nM</code> to ensure consistency in the bioactivity data.  We also check that <code>standard_value</code> is not <code>NULL</code>.</li>
+<li><strong>Limiting Results:</strong>  <code>LIMIT 100</code> ensures that only 100 rows are returned, as requested.</li>
+</ul>
+<p><strong>Python (Jupyter Notebook):</strong></p>
+<p>```python</p>
+<h1>File: notebooks/Topic_CheMBL_35_100_1_analysis.ipynb</h1>
+<p>import pandas as pd
+import numpy as np
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from rdkit.Chem import Lipinski
+import os
+from sklearn.metrics import mean_squared_error</p>
+<h1>Define base path</h1>
+<p>base_path = ".."  # Assuming the notebook is one level deep relative to the project root
+data_path = os.path.join(base_path, "data", "chembl_35_100.csv")</p>
+<h1>Load data from CSV</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}.  Make sure you've run the SQL script and saved the CSV.")
+    exit()</p>
+<h1>Data Cleaning and Preparation</h1>
+<p>df = df.dropna(subset=['canonical_smiles', 'standard_value']) # Remove rows with missing SMILES or standard_value</p>
+<h1>Convert standard_value to numeric, handling potential errors</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce') # Coerce errors to NaN
+df = df.dropna(subset=['standard_value']) # Drop rows with NaN standard_value after conversion</p>
+<h1>RDKit Molecule Creation and Feature Calculation</h1>
+<p>def calculate_properties(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        mw = Descriptors.MolWt(mol)
+        logp = Descriptors.MolLogP(mol)
+        hbd = Lipinski.NumHDonors(mol)
+        hba = Lipinski.NumHAcceptors(mol)
+        return mw, logp, hbd, hba
+    else:
+        return None, None, None, None</p>
+<p>df[['mol_weight', 'logP', 'HBD', 'HBA']] = df['canonical_smiles'].apply(lambda x: pd.Series(calculate_properties(x)))
+df = df.dropna(subset=['mol_weight', 'logP', 'HBD', 'HBA']) # Drop rows where RDKit failed</p>
+<h1>Activity Transformation (pIC50)</h1>
+<p>df['pIC50'] = -np.log10(df['standard_value'] * 1e-9) # Convert IC50 (nM) to pIC50</p>
+<h1>Simple Analysis (Example: Relationship between Molecular Weight and pIC50)</h1>
+<h1>Let's try a very basic linear regression.  This is just for illustration.</h1>
+<p>from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression</p>
+<p>X = df[['mol_weight', 'logP']] # Features
+y = df['pIC50']  # Target</p>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42) # Split data</p>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)</p>
+<h1>Calculate Mean Squared Error</h1>
+<p>try:
+    mse = mean_squared_error(y_test, y_pred)
+except TypeError as e:
+    print(f"Error calculating MSE: {e}")
+    print("This might be due to an old scikit-learn version. Ensure it's up-to-date.")
+    mse = None  # Set mse to None if calculation fails
+else:
+    print(f"Mean Squared Error: {mse}")</p>
+<p>if mse is not None:
+  # Optionally, you can try to fix the scikit-learn version issue.
+  # However, this often requires a full environment rebuild.
+  # print("Trying to fix scikit-learn version issue (requires restart):")
+  # !pip install scikit-learn --upgrade</p>
+<p>import matplotlib.pyplot as plt
+  plt.scatter(y_test, y_pred)
+  plt.xlabel("Actual pIC50")
+  plt.ylabel("Predicted pIC50")
+  plt.title("Actual vs. Predicted pIC50")
+  plt.show()</p>
+<h1>Display the first few rows of the processed DataFrame</h1>
+<p>print("\nProcessed Data (First 5 rows):")
+print(df.head())
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Import Libraries:</strong> Import necessary libraries (pandas, RDKit, scikit-learn, os).</li>
+<li><strong>File Path:</strong>  Construct the correct file path to the CSV file using <code>os.path.join</code>.</li>
+<li><strong>Load Data:</strong> Load the CSV data into a pandas DataFrame.</li>
+<li><strong>Data Cleaning:</strong> Drop rows with missing SMILES or <code>standard_value</code>.</li>
+<li><strong>RDKit Molecule Conversion:</strong>  The <code>calculate_properties</code> function takes a SMILES string and returns molecular weight, logP, H-bond donors, and H-bond acceptors. It handles potential errors during the RDKit molecule conversion by returning <code>None</code> if the conversion fails.</li>
+<li><strong>Feature Calculation:</strong> Apply the <code>calculate_properties</code> function to the <code>canonical_smiles</code> column to create new columns for molecular weight and logP.</li>
+<li><strong>Activity Transformation:</strong> Convert <code>IC50</code> values to <code>pIC50</code> using the formula: <code>pIC50 = -log10(IC50 * 1e-9)</code>.  This transforms the IC50 values (in nM) to a more interpretable scale.</li>
+<li><strong>Basic Analysis (Linear Regression):</strong><ul>
+<li>Split the data into training and testing sets.</li>
+<li>Create a <code>LinearRegression</code> model.</li>
+<li>Train the model on the training data.</li>
+<li>Make predictions on the testing data.</li>
+<li>Calculate the Mean Squared Error (MSE).</li>
+</ul>
+</li>
+<li><strong>Error Handling (scikit-learn):</strong>  The original code had an issue with the <code>squared=False</code> parameter in <code>mean_squared_error</code>, which is not supported in older scikit-learn versions.  I have removed this parameter, so the code will now compute the regular MSE (not the root mean squared error). You should upgrade scikit-learn if possible, using <code>!pip install scikit-learn --upgrade</code>. I've added a check to see if <code>mse</code> is None, and if so, we do not display the plot.</li>
+<li><strong>Display Results:</strong> Print the first few rows of the processed DataFrame.</li>
+</ul>
+<p><strong>3. Five Examples of How to Extend the Analysis</strong></p>
+<p>Here are five examples to extend the analysis, building upon the code above:</p>
+<ol>
+<li>
+<p><strong>More Advanced Regression Models:</strong> Instead of a simple linear regression, try more sophisticated models like Random Forest Regression, Support Vector Regression (SVR), or Gradient Boosting Regression. These models can capture non-linear relationships between molecular properties and activity.</p>
+<p>```python
+from sklearn.ensemble import RandomForestRegressor</p>
+<h1>... (Data preparation code from above) ...</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42) # Example: Random Forest with 100 trees
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+print(f"Random Forest MSE: {mse}")
+```</p>
+</li>
+<li>
+<p><strong>Feature Engineering:</strong>  Calculate more molecular descriptors using RDKit.  Explore descriptors like:</p>
+<ul>
+<li><strong>Topological Polar Surface Area (TPSA):</strong>  Related to drug absorption and permeability.</li>
+<li><strong>Number of Rotatable Bonds:</strong>  Indicates molecular flexibility.</li>
+<li><strong>Aromatic Ring Count:</strong>  Related to aromaticity.</li>
+</ul>
+<p>```python
+from rdkit.Chem import rdMolDescriptors</p>
+<p>def calculate_more_properties(mol):
+    if mol is not None:
+        tpsa = rdMolDescriptors.CalcTPSA(mol)
+        rotatable_bonds = rdMolDescriptors.CalcNumRotatableBonds(mol)
+        aromatic_rings = rdMolDescriptors.CalcNumAromaticRings(mol)
+        return tpsa, rotatable_bonds, aromatic_rings
+    else:
+        return None, None, None</p>
+<p>df[['TPSA', 'RotatableBonds', 'AromaticRings']] = df['canonical_smiles'].apply(lambda x: pd.Series(calculate_more_properties(Chem.MolFromSmiles(x))))
+df = df.dropna(subset=['TPSA', 'RotatableBonds', 'AromaticRings'])</p>
+<h1>Add the new features to your X matrix for modeling</h1>
+<p>X = df[['mol_weight', 'logP', 'TPSA', 'RotatableBonds', 'AromaticRings']]
+```</p>
+</li>
+<li>
+<p><strong>Activity Cliffs Analysis:</strong>  Identify pairs of molecules with similar structures but significantly different activities.  This can help pinpoint crucial structural features that influence activity.  This requires calculating molecular similarity (e.g., Tanimoto similarity) using RDKit.</p>
+<p>```python
+from rdkit import DataStructs
+from rdkit.Chem import AllChem</p>
+<p>def calculate_fingerprint(mol):
+    if mol is not None:
+        fp = AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=2048) # Morgan Fingerprint
+        return fp
+    else:
+        return None</p>
+<p>df['fingerprint'] = df['canonical_smiles'].apply(lambda x: calculate_fingerprint(Chem.MolFromSmiles(x)))
+df = df.dropna(subset=['fingerprint'])</p>
+<h1>Now, iterate through pairs of molecules and calculate Tanimoto similarity</h1>
+<h1>This is just a basic example.  A real activity cliff analysis would require more sophisticated methods.</h1>
+<p>from itertools import combinations</p>
+<p>activity_cliff_threshold = 1.0  # pIC50 difference threshold
+similarity_threshold = 0.8      # Tanimoto similarity threshold</p>
+<p>activity_cliffs = []
+for (idx1, idx2) in combinations(df.index, 2):
+    mol1 = df.loc[idx1]
+    mol2 = df.loc[idx2]</p>
+<pre><code>similarity = DataStructs.TanimotoSimilarity(mol1['fingerprint'], mol2['fingerprint'])
+activity_difference = abs(mol1['pIC50'] - mol2['pIC50'])
+
+if similarity &gt;= similarity_threshold and activity_difference &gt;= activity_cliff_threshold:
+    activity_cliffs.append((mol1['chembl_id'], mol2['chembl_id'], similarity, activity_difference))
+</code></pre>
+<p>print(f"Found {len(activity_cliffs)} potential activity cliffs.")
+```</p>
+</li>
+<li>
+<p><strong>Clustering:</strong> Group molecules based on their properties (molecular weight, logP, TPSA, etc.) using clustering algorithms like k-means or hierarchical clustering. This can help identify groups of compounds with similar characteristics.</p>
+<p>```python
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler</p>
+<h1>... (Data preparation code from above) ...</h1>
+<p>X = df[['mol_weight', 'logP', 'TPSA', 'RotatableBonds', 'AromaticRings']]</p>
+<h1>Scale the features</h1>
+<p>scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)</p>
+<h1>Perform k-means clustering</h1>
+<p>kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)  # Example: 5 clusters
+df['cluster'] = kmeans.fit_predict(X_scaled)</p>
+<h1>Analyze the clusters</h1>
+<p>print(df.groupby('cluster')[['mol_weight', 'logP', 'TPSA']].mean())
+```</p>
+</li>
+<li>
+<p><strong>Visualization:</strong> Create visualizations to explore the relationships between molecular properties and activity. Use scatter plots, histograms, box plots, and other visualization techniques to gain insights into the data.</p>
+<p>```python
+import matplotlib.pyplot as plt
+import seaborn as sns</p>
+<h1>... (Data preparation code from above) ...</h1>
+<h1>Scatter plot of logP vs. pIC50</h1>
+<p>plt.figure(figsize=(8, 6))
+sns.scatterplot(x='logP', y='pIC50', data=df)
+plt.xlabel("LogP")
+plt.ylabel("pIC50")
+plt.title("LogP vs. pIC50")
+plt.show()</p>
+<h1>Histogram of pIC50 values</h1>
+<p>plt.figure(figsize=(8, 6))
+sns.histplot(df['pIC50'], kde=True)
+plt.xlabel("pIC50")
+plt.title("Distribution of pIC50 Values")
+plt.show()
+```</p>
+</li>
+</ol>
+<p><strong>4. Important Considerations</strong></p>
+<ul>
+<li><strong>Data Quality:</strong> The quality of your analysis depends heavily on the quality of the Chembl 35 data. Pay attention to data cleaning and validation.</li>
+<li><strong>Statistical Significance:</strong> Be mindful of statistical significance when interpreting results.  With only 100 data points, your statistical power will be limited.</li>
+<li><strong>Domain Knowledge:</strong>  Drug discovery benefits from domain expertise. Consult with chemists and biologists to interpret your findings effectively.</li>
+<li><strong>Environment Consistency:</strong> Ensure that your RDKit and scikit-learn versions are consistent and up-to-date. Use a virtual environment (e.g., conda or venv) to manage dependencies.</li>
+<li><strong>Error Handling:</strong>  Robust error handling is crucial.  Anticipate potential issues (e.g., invalid SMILES strings, missing data) and handle them gracefully.</li>
+</ul>
+<p><strong>In Summary (Resumen en Español):</strong></p>
+<p>Este proyecto tiene como objetivo analizar datos de Chembl 35 para la investigación y el desarrollo de fármacos utilizando RDKit y PostgreSQL. Primero, extraemos datos relevantes de Chembl 35, limitando la extracción a 100 filas. Luego, convertimos las cadenas SMILES en moléculas RDKit y calculamos propiedades moleculares como el peso molecular y el logP. Realizamos un análisis básico utilizando regresión lineal para explorar la relación entre las propiedades moleculares y la bioactividad (pIC50). También abordamos errores como problemas de tipos de datos en SQL y la incompatibilidad de versiones de scikit-learn. Finalmente, proporcionamos cinco ejemplos para ampliar el análisis, incluyendo modelos de regresión más avanzados, ingeniería de características, análisis de "activity cliffs", clustering y visualización de datos. Es crucial prestar atención a la calidad de los datos, la significación estadística y utilizar el conocimiento del dominio para interpretar los resultados de manera efectiva.</p>
+        </body>
+        </html>
+        

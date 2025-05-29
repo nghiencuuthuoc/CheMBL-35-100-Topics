@@ -1,0 +1,573 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_74</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Vẽ 3D không gian hóa học phân tử</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 sử dụng RDKit. Với vai trò là một chuyên gia nghiên cứu và phát triển dược học, tôi hiểu rõ tầm quan trọng của việc khai thác dữ liệu ChEMBL để tìm kiếm các hợp chất tiềm năng. Dưới đây là phân tích chi tiết, hướng dẫn song ngữ, code mẫu SQL và Python, cùng với các ví dụ để bạn bắt đầu.</p>
+<p><strong>1. Phân tích Mô hình Phân tích (Analysis of the Analysis Model)</strong></p>
+<p>Dự án của bạn tập trung vào việc phân tích dữ liệu ChEMBL 35, một cơ sở dữ liệu lớn chứa thông tin về các phân tử hoạt tính sinh học. Mục tiêu là sử dụng RDKit để trích xuất các đặc trưng hóa học từ cấu trúc phân tử và kết hợp chúng với dữ liệu hoạt tính sinh học để xây dựng mô hình dự đoán.</p>
+<ul>
+<li><strong>Data Source (Nguồn dữ liệu):</strong> ChEMBL 35 database.</li>
+<li><strong>Tools (Công cụ):</strong><ul>
+<li>psql (PostgreSQL) for database querying.</li>
+<li>RDKit for chemical feature extraction.</li>
+<li>Jupyter Notebook for code execution and documentation.</li>
+<li>Scikit-learn (or other machine learning libraries) for model building.</li>
+</ul>
+</li>
+<li><strong>Steps (Các bước):</strong><ol>
+<li><strong>Data Extraction (Trích xuất dữ liệu):</strong> Use SQL queries to extract relevant data from ChEMBL, such as compound structures (SMILES) and activity data (IC50, Ki, etc.).</li>
+<li><strong>Feature Generation (Tạo đặc trưng):</strong> Use RDKit to generate molecular descriptors (e.g., fingerprints, physicochemical properties) from the SMILES strings.</li>
+<li><strong>Data Preprocessing (Tiền xử lý dữ liệu):</strong> Clean and prepare the data for modeling. This may involve handling missing values, scaling features, and splitting the data into training and testing sets.</li>
+<li><strong>Model Building (Xây dựng mô hình):</strong> Train a machine learning model to predict activity based on the molecular descriptors. Common models include Random Forest, Support Vector Machines, and Neural Networks.</li>
+<li><strong>Model Evaluation (Đánh giá mô hình):</strong> Evaluate the performance of the model using appropriate metrics (e.g., AUC, RMSE, R-squared).</li>
+<li><strong>Analysis and Interpretation (Phân tích và giải thích):</strong> Analyze the model to identify important features and gain insights into the structure-activity relationship.</li>
+</ol>
+</li>
+</ul>
+<p><strong>2. Hướng dẫn song ngữ (Bilingual Instructions)</strong></p>
+<p>Dưới đây là hướng dẫn chi tiết bằng cả tiếng Anh và tiếng Việt:</p>
+<ul>
+<li>
+<p><strong>English:</strong></p>
+<ol>
+<li><strong>Connect to the ChEMBL database using psql.</strong></li>
+<li><strong>Execute SQL queries to extract the desired data (e.g., compound structures and activity data).</strong></li>
+<li><strong>Save the extracted data as CSV files in the <code>../data/</code> directory.</strong></li>
+<li><strong>Load the CSV files into a Jupyter Notebook.</strong></li>
+<li><strong>Use RDKit to generate molecular descriptors from the SMILES strings.</strong></li>
+<li><strong>Preprocess the data (handle missing values, scale features, etc.).</strong></li>
+<li><strong>Split the data into training and testing sets.</strong></li>
+<li><strong>Train a machine learning model to predict activity.</strong></li>
+<li><strong>Evaluate the model's performance.</strong></li>
+<li><strong>Analyze the model to identify important features and gain insights into the structure-activity relationship.</strong></li>
+<li>
+<p><strong>Tiếng Việt:</strong></p>
+</li>
+<li>
+<p><strong>Kết nối đến cơ sở dữ liệu ChEMBL bằng psql.</strong></p>
+</li>
+<li><strong>Thực hiện các truy vấn SQL để trích xuất dữ liệu mong muốn (ví dụ: cấu trúc hợp chất và dữ liệu hoạt tính).</strong></li>
+<li><strong>Lưu dữ liệu đã trích xuất dưới dạng tệp CSV trong thư mục <code>../data/</code>.</strong></li>
+<li><strong>Tải các tệp CSV vào Jupyter Notebook.</strong></li>
+<li><strong>Sử dụng RDKit để tạo các đặc trưng phân tử từ chuỗi SMILES.</strong></li>
+<li><strong>Tiền xử lý dữ liệu (xử lý giá trị thiếu, chia tỷ lệ đặc trưng, v.v.).</strong></li>
+<li><strong>Chia dữ liệu thành các tập huấn luyện và kiểm tra.</strong></li>
+<li><strong>Huấn luyện mô hình học máy để dự đoán hoạt tính.</strong></li>
+<li><strong>Đánh giá hiệu suất của mô hình.</strong></li>
+<li><strong>Phân tích mô hình để xác định các đặc trưng quan trọng và hiểu rõ hơn về mối quan hệ cấu trúc-hoạt tính.</strong></li>
+</ol>
+</li>
+</ul>
+<p><strong>3. Code SQL và Python mẫu (Sample SQL and Python Code)</strong></p>
+<p><strong>SQL (English):</strong></p>
+<p><code>sql
+-- Extract 100 compounds with IC50 values for a specific target
+SELECT
+    molregno,
+    compound_structures.canonical_smiles,
+    activities.standard_value,
+    activities.standard_units
+FROM
+    compound_structures
+JOIN
+    activities ON compound_structures.molregno = activities.molregno
+JOIN
+    target_dictionary ON activities.tid = target_dictionary.tid
+WHERE
+    target_dictionary.pref_name = 'desired_target_name'  -- Replace with your target
+    AND activities.standard_type = 'IC50'
+    AND activities.standard_units = 'nM'
+    AND act.standard_value ~ '^[0-9\.]+$'  -- Only numeric values
+LIMIT 100;</code></p>
+<p><strong>SQL (Tiếng Việt):</strong></p>
+<p><code>sql
+-- Trích xuất 100 hợp chất với giá trị IC50 cho một mục tiêu cụ thể
+SELECT
+    molregno,
+    compound_structures.canonical_smiles,
+    activities.standard_value,
+    activities.standard_units
+FROM
+    compound_structures
+JOIN
+    activities ON compound_structures.molregno = activities.molregno
+JOIN
+    target_dictionary ON activities.tid = target_dictionary.tid
+WHERE
+    target_dictionary.pref_name = 'desired_target_name'  -- Thay thế bằng mục tiêu của bạn
+    AND activities.standard_type = 'IC50'
+    AND activities.standard_units = 'nM'
+    AND act.standard_value ~ '^[0-9\.]+$'  -- Chỉ giá trị số
+LIMIT 100;</code></p>
+<p><strong>Python (English):</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score</p>
+<h1>Define the base path</h1>
+<p>base_path = "../data/"</p>
+<h1>Load the data from CSV</h1>
+<p>data = pd.read_csv(os.path.join(base_path, "your_data.csv"))  # Replace with your CSV file</p>
+<h1>Function to calculate molecular descriptors</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        descriptors = {}
+        descriptors['MolLogP'] = Descriptors.MolLogP(mol)
+        descriptors['MolWt'] = Descriptors.MolWt(mol)
+        descriptors['NumHAcceptors'] = Descriptors.NumHAcceptors(mol)
+        descriptors['NumHDonors'] = Descriptors.NumHDonors(mol)
+        return descriptors
+    else:
+        return None</p>
+<h1>Apply the function to each SMILES string</h1>
+<p>data['descriptors'] = data['canonical_smiles'].apply(calculate_descriptors)</p>
+<h1>Handle missing descriptors</h1>
+<p>data = data.dropna(subset=['descriptors'])</p>
+<h1>Convert descriptors to DataFrame</h1>
+<p>descriptors_df = pd.DataFrame(data['descriptors'].tolist())
+data = pd.concat([data, descriptors_df], axis=1)</p>
+<h1>Prepare data for modeling</h1>
+<p>X = data[['MolLogP', 'MolWt', 'NumHAcceptors', 'NumHDonors']]  # Use only available descriptors
+y = data['standard_value']</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a Random Forest Regressor model</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>Python (Tiếng Việt):</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score</p>
+<h1>Xác định đường dẫn cơ sở</h1>
+<p>base_path = "../data/"</p>
+<h1>Tải dữ liệu từ tệp CSV</h1>
+<p>data = pd.read_csv(os.path.join(base_path, "your_data.csv"))  # Thay thế bằng tệp CSV của bạn</p>
+<h1>Hàm tính toán các descriptor phân tử</h1>
+<p>def calculate_descriptors(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        descriptors = {}
+        descriptors['MolLogP'] = Descriptors.MolLogP(mol)
+        descriptors['MolWt'] = Descriptors.MolWt(mol)
+        descriptors['NumHAcceptors'] = Descriptors.NumHAcceptors(mol)
+        descriptors['NumHDonors'] = Descriptors.NumHDonors(mol)
+        return descriptors
+    else:
+        return None</p>
+<h1>Áp dụng hàm cho mỗi chuỗi SMILES</h1>
+<p>data['descriptors'] = data['canonical_smiles'].apply(calculate_descriptors)</p>
+<h1>Xử lý các descriptor bị thiếu</h1>
+<p>data = data.dropna(subset=['descriptors'])</p>
+<h1>Chuyển đổi descriptors thành DataFrame</h1>
+<p>descriptors_df = pd.DataFrame(data['descriptors'].tolist())
+data = pd.concat([data, descriptors_df], axis=1)</p>
+<h1>Chuẩn bị dữ liệu cho mô hình hóa</h1>
+<p>X = data[['MolLogP', 'MolWt', 'NumHAcceptors', 'NumHDonors']]  # Chỉ sử dụng các descriptor có sẵn
+y = data['standard_value']</p>
+<h1>Chia dữ liệu thành các tập huấn luyện và kiểm tra</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Huấn luyện mô hình Random Forest Regressor</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)</p>
+<h1>Dự đoán</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Đánh giá mô hình</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")
+```</p>
+<p><strong>4. Ví dụ Code SQL và Python (SQL and Python Code Examples)</strong></p>
+<p>Dưới đây là 5 ví dụ về code SQL và Python để bạn tham khảo:</p>
+<p><strong>Example 1: Extract compounds with specific activity range</strong></p>
+<ul>
+<li><strong>SQL (English):</strong></li>
+</ul>
+<p><code>sql
+SELECT molregno, compound_structures.canonical_smiles, activities.standard_value
+FROM compound_structures
+JOIN activities ON compound_structures.molregno = activities.molregno
+WHERE activities.standard_type = 'IC50'
+AND activities.standard_units = 'nM'
+AND activities.standard_value &gt;= 100 AND activities.standard_value &lt;= 1000
+LIMIT 100;</code></p>
+<ul>
+<li><strong>SQL (Tiếng Việt):</strong></li>
+</ul>
+<p><code>sql
+SELECT molregno, compound_structures.canonical_smiles, activities.standard_value
+FROM compound_structures
+JOIN activities ON compound_structures.molregno = activities.molregno
+WHERE activities.standard_type = 'IC50'
+AND activities.standard_units = 'nM'
+AND activities.standard_value &gt;= 100 AND activities.standard_value &lt;= 1000
+LIMIT 100;</code></p>
+<ul>
+<li><strong>Python (English):</strong></li>
+</ul>
+<p>```python</p>
+<h1>Read the CSV file</h1>
+<p>df = pd.read_csv(os.path.join(base_path, "activity_range.csv"))</p>
+<h1>Print the number of rows and columns</h1>
+<p>print(f"Number of rows: {len(df)}")
+print(f"Number of columns: {len(df.columns)}")</p>
+<h1>Print the first 5 rows of the DataFrame</h1>
+<p>print(df.head())
+```</p>
+<ul>
+<li><strong>Python (Tiếng Việt):</strong></li>
+</ul>
+<p>```python</p>
+<h1>Đọc file CSV</h1>
+<p>df = pd.read_csv(os.path.join(base_path, "activity_range.csv"))</p>
+<h1>In số lượng hàng và cột</h1>
+<p>print(f"Số lượng hàng: {len(df)}")
+print(f"Số lượng cột: {len(df.columns)}")</p>
+<h1>In 5 hàng đầu tiên của DataFrame</h1>
+<p>print(df.head())
+```</p>
+<p><strong>Example 2: Calculate Lipinski's Rule of Five</strong></p>
+<ul>
+<li><strong>Python (English):</strong></li>
+</ul>
+<p>```python
+def lipinski_rule_of_five(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        mw = Descriptors.MolWt(mol)
+        logp = Descriptors.MolLogP(mol)
+        hbd = Descriptors.NumHDonors(mol)
+        hba = Descriptors.NumHAcceptors(mol)</p>
+<pre><code>    # Check Lipinski's rule of five
+    rule_1 = mw &lt;= 500
+    rule_2 = logp &lt;= 5
+    rule_3 = hbd &lt;= 5
+    rule_4 = hba &lt;= 10
+
+    # Count number of rules that fail
+    num_failed_rules = sum([not rule_1, not rule_2, not rule_3, not rule_4])
+    return num_failed_rules
+else:
+    return None
+</code></pre>
+<h1>Apply Lipinski's Rule of Five to each SMILES</h1>
+<p>df['Lipinski_Failures'] = df['canonical_smiles'].apply(lipinski_rule_of_five)</p>
+<h1>Print the results</h1>
+<p>print(df[['canonical_smiles', 'Lipinski_Failures']].head())
+```</p>
+<ul>
+<li><strong>Python (Tiếng Việt):</strong></li>
+</ul>
+<p>```python
+def lipinski_rule_of_five(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        mw = Descriptors.MolWt(mol)
+        logp = Descriptors.MolLogP(mol)
+        hbd = Descriptors.NumHDonors(mol)
+        hba = Descriptors.NumHAcceptors(mol)</p>
+<pre><code>    # Kiểm tra quy tắc 5 của Lipinski
+    rule_1 = mw &lt;= 500
+    rule_2 = logp &lt;= 5
+    rule_3 = hbd &lt;= 5
+    rule_4 = hba &lt;= 10
+
+    # Đếm số lượng quy tắc không đạt
+    num_failed_rules = sum([not rule_1, not rule_2, not rule_3, not rule_4])
+    return num_failed_rules
+else:
+    return None
+</code></pre>
+<h1>Áp dụng quy tắc 5 của Lipinski cho mỗi SMILES</h1>
+<p>df['Lipinski_Failures'] = df['canonical_smiles'].apply(lipinski_rule_of_five)</p>
+<h1>In kết quả</h1>
+<p>print(df[['canonical_smiles', 'Lipinski_Failures']].head())
+```</p>
+<p><strong>Example 3: Extract compounds based on substructure</strong></p>
+<ul>
+<li><strong>SQL (English):</strong></li>
+</ul>
+<p><code>sql
+SELECT molregno, compound_structures.canonical_smiles
+FROM compound_structures
+WHERE compound_structures.canonical_smiles LIKE '%C=O%'  -- Example: compounds containing a carbonyl group
+LIMIT 100;</code></p>
+<ul>
+<li><strong>SQL (Tiếng Việt):</strong></li>
+</ul>
+<p><code>sql
+SELECT molregno, compound_structures.canonical_smiles
+FROM compound_structures
+WHERE compound_structures.canonical_smiles LIKE '%C=O%'  -- Ví dụ: hợp chất chứa nhóm carbonyl
+LIMIT 100;</code></p>
+<ul>
+<li><strong>Python (English):</strong></li>
+</ul>
+<p>```python
+from rdkit import Chem</p>
+<p>def check_substructure(smiles, substructure_smarts):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        substructure = Chem.MolFromSmarts(substructure_smarts)
+        if substructure is not None:
+            return mol.HasSubstructMatch(substructure)
+        else:
+            return False
+    else:
+        return False</p>
+<h1>Define substructure SMARTS</h1>
+<p>substructure_smarts = "C=O"  # Carbonyl group</p>
+<h1>Apply the function to each SMILES</h1>
+<p>df['Has_Carbonyl'] = df['canonical_smiles'].apply(lambda x: check_substructure(x, substructure_smarts))</p>
+<h1>Print the results</h1>
+<p>print(df[['canonical_smiles', 'Has_Carbonyl']].head())
+```</p>
+<ul>
+<li><strong>Python (Tiếng Việt):</strong></li>
+</ul>
+<p>```python
+from rdkit import Chem</p>
+<p>def check_substructure(smiles, substructure_smarts):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        substructure = Chem.MolFromSmarts(substructure_smarts)
+        if substructure is not None:
+            return mol.HasSubstructMatch(substructure)
+        else:
+            return False
+    else:
+        return False</p>
+<h1>Xác định cấu trúc con SMARTS</h1>
+<p>substructure_smarts = "C=O"  # Nhóm carbonyl</p>
+<h1>Áp dụng hàm cho mỗi SMILES</h1>
+<p>df['Has_Carbonyl'] = df['canonical_smiles'].apply(lambda x: check_substructure(x, substructure_smarts))</p>
+<h1>In kết quả</h1>
+<p>print(df[['canonical_smiles', 'Has_Carbonyl']].head())
+```</p>
+<p><strong>Example 4: Calculate Molecular Weight</strong></p>
+<ul>
+<li><strong>Python (English):</strong></li>
+</ul>
+<p>```python
+from rdkit import Chem
+from rdkit.Chem import Descriptors</p>
+<p>def calculate_molecular_weight(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<h1>Apply the function to each SMILES</h1>
+<p>df['Molecular_Weight'] = df['canonical_smiles'].apply(calculate_molecular_weight)</p>
+<h1>Print the results</h1>
+<p>print(df[['canonical_smiles', 'Molecular_Weight']].head())
+```</p>
+<ul>
+<li><strong>Python (Tiếng Việt):</strong></li>
+</ul>
+<p>```python
+from rdkit import Chem
+from rdkit.Chem import Descriptors</p>
+<p>def calculate_molecular_weight(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Descriptors.MolWt(mol)
+    else:
+        return None</p>
+<h1>Áp dụng hàm cho mỗi SMILES</h1>
+<p>df['Molecular_Weight'] = df['canonical_smiles'].apply(calculate_molecular_weight)</p>
+<h1>In kết quả</h1>
+<p>print(df[['canonical_smiles', 'Molecular_Weight']].head())
+```</p>
+<p><strong>Example 5: Visualize Molecules</strong></p>
+<ul>
+<li><strong>Python (English):</strong></li>
+</ul>
+<p>```python
+from rdkit import Chem
+from rdkit.Chem.Draw import IPythonConsole
+from rdkit.Chem import Draw</p>
+<p>def visualize_molecule(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Draw.MolToImage(mol)
+    else:
+        return None</p>
+<h1>Visualize the first molecule</h1>
+<p>img = visualize_molecule(df['canonical_smiles'].iloc[0])
+img
+```</p>
+<ul>
+<li><strong>Python (Tiếng Việt):</strong></li>
+</ul>
+<p>```python
+from rdkit import Chem
+from rdkit.Chem.Draw import IPythonConsole
+from rdkit.Chem import Draw</p>
+<p>def visualize_molecule(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        return Draw.MolToImage(mol)
+    else:
+        return None</p>
+<h1>Visualize phân tử đầu tiên</h1>
+<p>img = visualize_molecule(df['canonical_smiles'].iloc[0])
+img
+```</p>
+<p><strong>5. Giải quyết lỗi (Error Resolution)</strong></p>
+<ul>
+<li>
+<p><strong>ERROR: operator does not exist: numeric ~ unknown LINE 12: AND act.standard_value ~ '^[0-9.]+$'</strong></p>
+<ul>
+<li><strong>Explanation (Giải thích):</strong> Lỗi này xảy ra vì toán tử <code>~</code> (regex match) không được hỗ trợ trực tiếp trên kiểu dữ liệu <code>numeric</code> trong PostgreSQL.</li>
+<li><strong>Solution (Giải pháp):</strong> Chuyển đổi cột <code>standard_value</code> sang kiểu <code>text</code> trước khi so sánh với biểu thức chính quy.</li>
+<li><strong>SQL (English):</strong></li>
+</ul>
+</li>
+</ul>
+<p><code>sql
+SELECT
+    molregno,
+    compound_structures.canonical_smiles,
+    activities.standard_value,
+    activities.standard_units
+FROM
+    compound_structures
+JOIN
+    activities ON compound_structures.molregno = activities.molregno
+JOIN
+    target_dictionary ON activities.tid = target_dictionary.tid
+WHERE
+    target_dictionary.pref_name = 'desired_target_name'  -- Replace with your target
+    AND activities.standard_type = 'IC50'
+    AND activities.standard_units = 'nM'
+    AND CAST(activities.standard_value AS TEXT) ~ '^[0-9\.]+$'  -- Convert to TEXT
+LIMIT 100;</code></p>
+<pre><code>*   **SQL (Tiếng Việt):**
+</code></pre>
+<p><code>sql
+SELECT
+    molregno,
+    compound_structures.canonical_smiles,
+    activities.standard_value,
+    activities.standard_units
+FROM
+    compound_structures
+JOIN
+    activities ON compound_structures.molregno = activities.molregno
+JOIN
+    target_dictionary ON activities.tid = target_dictionary.tid
+WHERE
+    target_dictionary.pref_name = 'desired_target_name'  -- Thay thế bằng mục tiêu của bạn
+    AND activities.standard_type = 'IC50'
+    AND activities.standard_units = 'nM'
+    AND CAST(activities.standard_value AS TEXT) ~ '^[0-9\.]+$'  -- Chuyển đổi sang TEXT
+LIMIT 100;</code></p>
+<ul>
+<li>
+<p><strong>Phiên bản scikit-learn cũ không hỗ trợ tham số <code>squared=False</code> trong hàm <code>mean_squared_error</code></strong></p>
+<ul>
+<li><strong>Explanation (Giải thích):</strong> Tham số <code>squared=False</code> được thêm vào hàm <code>mean_squared_error</code> trong các phiên bản scikit-learn mới hơn để trả về Root Mean Squared Error (RMSE) thay vì Mean Squared Error (MSE).</li>
+<li>
+<p><strong>Solution (Giải pháp):</strong></p>
+<ol>
+<li><strong>Update scikit-learn (Cập nhật scikit-learn):</strong> Nâng cấp phiên bản scikit-learn của bạn lên phiên bản mới nhất bằng lệnh <code>pip install --upgrade scikit-learn</code>.</li>
+<li>
+<p><strong>Calculate RMSE manually (Tính RMSE thủ công):</strong> Nếu bạn không thể nâng cấp scikit-learn, bạn có thể tính RMSE bằng cách lấy căn bậc hai của MSE.</p>
+</li>
+<li>
+<p><strong>Python (English):</strong></p>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<p>```python
+from sklearn.metrics import mean_squared_error
+import numpy as np</p>
+<h1>Calculate MSE</h1>
+<p>mse = mean_squared_error(y_test, y_pred)</p>
+<h1>Calculate RMSE</h1>
+<p>rmse = np.sqrt(mse)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"Root Mean Squared Error: {rmse}")
+```</p>
+<pre><code>    *   **Python (Tiếng Việt):**
+</code></pre>
+<p>```python
+from sklearn.metrics import mean_squared_error
+import numpy as np</p>
+<h1>Tính MSE</h1>
+<p>mse = mean_squared_error(y_test, y_pred)</p>
+<h1>Tính RMSE</h1>
+<p>rmse = np.sqrt(mse)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"Root Mean Squared Error: {rmse}")
+```</p>
+<p><strong>Lưu ý quan trọng:</strong></p>
+<ul>
+<li>Hãy thay thế <code>"your_data.csv"</code> và <code>"desired_target_name"</code> bằng tên tệp và mục tiêu cụ thể của bạn.</li>
+<li>Đảm bảo rằng bạn đã cài đặt tất cả các thư viện cần thiết (RDKit, pandas, scikit-learn, etc.) trước khi chạy code Python.</li>
+<li>Khi làm việc với dữ liệu lớn, hãy cân nhắc sử dụng các kỹ thuật tối ưu hóa để cải thiện hiệu suất.</li>
+</ul>
+<p>Chúc bạn thành công với dự án phân tích dữ liệu ChEMBL 35! Nếu bạn có bất kỳ câu hỏi nào khác, đừng ngần ngại hỏi.</p>
+        </body>
+        </html>
+        

@@ -1,0 +1,327 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_39</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | Nghiên Cứu Thuốc | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Tìm target có hoạt tính đối kháng và đồng vận</h1>
+<hr />
+<p>Tuyệt vời! Tôi rất vui được hỗ trợ bạn trong dự án phân tích dữ liệu ChEMBL 35 này. Dựa trên thông tin bạn cung cấp, chúng ta sẽ tập trung vào chủ đề "Topic_CheMBL_35_39" và giải quyết các vấn đề cụ thể bạn gặp phải.</p>
+<p><strong>1. Phân tích mô hình phân tích (Analysis Model):</strong></p>
+<p>Mục tiêu của chủ đề "Topic_CheMBL_35_39" là gì? Để đưa ra mô hình phân tích phù hợp, chúng ta cần xác định rõ câu hỏi nghiên cứu. Dưới đây là một số khả năng:</p>
+<ul>
+<li><strong>Dự đoán hoạt tính (Activity Prediction):</strong> Xây dựng mô hình dự đoán hoạt tính của các hợp chất dựa trên cấu trúc hóa học của chúng (ví dụ: dự đoán IC50, Ki, EC50).</li>
+<li><strong>Phân tích SAR (Structure-Activity Relationship):</strong> Tìm hiểu mối quan hệ giữa cấu trúc hóa học của các hợp chất và hoạt tính sinh học của chúng. Xác định các nhóm chức (functional groups) hoặc phần tử cấu trúc (structural motifs) quan trọng ảnh hưởng đến hoạt tính.</li>
+<li><strong>Phân cụm hợp chất (Compound Clustering):</strong> Phân nhóm các hợp chất thành các cụm dựa trên tính tương đồng về cấu trúc hoặc hoạt tính.</li>
+<li><strong>Phân tích QSAR/QSPR (Quantitative Structure-Activity/Property Relationship):</strong> Xây dựng mô hình định lượng mối quan hệ giữa cấu trúc hóa học và hoạt tính/tính chất của hợp chất.</li>
+</ul>
+<p>Dựa trên mục tiêu cụ thể, chúng ta có thể lựa chọn các phương pháp phân tích phù hợp:</p>
+<ul>
+<li><strong>Machine Learning:</strong> Các thuật toán như Random Forest, Support Vector Machines (SVM), Neural Networks, Gradient Boosting.</li>
+<li><strong>Cheminformatics:</strong> Sử dụng các descriptor phân tử (ví dụ: Morgan fingerprints, physicochemical properties) để biểu diễn cấu trúc hóa học và phân tích.</li>
+<li><strong>Statistical Analysis:</strong> Các phương pháp thống kê như hồi quy tuyến tính, phân tích phương sai (ANOVA).</li>
+</ul>
+<p><strong>2. Hướng dẫn song ngữ (Bilingual Guidance):</strong></p>
+<p><strong>2.1. SQL:</strong></p>
+<ul>
+<li><strong>Purpose:</strong> To extract relevant data from the ChEMBL database.</li>
+<li><strong>Mục đích:</strong> Trích xuất dữ liệu liên quan từ cơ sở dữ liệu ChEMBL.</li>
+</ul>
+<p><strong>2.2. Python:</strong></p>
+<ul>
+<li><strong>Purpose:</strong> To process the data, perform calculations, build models, and visualize results.</li>
+<li><strong>Mục đích:</strong> Xử lý dữ liệu, thực hiện tính toán, xây dựng mô hình và trực quan hóa kết quả.</li>
+</ul>
+<p><strong>3. Code SQL và Python mẫu (Sample SQL and Python Code):</strong></p>
+<p><strong>3.1. SQL (with error handling):</strong></p>
+<p>```sql
+-- Extract data for Topic_CheMBL_35_39 (limited to 100 records)
+-- Trích xuất dữ liệu cho Topic_CheMBL_35_39 (giới hạn 100 bản ghi)</p>
+<p>SELECT
+    act.molregno,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    md.chembl_id,
+    cs.canonical_smiles
+FROM
+    activities act
+JOIN
+    molecule_dictionary md ON act.molregno = md.molregno
+JOIN
+    compound_structures cs ON md.molregno = cs.molregno
+WHERE
+    act.standard_type IN ('IC50', 'Ki', 'EC50')  -- Example activity types
+    AND act.standard_units = 'nM' -- Example units
+    AND act.standard_value IS NOT NULL
+    AND cs.canonical_smiles IS NOT NULL
+    -- Handle the numeric check safely:
+    AND act.standard_value::text ~ '^[0-9.]+$'  -- Check if it's numeric
+LIMIT 100;
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li>The <code>::text</code> cast is used to convert <code>standard_value</code> to text before applying the regular expression.</li>
+<li>We limit the results to 100 records using <code>LIMIT 100</code>.</li>
+</ul>
+<p><strong>3.2. Python (with scikit-learn version check):</strong></p>
+<p>```python
+import pandas as pd
+import numpy as np
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
+import sklearn
+import os</p>
+<p>print(f"Scikit-learn version: {sklearn.<strong>version</strong>}")</p>
+<h1>Define paths (following AIMLOps Template)</h1>
+<p>base_path = "../data"  # Adjust if needed
+csv_file = os.path.join(base_path, "chembl_35_data.csv") # Replace with your actual filename</p>
+<h1>Load data</h1>
+<p>try:
+    data = pd.read_csv(csv_file)
+    print("Data loaded successfully.")
+except FileNotFoundError:
+    print(f"Error: File not found at {csv_file}")
+    exit()</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<p>data = data.dropna(subset=['canonical_smiles', 'standard_value']) # Drop rows with missing SMILES or activity values
+data = data[data['standard_value'].astype(str).str.match(r'^[0-9.]+$')] #Keep numeric values only
+data['standard_value'] = pd.to_numeric(data['standard_value']) # Transform to numeric</p>
+<h1>Function to convert SMILES to Morgan Fingerprints</h1>
+<p>def smiles_to_morgan(smiles, radius=2, n_bits=2048):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            fp = AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=n_bits)
+            return np.array(list(fp.ToBitString()), dtype=int)
+        else:
+            return None
+    except:
+        return None</p>
+<h1>Apply the function to create fingerprints</h1>
+<p>data['morgan_fp'] = data['canonical_smiles'].apply(smiles_to_morgan)
+data = data.dropna(subset=['morgan_fp'])  # Remove rows where fingerprint generation failed
+data = data[data['morgan_fp'].map(len) &gt; 0]</p>
+<h1>Prepare data for machine learning</h1>
+<p>X = np.stack(data['morgan_fp'].values)
+y = data['standard_value'].values</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a RandomForestRegressor model</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Calculate Mean Squared Error</h1>
+<p>if sklearn.<strong>version</strong> &lt; '0.22':
+    mse = mean_squared_error(y_test, y_pred)
+else:
+    mse = mean_squared_error(y_test, y_pred, squared=False)  # Use squared=False for newer versions</p>
+<p>print(f"Mean Squared Error: {mse}")
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Error Handling:</strong> Includes <code>try...except</code> blocks for file loading and SMILES conversion.</li>
+<li><strong>Scikit-learn Version Check:</strong>  Checks the scikit-learn version and uses the appropriate <code>mean_squared_error</code> call.</li>
+<li><strong>Data Preprocessing:</strong>  Handles missing data and converts SMILES to Morgan fingerprints.</li>
+<li><strong>Model Training:</strong>  Trains a Random Forest Regressor.</li>
+<li><strong>Evaluation:</strong>  Calculates and prints the Mean Squared Error.</li>
+</ul>
+<p><strong>4. Ví dụ code SQL và Python mẫu (Sample SQL and Python Code Examples):</strong></p>
+<p>Here are 5 examples of SQL and Python code snippets that you can adapt for your project.</p>
+<p><strong>Example 1:  Extracting compounds with specific properties</strong></p>
+<ul>
+<li><strong>SQL:</strong>
+    <code>sql
+    SELECT md.chembl_id, cs.canonical_smiles, act.standard_value
+    FROM molecule_dictionary md
+    JOIN compound_structures cs ON md.molregno = cs.molregno
+    JOIN activities act ON md.molregno = act.molregno
+    WHERE md.mw_freebase &lt; 300 -- Molecular weight less than 300
+    AND act.standard_type = 'IC50'
+    LIMIT 10;</code></li>
+<li><strong>Python:</strong> (Reading from a CSV file generated from the SQL query above)
+    <code>python
+    import pandas as pd
+    data = pd.read_csv('../data/example1.csv') # Update with the correct path
+    print(data.head())</code></li>
+</ul>
+<p><strong>Example 2: Calculating LogP using RDKit</strong></p>
+<ul>
+<li>
+<p><strong>SQL:</strong> (Extract SMILES strings)
+    <code>sql
+    SELECT md.chembl_id, cs.canonical_smiles
+    FROM molecule_dictionary md
+    JOIN compound_structures cs ON md.molregno = cs.molregno
+    LIMIT 10;</code></p>
+</li>
+<li>
+<p><strong>Python:</strong>
+    ```python
+    import pandas as pd
+    from rdkit import Chem
+    from rdkit.Chem import Descriptors</p>
+<p>data = pd.read_csv('../data/example2.csv') # Update with the correct path</p>
+<p>def calculate_logp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return Descriptors.MolLogP(mol)
+    else:
+        return None</p>
+<p>data['logp'] = data['canonical_smiles'].apply(calculate_logp)
+print(data.head())
+```</p>
+</li>
+</ul>
+<p><strong>Example 3:  Filtering by activity value range</strong></p>
+<ul>
+<li>
+<p><strong>SQL:</strong>
+    <code>sql
+    SELECT md.chembl_id, cs.canonical_smiles, act.standard_value
+    FROM molecule_dictionary md
+    JOIN compound_structures cs ON md.molregno = cs.molregno
+    JOIN activities act ON md.molregno = act.molregno
+    WHERE act.standard_type = 'IC50'
+    AND act.standard_value BETWEEN 10 AND 100  -- IC50 between 10 and 100 nM
+    LIMIT 10;</code></p>
+</li>
+<li>
+<p><strong>Python:</strong> (Analyzing the extracted data)
+    ```python
+    import pandas as pd
+    import matplotlib.pyplot as plt</p>
+<p>data = pd.read_csv('../data/example3.csv') # Update with the correct path
+plt.hist(data['standard_value'])
+plt.xlabel('IC50 (nM)')
+plt.ylabel('Frequency')
+plt.title('IC50 Distribution')
+plt.show()
+```</p>
+</li>
+</ul>
+<p><strong>Example 4:  Generating Morgan fingerprints and visualizing them</strong></p>
+<ul>
+<li><strong>SQL:</strong> (Extract SMILES)
+        <code>sql
+    SELECT md.chembl_id, cs.canonical_smiles
+    FROM molecule_dictionary md
+    JOIN compound_structures cs ON md.molregno = cs.molregno
+    LIMIT 10;</code></li>
+<li>
+<p><strong>Python:</strong>
+    ```python
+    import pandas as pd
+    from rdkit import Chem
+    from rdkit.Chem import AllChem
+    import matplotlib.pyplot as plt</p>
+<p>data = pd.read_csv('../data/example4.csv') # Update with the correct path</p>
+<p>def generate_morgan_fp(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        fp = AllChem.GetMorganFingerprint(mol, 2) # Radius 2
+        return fp
+    else:
+        return None</p>
+<p>data['morgan_fp'] = data['canonical_smiles'].apply(generate_morgan_fp)
+print(data.head())
+```</p>
+</li>
+</ul>
+<p><strong>Example 5: Basic Activity Prediction with a Simple Model</strong></p>
+<ul>
+<li><strong>SQL:</strong>
+    <code>sql
+    SELECT md.chembl_id, cs.canonical_smiles, act.standard_value
+    FROM molecule_dictionary md
+    JOIN compound_structures cs ON md.molregno = cs.molregno
+    JOIN activities act ON md.molregno = act.molregno
+    WHERE act.standard_type = 'IC50'
+    AND act.standard_units = 'nM'
+    LIMIT 100;</code></li>
+<li>
+<p><strong>Python:</strong> (Simple Activity Prediction)
+    ```python
+    import pandas as pd
+    from rdkit import Chem
+    from rdkit.Chem import AllChem
+    from sklearn.model_selection import train_test_split
+    from sklearn.linear_model import LinearRegression
+    from sklearn.metrics import mean_squared_error
+    import numpy as np</p>
+<h1>Load data</h1>
+<p>data = pd.read_csv('../data/example5.csv') # Update with the correct path
+data.dropna(inplace=True)</p>
+<h1>RDKit: Generate Morgan Fingerprints</h1>
+<p>def generate_fingerprint(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is not None:
+        fp = AllChem.GetMorganFingerprintAsBitVect(mol, radius=2, nBits=2048)
+        return np.array(list(fp))
+    else:
+        return None</p>
+<p>data['fingerprint'] = data['canonical_smiles'].apply(generate_fingerprint)
+data.dropna(subset=['fingerprint'], inplace=True)</p>
+<h1>Prepare data</h1>
+<p>X = np.stack(data['fingerprint'].values)
+y = data['standard_value'].values</p>
+<h1>Split data</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Model training</h1>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<h1>Make predictions</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+print(f'Mean Squared Error: {mse}')
+```</p>
+</li>
+</ul>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>Database Connection:</strong> You'll need to establish a connection to your PostgreSQL database using a Python library like <code>psycopg2</code>.</li>
+<li><strong>Data Scaling/Normalization:</strong> Consider scaling or normalizing your activity values (e.g., converting IC50 to pIC50) to improve model performance.</li>
+<li><strong>Feature Selection:</strong> Explore different molecular descriptors and feature selection techniques to optimize your models.</li>
+<li><strong>Model Validation:</strong> Use appropriate validation techniques (e.g., cross-validation) to ensure the robustness of your models.</li>
+<li><strong>Logging:</strong> Implement logging to track the progress of your analysis and debug any issues.</li>
+<li><strong>AIMLOps:</strong> Integrate your code into the AIMLOps framework for reproducibility, version control, and automated deployment.</li>
+</ul>
+<p>Hãy cho tôi biết nếu bạn có bất kỳ câu hỏi cụ thể nào hoặc muốn tôi đi sâu hơn vào một khía cạnh cụ thể của dự án. Chúc bạn thành công!</p>
+        </body>
+        </html>
+        

@@ -1,0 +1,671 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_57</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Pharmacovigilance risk signals in ChEMBL</h1>
+<hr />
+<p>Okay, I understand. You're working with Chembl 35 data, using PostgreSQL and RDKit, and following an AIMLops-like directory structure. You need help structuring your code, addressing errors, and implementing a specific workflow. Let's break down the process, incorporating the "Topic_CheMBL_35_57" code and limiting the data to 100 rows.</p>
+<p>Here's a comprehensive guide in both English and Vietnamese:</p>
+<p><strong>English Version</strong></p>
+<p><strong>1. Analysis Model &amp; Workflow</strong></p>
+<p>The overall analysis involves extracting relevant data from the Chembl 35 database using SQL, cleaning and transforming it using Python (RDKit and scikit-learn), and then performing your desired analysis. Given the "Topic_CheMBL_35_57," I assume you are investigating a specific area within Chembl, but I will give a set of diverse examples.
+Here’s the proposed workflow:</p>
+<ul>
+<li><strong>Data Extraction (SQL):</strong><ul>
+<li>Connect to the Chembl 35 database using the provided credentials.</li>
+<li>Write SQL queries to extract the necessary data (e.g., molecules, activities, targets).  Limit the results to 100 rows for faster processing and testing.</li>
+<li>Save the extracted data as CSV files in the <code>../data/</code> directory.</li>
+</ul>
+</li>
+<li><strong>Data Loading and Processing (Python):</strong><ul>
+<li>Use Python to load the CSV files into Pandas DataFrames.</li>
+<li>Clean and pre-process the data. This might involve:<ul>
+<li>Handling missing values.</li>
+<li>Converting data types.</li>
+<li>Filtering data based on specific criteria.</li>
+</ul>
+</li>
+<li>Use RDKit to generate molecular descriptors (e.g., fingerprints, physicochemical properties).</li>
+<li>Prepare the data for analysis (e.g., feature scaling, train-test split).</li>
+</ul>
+</li>
+<li><strong>Analysis (Python):</strong><ul>
+<li>Perform the analysis relevant to your specific research question (Topic_CheMBL_35_57). Examples below.</li>
+<li>Use scikit-learn or other libraries to build and evaluate your models.</li>
+<li>Visualize the results.</li>
+</ul>
+</li>
+</ul>
+<p><strong>2. Code Implementation</strong></p>
+<p><strong>Directory Structure (AIMLops-Inspired):</strong></p>
+<p><code>project_root/
+├── data/
+│   └── extracted_data_1.csv
+│   └── extracted_data_2.csv
+│   └── ...
+├── notebooks/
+│   └── Topic_CheMBL_35_57_1_data_extraction_and_preprocessing.ipynb
+│   └── Topic_CheMBL_35_57_2_analysis.ipynb
+├── src/  # Optional, for reusable modules
+│   └── utils.py
+└── README.md</code></p>
+<p><strong>2.1. SQL Code (for pgAdmin and saving to CSV)</strong></p>
+<p>```sql
+-- File: Topic_CheMBL_35_57_data_extraction.sql
+-- Get only 100 rows</p>
+<p>-- Example 1: Extract target, molecule, and activity data for a specific target
+SELECT
+    act.standard_value,
+    act.standard_units,
+    mol.molecule_structures,
+    target.pref_name
+FROM
+    activities act
+JOIN
+    molecule_dictionary mol ON act.molregno = mol.molregno
+JOIN
+    target_dictionary target ON act.tid = target.tid
+WHERE target.pref_name LIKE '%Kinase%'  -- Filtering for Kinases as an example
+AND act.standard_type = 'IC50'
+AND act.standard_relation = '='
+AND act.standard_value IS NOT NULL
+AND act.standard_units = 'nM'
+AND act.standard_value::text ~ '^[0-9.]+$' -- Check for numeric values
+LIMIT 100;</p>
+<p>-- Save this result as a CSV file named extracted_data_1.csv</p>
+<p>-- Example 2: Extract data related to a specific assay
+SELECT
+    act.standard_value,
+    act.standard_units,
+    mol.molecule_structures,
+    assay.description
+FROM
+    activities act
+JOIN
+    molecule_dictionary mol ON act.molregno = mol.molregno
+JOIN
+    assays assay ON act.assay_id = assay.assay_id
+WHERE assay.description LIKE '%acetylcholinesterase%' -- Filtering for Acetylcholinesterase assays
+AND act.standard_type = 'IC50'
+AND act.standard_relation = '='
+AND act.standard_value IS NOT NULL
+AND act.standard_units = 'nM'
+AND act.standard_value::text ~ '^[0-9.]+$'  -- Check for numeric values
+LIMIT 100;</p>
+<p>-- Save this result as a CSV file named extracted_data_2.csv
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li>The <code>WHERE</code> clause filters for specific targets (kinases and acetylcholinesterase) or assays.  Adjust this based on your research focus (Topic_CheMBL_35_57).</li>
+<li><code>act.standard_type = 'IC50'</code> ensures we're working with IC50 values.</li>
+<li><code>act.standard_relation = '='</code> ensures we only get exact IC50 measurements.</li>
+<li><code>act.standard_value IS NOT NULL</code> excludes entries with missing values.</li>
+<li><code>act.standard_units = 'nM'</code> filters for data reported in nanomolar units.</li>
+<li><code>act.standard_value::text ~ '^[0-9\.]+$'</code>  This is important!  It casts the <code>standard_value</code> to text and then uses a regular expression to check if it contains only numbers and decimal points, addressing the error message you received.  This helps ensure that you're only trying to convert valid numeric strings to numbers in your Python code.</li>
+<li><code>LIMIT 100</code> restricts the output to 100 rows.</li>
+<li>The comments indicate how to save the results as CSV files.  In pgAdmin, you can usually right-click on the query results and choose "Copy with Headers" and then paste into a CSV file.  Alternatively, you can use the <code>\copy</code> command in <code>psql</code>.</li>
+</ul>
+<p><strong>2.2. Python Code (Jupyter Notebook - <code>Topic_CheMBL_35_57_1_data_extraction_and_preprocessing.ipynb</code>)</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Define base path</h1>
+<p>base_path = os.path.abspath(os.path.join(os.getcwd(), ".."))  # Go up one level</p>
+<h1>Load the data (replace with your actual file names)</h1>
+<p>data_file_1 = os.path.join(base_path, "data", "extracted_data_1.csv")
+data_file_2 = os.path.join(base_path, "data", "extracted_data_2.csv")</p>
+<p>try:
+    df1 = pd.read_csv(data_file_1)
+    df2 = pd.read_csv(data_file_2)
+    print("Data loaded successfully!")
+except FileNotFoundError:
+    print(f"Error: One or both data files not found in the specified directory: {os.path.join(base_path, 'data')}")
+    raise  # Re-raise the exception to halt execution</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<h1>Handle missing values (example: drop rows with missing molecule structures)</h1>
+<p>df1 = df1.dropna(subset=['molecule_structures'])
+df2 = df2.dropna(subset=['molecule_structures'])</p>
+<h1>Function to calculate RDKit descriptors</h1>
+<p>def calculate_descriptors(mol):
+    try:
+        return Descriptors.CalcMolDescriptors(mol)
+    except:
+        return None</p>
+<p>def calculate_morgan_fingerprint(mol, radius=2, nBits=2048):
+    try:
+        return AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=nBits)
+    except:
+        return None</p>
+<h1>Generate RDKit molecules and calculate descriptors</h1>
+<p>def process_dataframe(df):
+    df['ROMol'] = df['molecule_structures'].apply(lambda x: Chem.MolFromSmiles(x))
+    df = df.dropna(subset=['ROMol']) # remove rows where smiles cannot be parsed
+    df['descriptors'] = df['ROMol'].apply(calculate_descriptors)
+    df['fingerprint'] = df['ROMol'].apply(calculate_morgan_fingerprint)
+    df = df.dropna(subset=['descriptors', 'fingerprint']) # remove rows where descriptor generation failed
+    return df</p>
+<p>df1 = process_dataframe(df1)
+df2 = process_dataframe(df2)</p>
+<h1>Display the first few rows of the processed dataframes</h1>
+<p>print("Processed Dataframe 1:")
+print(df1.head())
+print("\nProcessed Dataframe 2:")
+print(df2.head())</p>
+<h1>Save processed dataframes to new csv files</h1>
+<p>df1.to_csv(os.path.join(base_path, "data", "processed_data_1.csv"), index=False)
+df2.to_csv(os.path.join(base_path, "data", "processed_data_2.csv"), index=False)
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Import Libraries:</strong> Imports necessary libraries (os, pandas, RDKit, scikit-learn).</li>
+<li><strong>Define <code>base_path</code>:</strong>  Uses <code>os.path.join</code> to construct the correct path to the data directory, adhering to your AIMLops structure.</li>
+<li><strong>Load Data:</strong> Loads the CSV files into Pandas DataFrames.  Includes error handling for <code>FileNotFoundError</code>.</li>
+<li><strong>Data Cleaning:</strong> Handles missing values.</li>
+<li><strong>RDKit Processing:</strong><ul>
+<li>Converts SMILES strings to RDKit <code>ROMol</code> objects.</li>
+<li>Calculates molecular descriptors and Morgan fingerprints.</li>
+<li>Handles potential errors during descriptor calculation (important for robustness).</li>
+</ul>
+</li>
+<li><strong>Feature Scaling (Optional):</strong>  Scales the descriptors using <code>StandardScaler</code> if needed for your analysis.</li>
+<li><strong>Display and Save:</strong> Prints the first few rows of the processed DataFrames and saves the processed data to new CSV files.</li>
+</ul>
+<p><strong>2.3. Python Code (Jupyter Notebook - <code>Topic_CheMBL_35_57_2_analysis.ipynb</code>)</strong></p>
+<p>```python
+import os
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.impute import SimpleImputer
+from joblib import dump</p>
+<h1>Define base path</h1>
+<p>base_path = os.path.abspath(os.path.join(os.getcwd(), ".."))</p>
+<h1>Load the processed data (replace with your actual file names)</h1>
+<p>data_file_1 = os.path.join(base_path, "data", "processed_data_1.csv")
+data_file_2 = os.path.join(base_path, "data", "processed_data_2.csv")</p>
+<p>try:
+    df1 = pd.read_csv(data_file_1)
+    df2 = pd.read_csv(data_file_2)
+    print("Processed data loaded successfully!")
+except FileNotFoundError:
+    print(f"Error: One or both processed data files not found in the specified directory: {os.path.join(base_path, 'data')}")
+    raise</p>
+<h1>Rename columns to avoid conflicts after concat</h1>
+<p>df1 = df1.rename(columns={'standard_value': 'standard_value_1'})
+df2 = df2.rename(columns={'standard_value': 'standard_value_2'})</p>
+<h1>Concatenate both dataframes</h1>
+<p>df = pd.concat([df1, df2], ignore_index=True)</p>
+<h1>Prepare data for modeling</h1>
+<h1>Assuming 'descriptors' and 'standard_value' are in your DataFrames</h1>
+<h1>Convert descriptors from dictionary to list of values</h1>
+<p>def extract_descriptor_values(descriptors):
+    if isinstance(descriptors, str):
+        try:
+            descriptors = eval(descriptors) # Convert string representation of dict to actual dict
+            return list(descriptors.values())
+        except (SyntaxError, NameError):
+            return None  # Handle cases where descriptor string is invalid
+    elif isinstance(descriptors, dict):
+        return list(descriptors.values())
+    else:
+        return None</p>
+<p>df['descriptor_values'] = df['descriptors'].apply(extract_descriptor_values)
+df = df.dropna(subset=['descriptor_values'])</p>
+<h1>Convert descriptor values to numeric and create feature matrix X</h1>
+<p>X = df['descriptor_values'].apply(lambda x: pd.Series(x))
+y = df['standard_value_1']  # Using IC50 as target variable;  handle missing values</p>
+<h1>Impute missing values (if any)</h1>
+<p>imputer = SimpleImputer(strategy='mean')
+X = imputer.fit_transform(X)</p>
+<h1>Split data into training and testing sets</h1>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<h1>Train a Random Forest Regressor model</h1>
+<p>model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)</p>
+<h1>Make predictions on the test set</h1>
+<p>y_pred = model.predict(X_test)</p>
+<h1>Evaluate the model</h1>
+<p>mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"R-squared: {r2}")</p>
+<h1>Save the trained model</h1>
+<p>model_path = os.path.join(base_path, "models", "random_forest_model.joblib")
+dump(model, model_path)
+print(f"Model saved to {model_path}")
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Load Data:</strong> Loads the processed DataFrames.</li>
+<li><strong>Prepare Data:</strong><ul>
+<li>Extracts descriptor values from the <code>descriptors</code> column.</li>
+<li>Creates feature matrix <code>X</code> from the descriptors.</li>
+<li>Uses the first <code>standard_value</code> as the target <code>y</code></li>
+<li>Imputes missing values using <code>SimpleImputer</code>.</li>
+</ul>
+</li>
+<li><strong>Train-Test Split:</strong> Splits the data into training and testing sets.</li>
+<li><strong>Model Training:</strong><ul>
+<li>Creates a <code>RandomForestRegressor</code> model.</li>
+<li>Trains the model on the training data.</li>
+</ul>
+</li>
+<li><strong>Model Evaluation:</strong><ul>
+<li>Makes predictions on the test data.</li>
+<li>Calculates Mean Squared Error (MSE) and R-squared.</li>
+</ul>
+</li>
+<li><strong>Model Saving:</strong> Saves the trained model using <code>joblib</code>.</li>
+</ul>
+<p><strong>3. Addressing the Errors</strong></p>
+<ul>
+<li>
+<p><strong>Error a: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<ul>
+<li><strong>Cause:</strong> PostgreSQL might not be able to directly use the <code>~</code> (regular expression match) operator on a <code>numeric</code> column.</li>
+<li>
+<p><strong>Solution:</strong>  Cast the <code>standard_value</code> column to <code>text</code> before using the regular expression:</p>
+<p><code>sql
+AND act.standard_value::text ~ '^[0-9\.]+$'</code></p>
+</li>
+<li>
+<p><strong>Explanation:</strong> This converts the numeric value to a string, allowing the regular expression to work correctly.  The <code>^[0-9\.]+$</code> regular expression checks if the string contains only digits and periods.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Error b: <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<ul>
+<li><strong>Cause:</strong> You're using an older version of scikit-learn where the <code>squared</code> parameter isn't available in <code>mean_squared_error</code>.</li>
+<li>
+<p><strong>Solution:</strong>  Remove the <code>squared=False</code> parameter.  The default behavior is to return the MSE (mean squared error), which is the square root of the RMSE (root mean squared error).  If you specifically need RMSE, take the square root of the MSE.</p>
+<p><code>python
+mse = mean_squared_error(y_test, y_pred)  # Remove squared=False</code></p>
+<p>If you need RMSE, calculate it separately:</p>
+<p><code>python
+mse = mean_squared_error(y_test, y_pred)
+rmse = mse**0.5
+print(f"Root Mean Squared Error: {rmse}")</code></p>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>4. Examples (5 Scenarios)</strong></p>
+<p>Here are five different examples of how you might adapt this workflow for different research questions related to Topic_CheMBL_35_57. You'll need to modify the SQL queries and the Python analysis based on the specific question. I will provide example topics so you can use it.</p>
+<ul>
+<li>
+<p><strong>Example 1:  Activity Prediction for Kinase Inhibitors</strong></p>
+<ul>
+<li><strong>Topic:</strong>  Predicting IC50 values for novel kinase inhibitors based on molecular descriptors.</li>
+<li>
+<p><strong>SQL:</strong>  Extract data for molecules that inhibit kinase activity.  Focus on a specific kinase or a family of kinases.</p>
+<p><code>sql
+SELECT
+    act.standard_value,
+    mol.molecule_structures
+FROM
+    activities act
+JOIN
+    molecule_dictionary mol ON act.molregno = mol.molregno
+JOIN
+    target_dictionary target ON act.tid = target.tid
+WHERE target.pref_name LIKE '%EGFR%'  -- Example: Epidermal Growth Factor Receptor
+AND act.standard_type = 'IC50'
+AND act.standard_relation = '='
+AND act.standard_value IS NOT NULL
+AND act.standard_units = 'nM'
+AND act.standard_value::text ~ '^[0-9\.]+$'
+LIMIT 100;</code></p>
+</li>
+<li>
+<p><strong>Python (Analysis):</strong>  Use the molecular descriptors as features (X) and the IC50 values as the target variable (y). Train a regression model (e.g., Random Forest, Support Vector Regression) to predict IC50 values.</p>
+</li>
+<li><strong>Relevant Code Blocks to Modify:</strong>  SQL <code>WHERE</code> clause, <code>y = df['standard_value_1']</code> in the analysis notebook.</li>
+</ul>
+</li>
+<li>
+<p><strong>Example 2:  Structure-Activity Relationship (SAR) Analysis for Acetylcholinesterase Inhibitors</strong></p>
+<ul>
+<li><strong>Topic:</strong>  Identifying key molecular features that influence the activity of acetylcholinesterase inhibitors.</li>
+<li>
+<p><strong>SQL:</strong> Extract data for molecules that inhibit acetylcholinesterase.</p>
+<p><code>sql
+SELECT
+    act.standard_value,
+    mol.molecule_structures
+FROM
+    activities act
+JOIN
+    molecule_dictionary mol ON act.molregno = mol.molregno
+JOIN
+    target_dictionary target ON act.tid = target.tid
+WHERE target.pref_name LIKE '%acetylcholinesterase%'
+AND act.standard_type = 'IC50'
+AND act.standard_relation = '='
+AND act.standard_value IS NOT NULL
+AND act.standard_units = 'nM'
+AND act.standard_value::text ~ '^[0-9\.]+$'
+LIMIT 100;</code></p>
+</li>
+<li>
+<p><strong>Python (Analysis):</strong>  Calculate various molecular descriptors.  Use feature selection techniques (e.g., SelectKBest, Recursive Feature Elimination) to identify the descriptors that are most strongly correlated with IC50 values. Visualize the relationship between key descriptors and activity.</p>
+</li>
+<li><strong>Relevant Code Blocks to Modify:</strong> SQL <code>WHERE</code> clause, feature selection in the analysis notebook.</li>
+</ul>
+</li>
+<li>
+<p><strong>Example 3:  Comparing Activity Profiles Across Different Assays for the Same Target</strong></p>
+<ul>
+<li><strong>Topic:</strong>  Investigating how the activity of a compound against a specific target varies depending on the assay conditions.</li>
+<li>
+<p><strong>SQL:</strong>  Extract data for the same target (e.g., a specific kinase) but from different assays.</p>
+<p><code>sql
+SELECT
+    act.standard_value,
+    mol.molecule_structures,
+    assay.assay_id,
+    assay.description
+FROM
+    activities act
+JOIN
+    molecule_dictionary mol ON act.molregno = mol.molregno
+JOIN
+    target_dictionary target ON act.tid = target.tid
+JOIN
+    assays assay ON act.assay_id = assay.assay_id
+WHERE target.pref_name LIKE '%MAPK14%'  -- Example: MAPK14 Kinase
+AND act.standard_type = 'IC50'
+AND act.standard_relation = '='
+AND act.standard_value IS NOT NULL
+AND act.standard_units = 'nM'
+AND act.standard_value::text ~ '^[0-9\.]+$'
+LIMIT 100;</code></p>
+</li>
+<li>
+<p><strong>Python (Analysis):</strong>  Group the data by assay ID.  Compare the distribution of IC50 values for each assay.  Perform statistical tests (e.g., t-tests, ANOVA) to determine if there are significant differences in activity across different assays.</p>
+</li>
+<li><strong>Relevant Code Blocks to Modify:</strong>  SQL <code>WHERE</code> clause, grouping and statistical analysis in the analysis notebook.</li>
+</ul>
+</li>
+<li>
+<p><strong>Example 4:  Building a Classification Model to Distinguish Active vs. Inactive Compounds</strong></p>
+<ul>
+<li><strong>Topic:</strong>  Developing a model to classify compounds as active or inactive against a specific target.</li>
+<li>
+<p><strong>SQL:</strong> Extract data for a specific target (e.g., a protease). Define a threshold for activity (e.g., IC50 &lt; 1000 nM = active, IC50 &gt; 10000 nM = inactive).</p>
+<p><code>sql
+SELECT
+    act.standard_value,
+    mol.molecule_structures,
+    CASE
+        WHEN act.standard_value &lt; 1000 THEN 1  -- Active
+        WHEN act.standard_value &gt; 10000 THEN 0 -- Inactive
+        ELSE NULL  -- Exclude intermediate values
+    END AS activity_class
+FROM
+    activities act
+JOIN
+    molecule_dictionary mol ON act.molregno = mol.molregno
+JOIN
+    target_dictionary target ON act.tid = target.tid
+WHERE target.pref_name LIKE '%Thrombin%'  -- Example: Thrombin
+AND act.standard_type = 'IC50'
+AND act.standard_relation = '='
+AND act.standard_value IS NOT NULL
+AND act.standard_units = 'nM'
+AND act.standard_value::text ~ '^[0-9\.]+$'
+AND act.standard_value &lt; 100000 -- Limit to values less than 100000
+LIMIT 100;</code></p>
+</li>
+<li>
+<p><strong>Python (Analysis):</strong>  Use the molecular descriptors as features (X) and the <code>activity_class</code> as the target variable (y). Train a classification model (e.g., Random Forest, Support Vector Machine, Logistic Regression) to predict activity.</p>
+</li>
+<li><strong>Relevant Code Blocks to Modify:</strong> SQL <code>WHERE</code> clause and <code>CASE</code> statement, model type in the analysis notebook.</li>
+</ul>
+</li>
+<li>
+<p><strong>Example 5:  Identifying Potential Off-Target Effects</strong></p>
+<ul>
+<li><strong>Topic:</strong> Investigating whether compounds designed for one target also show activity against other targets.</li>
+<li>
+<p><strong>SQL:</strong>  Extract data for a set of compounds and their activity against multiple targets.  This requires a more complex SQL query.</p>
+<p><code>sql
+SELECT
+    mol.molecule_structures,
+    target.pref_name,
+    act.standard_value
+FROM
+    activities act
+JOIN
+    molecule_dictionary mol ON act.molregno = mol.molregno
+JOIN
+    target_dictionary target ON act.tid = target.tid
+WHERE mol.molregno IN (SELECT molregno FROM activities WHERE tid = (SELECT tid FROM target_dictionary WHERE pref_name LIKE '%EGFR%') AND act.standard_value &lt; 1000) -- Select molecules active against EGFR
+AND act.standard_type = 'IC50'
+AND act.standard_relation = '='
+AND act.standard_value IS NOT NULL
+AND act.standard_units = 'nM'
+AND act.standard_value::text ~ '^[0-9\.]+$'
+LIMIT 100;</code></p>
+</li>
+<li>
+<p><strong>Python (Analysis):</strong>  Analyze the activity profiles of the compounds across different targets.  Identify compounds that show significant activity against multiple targets. This requires data manipulation to pivot the table so each target becomes a column.</p>
+</li>
+<li><strong>Relevant Code Blocks to Modify:</strong>  SQL query, data manipulation and analysis in the analysis notebook.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Key Considerations:</strong></p>
+<ul>
+<li><strong>Adapt the SQL queries and Python code to match your specific research question (Topic_CheMBL_35_57).</strong>  The examples are starting points.</li>
+<li><strong>Choose appropriate molecular descriptors and machine learning models based on the nature of your data and research question.</strong></li>
+<li><strong>Pay close attention to data cleaning and preprocessing.</strong>  Missing values and inconsistencies can significantly impact the results.</li>
+<li><strong>Evaluate the performance of your models using appropriate metrics.</strong></li>
+<li><strong>Document your code and analysis thoroughly.</strong></li>
+</ul>
+<p><strong>Vietnamese Version</strong></p>
+<p><strong>1. Phân Tích Mô Hình &amp; Quy Trình Làm Việc</strong></p>
+<p>Phân tích tổng thể bao gồm trích xuất dữ liệu liên quan từ cơ sở dữ liệu Chembl 35 bằng SQL, làm sạch và chuyển đổi nó bằng Python (RDKit và scikit-learn), và sau đó thực hiện phân tích mong muốn của bạn. Với "Topic_CheMBL_35_57," tôi cho rằng bạn đang điều tra một lĩnh vực cụ thể trong Chembl, nhưng tôi sẽ cung cấp một tập hợp các ví dụ đa dạng.
+Đây là quy trình làm việc được đề xuất:</p>
+<ul>
+<li><strong>Trích Xuất Dữ Liệu (SQL):</strong><ul>
+<li>Kết nối với cơ sở dữ liệu Chembl 35 bằng thông tin đăng nhập được cung cấp.</li>
+<li>Viết các truy vấn SQL để trích xuất dữ liệu cần thiết (ví dụ: phân tử, hoạt động, mục tiêu). Giới hạn kết quả thành 100 hàng để xử lý và kiểm tra nhanh hơn.</li>
+<li>Lưu dữ liệu đã trích xuất dưới dạng tệp CSV trong thư mục <code>../data/</code>.</li>
+</ul>
+</li>
+<li><strong>Tải và Xử Lý Dữ Liệu (Python):</strong><ul>
+<li>Sử dụng Python để tải các tệp CSV vào Pandas DataFrames.</li>
+<li>Làm sạch và tiền xử lý dữ liệu. Điều này có thể bao gồm:<ul>
+<li>Xử lý các giá trị bị thiếu.</li>
+<li>Chuyển đổi các loại dữ liệu.</li>
+<li>Lọc dữ liệu dựa trên các tiêu chí cụ thể.</li>
+</ul>
+</li>
+<li>Sử dụng RDKit để tạo các mô tả phân tử (ví dụ: dấu vân tay, các thuộc tính vật lý hóa học).</li>
+<li>Chuẩn bị dữ liệu để phân tích (ví dụ: chia tỷ lệ đặc trưng, chia tập huấn luyện-kiểm tra).</li>
+</ul>
+</li>
+<li><strong>Phân Tích (Python):</strong><ul>
+<li>Thực hiện phân tích liên quan đến câu hỏi nghiên cứu cụ thể của bạn (Topic_CheMBL_35_57). Ví dụ bên dưới.</li>
+<li>Sử dụng scikit-learn hoặc các thư viện khác để xây dựng và đánh giá các mô hình của bạn.</li>
+<li>Trực quan hóa kết quả.</li>
+</ul>
+</li>
+</ul>
+<p><strong>2. Triển Khai Mã</strong></p>
+<p><strong>Cấu Trúc Thư Mục (Lấy Cảm Hứng từ AIMLops):</strong></p>
+<p><code>project_root/
+├── data/
+│   └── extracted_data_1.csv
+│   └── extracted_data_2.csv
+│   └── ...
+├── notebooks/
+│   └── Topic_CheMBL_35_57_1_data_extraction_and_preprocessing.ipynb
+│   └── Topic_CheMBL_35_57_2_analysis.ipynb
+├── src/  # Tùy chọn, cho các mô-đun có thể tái sử dụng
+│   └── utils.py
+└── README.md</code></p>
+<p><strong>2.1. Mã SQL (cho pgAdmin và lưu vào CSV)</strong></p>
+<p>```sql
+-- File: Topic_CheMBL_35_57_data_extraction.sql
+-- Chỉ lấy 100 hàng</p>
+<p>-- Ví dụ 1: Trích xuất dữ liệu mục tiêu, phân tử và hoạt động cho một mục tiêu cụ thể
+SELECT
+    act.standard_value,
+    act.standard_units,
+    mol.molecule_structures,
+    target.pref_name
+FROM
+    activities act
+JOIN
+    molecule_dictionary mol ON act.molregno = mol.molregno
+JOIN
+    target_dictionary target ON act.tid = target.tid
+WHERE target.pref_name LIKE '%Kinase%'  -- Lọc cho Kinases như một ví dụ
+AND act.standard_type = 'IC50'
+AND act.standard_relation = '='
+AND act.standard_value IS NOT NULL
+AND act.standard_units = 'nM'
+AND act.standard_value::text ~ '^[0-9.]+$' -- Kiểm tra giá trị số
+LIMIT 100;</p>
+<p>-- Lưu kết quả này dưới dạng tệp CSV có tên extracted_data_1.csv</p>
+<p>-- Ví dụ 2: Trích xuất dữ liệu liên quan đến một xét nghiệm cụ thể
+SELECT
+    act.standard_value,
+    act.standard_units,
+    mol.molecule_structures,
+    assay.description
+FROM
+    activities act
+JOIN
+    molecule_dictionary mol ON act.molregno = mol.molregno
+JOIN
+    assays assay ON act.assay_id = assay.assay_id
+WHERE assay.description LIKE '%acetylcholinesterase%' -- Lọc cho xét nghiệm Acetylcholinesterase
+AND act.standard_type = 'IC50'
+AND act.standard_relation = '='
+AND act.standard_value IS NOT NULL
+AND act.standard_units = 'nM'
+AND act.standard_value::text ~ '^[0-9.]+$'  -- Kiểm tra giá trị số
+LIMIT 100;</p>
+<p>-- Lưu kết quả này dưới dạng tệp CSV có tên extracted_data_2.csv
+```</p>
+<p><strong>Giải thích:</strong></p>
+<ul>
+<li>Mệnh đề <code>WHERE</code> lọc cho các mục tiêu (kinases và acetylcholinesterase) hoặc xét nghiệm cụ thể. Điều chỉnh điều này dựa trên trọng tâm nghiên cứu của bạn (Topic_CheMBL_35_57).</li>
+<li><code>act.standard_type = 'IC50'</code> đảm bảo rằng chúng ta đang làm việc với các giá trị IC50.</li>
+<li><code>act.standard_relation = '='</code> đảm bảo rằng chúng ta chỉ nhận được các phép đo IC50 chính xác.</li>
+<li><code>act.standard_value IS NOT NULL</code> loại trừ các mục có giá trị bị thiếu.</li>
+<li><code>act.standard_units = 'nM'</code> lọc dữ liệu được báo cáo bằng đơn vị nanomolar.</li>
+<li><code>act.standard_value::text ~ '^[0-9\.]+$'</code> Điều này rất quan trọng! Nó chuyển đổi <code>standard_value</code> thành văn bản và sau đó sử dụng một biểu thức chính quy để kiểm tra xem nó chỉ chứa số và dấu thập phân hay không, giải quyết thông báo lỗi bạn nhận được. Điều này giúp đảm bảo rằng bạn chỉ đang cố gắng chuyển đổi các chuỗi số hợp lệ thành số trong mã Python của bạn.</li>
+<li><code>LIMIT 100</code> giới hạn đầu ra thành 100 hàng.</li>
+<li>Các nhận xét cho biết cách lưu kết quả dưới dạng tệp CSV. Trong pgAdmin, bạn thường có thể nhấp chuột phải vào kết quả truy vấn và chọn "Copy with Headers", sau đó dán vào tệp CSV. Ngoài ra, bạn có thể sử dụng lệnh <code>\copy</code> trong <code>psql</code>.</li>
+</ul>
+<p><strong>2.2. Mã Python (Jupyter Notebook - <code>Topic_CheMBL_35_57_1_data_extraction_and_preprocessing.ipynb</code>)</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors
+import numpy as np
+from sklearn.preprocessing import StandardScaler</p>
+<h1>Xác định đường dẫn gốc</h1>
+<p>base_path = os.path.abspath(os.path.join(os.getcwd(), ".."))  # Đi lên một cấp</p>
+<h1>Tải dữ liệu (thay thế bằng tên tệp thực tế của bạn)</h1>
+<p>data_file_1 = os.path.join(base_path, "data", "extracted_data_1.csv")
+data_file_2 = os.path.join(base_path, "data", "extracted_data_2.csv")</p>
+<p>try:
+    df1 = pd.read_csv(data_file_1)
+    df2 = pd.read_csv(data_file_2)
+    print("Dữ liệu đã được tải thành công!")
+except FileNotFoundError:
+    print(f"Lỗi: Một hoặc cả hai tệp dữ liệu không được tìm thấy trong thư mục được chỉ định: {os.path.join(base_path, 'data')}")
+    raise  # Gây ra lại ngoại lệ để dừng thực thi</p>
+<h1>Làm sạch và Tiền xử lý Dữ liệu</h1>
+<h1>Xử lý các giá trị bị thiếu (ví dụ: loại bỏ các hàng có cấu trúc phân tử bị thiếu)</h1>
+<p>df1 = df1.dropna(subset=['molecule_structures'])
+df2 = df2.dropna(subset=['molecule_structures'])</p>
+<h1>Hàm tính toán các mô tả RDKit</h1>
+<p>def calculate_descriptors(mol):
+    try:
+        return Descriptors.CalcMolDescriptors(mol)
+    except:
+        return None</p>
+<p>def calculate_morgan_fingerprint(mol, radius=2, nBits=2048):
+    try:
+        return AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=nBits)
+    except:
+        return None</p>
+<h1>Tạo các phân tử RDKit và tính toán các mô tả</h1>
+<p>def process_dataframe(df):
+    df['ROMol'] = df['molecule_structures'].apply(lambda x: Chem.MolFromSmiles(x))
+    df = df.dropna(subset=['ROMol']) # Xóa các hàng mà smiles không thể được phân tích cú pháp
+    df['descriptors'] = df['ROMol'].apply(calculate_descriptors)
+    df['fingerprint'] = df['ROMol'].apply(calculate_morgan_fingerprint)
+    df = df.dropna(subset=['descriptors', 'fingerprint']) # Xóa các hàng mà việc tạo mô tả thất bại
+    return df</p>
+<p>df1 = process_dataframe(df1)
+df2 = process_dataframe(df2)</p>
+<h1>Hiển thị một vài hàng đầu tiên của các dataframe đã xử lý</h1>
+<p>print("Dataframe đã xử lý 1:")
+print(df1.head())
+print("\nDataframe đã xử lý 2:")
+print(df2.head())</p>
+<h1>Lưu dataframe đã xử lý vào tệp csv mới</h1>
+<p>df1.to_csv(os.path.join(base_path, "data", "processed_data_1.csv"), index=False)
+df2.to_csv(os.path.join(base_path, "data", "processed_data_2.csv"), index=False)
+```</p>
+<p><strong>Giải thích:</strong></p>
+<ul>
+<li><strong>Nhập Thư Viện:</strong> Nhập các thư viện cần thiết (os, pandas, RDKit, scikit-learn).</li>
+<li><strong>Xác định <code>base_path</code>:</strong> Sử dụng <code>os.path.join</code> để xây dựng đường dẫn chính xác đến thư mục dữ liệu, tuân thủ cấu trúc AIMLops của bạn.</li>
+<li><strong>Tải Dữ Liệu:</strong> Tải các tệp CSV vào Pandas DataFrames. Bao gồm xử lý lỗi cho <code>FileNotFoundError</code>.</li>
+<li><strong>Làm Sạch Dữ Liệu:</strong> Xử lý các giá trị bị thiếu.</li>
+<li><strong>Xử Lý RDKit:</strong><ul>
+<li>Chuyển đổi chuỗi SMILES thành các đối tượng <code>ROMol</code> RDKit.</li>
+</ul>
+</li>
+</ul>
+        </body>
+        </html>
+        

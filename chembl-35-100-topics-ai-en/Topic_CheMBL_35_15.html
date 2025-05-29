@@ -1,0 +1,628 @@
+
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Topic_CheMBL_35_15</title>
+            <style>
+                body {
+                    font-family: "Georgia", serif;
+                    max-width: 800px;
+                    margin: 40px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                    background-color: #ffffff;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #1a1a1a;
+                }
+                code {
+                    background-color: #f5f5f5;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                pre {
+                    background-color: #f5f5f5;
+                    padding: 10px;
+                    overflow-x: auto;
+                    border-radius: 6px;
+                }
+            </style>
+        </head>
+        <body>
+        <h1>PharmApp Suite</h1>
+<h2>🧠 AI for Drug Discovery and Development 🧪</h2>
+<p>| Copyright 2025 | RnD Pharma Plus | www.nghiencuuthuoc.comlus | Zalo: +84888999311 |</p>
+<h1>🧩 Topic: Designing focused libraries from ChEMBL</h1>
+<hr />
+<p>Okay, I understand. I'll help you set up your ChEMBL 35 data analysis project using the AIMLops template, address the errors you've encountered, and provide example code for your "Topic_CheMBL_35_15" topic.</p>
+<p><strong>Analysis Model:</strong></p>
+<p>The goal is to leverage ChEMBL 35 data, accessed via PostgreSQL using <code>rdkit</code>, to contribute to drug research and development. Your workflow involves:</p>
+<ol>
+<li><strong>Data Extraction (SQL):</strong>  Querying the ChEMBL 35 database using SQL via pgAdmin to retrieve relevant data and saving it as CSV files in the <code>../data/</code> directory.  This allows you to pre-process and filter data directly at the database level, improving efficiency.</li>
+<li>
+<p><strong>Data Analysis (Python/Jupyter Notebook):</strong>  Loading the extracted CSV data into a Jupyter Notebook environment.  The <code>rdkit</code> library will be used to work with chemical structures, and you'll likely be performing analyses such as:</p>
+<ul>
+<li><strong>Structure-Activity Relationship (SAR) Analysis:</strong>  Relating chemical structure features (e.g., molecular descriptors, fingerprints) to activity values (e.g., IC50, Ki).</li>
+<li><strong>Data Visualization:</strong>  Creating plots and charts to explore relationships between chemical features and activity.</li>
+<li><strong>Model Building:</strong>  Developing predictive models to estimate the activity of new compounds based on their chemical structure.</li>
+</ul>
+</li>
+</ol>
+<p><strong>Addressing the Errors:</strong></p>
+<ul>
+<li>
+<p><strong>Error A: <code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p>This error indicates that you are trying to use a regular expression operator (<code>~</code>) on a numeric column (<code>act.standard_value</code>).  PostgreSQL likely does not allow regular expression matching directly on numeric types.  You'll need to cast the numeric column to text before applying the regular expression.
+*   <strong>Error B: <code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<p>This means that you are using an older version of scikit-learn.  The <code>squared=False</code> parameter was added to <code>mean_squared_error</code> in a later version. You have two solutions: 1) upgrade your scikit-learn installation (recommended), or 2)  remove the <code>squared=False</code> argument and take the square root of the result manually to get the Root Mean Squared Error (RMSE).</p>
+</li>
+</ul>
+<p><strong>Folder Structure (Based on AIMLops Template):</strong></p>
+<p>Assuming a typical AIMLops structure, here's how the folder structure might look:</p>
+<p><code>my_chembl_project/
+├── data/           # Contains the extracted CSV files from the database.  e.g., activity_data.csv
+├── notebooks/      # Contains your Jupyter Notebooks.  e.g., Topic_CheMBL_35_15_1_data_exploration.ipynb
+├── models/         # (Optional)  Stores saved model files (e.g., pickled scikit-learn models).
+├── src/            # (Optional) Python modules containing reusable code.
+├── reports/        # (Optional) Generated reports and figures.
+└── README.md</code></p>
+<p><strong>Topic: <code>Topic_CheMBL_35_15</code> (Let's assume this topic focuses on a specific target or assay)</strong></p>
+<p>For demonstration purposes, let's assume <code>Topic_CheMBL_35_15</code> is focused on <strong>"Inhibitors of EGFR Kinase"</strong>.</p>
+<p><strong>SQL Code (to extract data):</strong></p>
+<p>```sql
+-- File: ../data/egfr_inhibitors.csv</p>
+<p>SELECT
+    cmp.chembl_id AS compound_chembl_id,
+    cmp.pref_name AS compound_name,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.activity_comment,
+    mol.molfile AS molfile -- Include molfile
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+JOIN
+    assays ass ON act.assay_id = ass.assay_id
+JOIN
+    target_dictionary tgt ON ass.tid = tgt.tid
+LEFT JOIN
+    mols mol ON cmp.molregno = mol.molregno
+WHERE
+    tgt.pref_name = 'Epidermal Growth Factor Receptor' -- EGFR Kinase
+    AND act.standard_type IN ('IC50', 'Ki', 'Kd')  -- Common activity types
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9.]+$'   -- Corrected line: Cast to text for regex
+ORDER BY
+    act.standard_value ASC
+LIMIT 100;  -- Limit to 100 rows
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong><code>cmp.chembl_id, cmp.pref_name</code></strong>:  Selects the ChEMBL ID and preferred name of the compound.</li>
+<li><strong><code>act.standard_type, act.standard_value, act.standard_units</code></strong>: Selects the activity type (e.g., IC50), value, and units.</li>
+<li><strong><code>tgt.pref_name = 'Epidermal Growth Factor Receptor'</code></strong>:  Filters for activities against EGFR.</li>
+<li><strong><code>act.standard_type IN ('IC50', 'Ki', 'Kd')</code></strong>:  Filters for common activity types.</li>
+<li><strong><code>act.standard_units = 'nM'</code></strong>:  Ensures activity values are in nM.</li>
+<li><strong><code>act.standard_value IS NOT NULL</code></strong>: Excludes rows with missing standard values.</li>
+<li><strong><code>act.standard_value::text ~ '^[0-9\.]+$'</code></strong>:  <strong>Important Correction:</strong>  This line filters <code>standard_value</code> to ensure it contains only positive numeric values (integers or decimals).  It <em>also</em> addresses the PostgreSQL error by explicitly casting <code>act.standard_value</code> to <code>text</code> before applying the regular expression.  This allows the regular expression operator to work correctly.</li>
+<li><strong><code>LIMIT 100</code></strong>: Restricts the number of returned rows to 100.  This is important for performance during development.</li>
+<li><strong><code>mol.molfile AS molfile</code></strong>: includes the molfile in the data</li>
+</ul>
+<p><strong>How to Run:</strong></p>
+<ol>
+<li>Open pgAdmin.</li>
+<li>Connect to your PostgreSQL server (IP: 192.168.206.136, user: rd, password: rd, database: chembl_35).</li>
+<li>Open a new query window.</li>
+<li>Paste the SQL code into the query window.</li>
+<li>Execute the query.</li>
+<li>Save the results as a CSV file named <code>egfr_inhibitors.csv</code> in the <code>../data/</code> directory of your project.  (Make sure you choose CSV format when saving).</li>
+</ol>
+<p><strong>Python Code (Jupyter Notebook: <code>notebooks/Topic_CheMBL_35_15_1_data_exploration.ipynb</code>):</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from rdkit.Chem import Lipinski
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np</p>
+<h1>Define base path for project</h1>
+<p>base_path = os.path.abspath(os.path.join(os.getcwd(), ".."))  # Assuming notebook is in notebooks/</p>
+<h1>Construct the data path</h1>
+<p>data_path = os.path.join(base_path, "data", "egfr_inhibitors.csv")</p>
+<h1>Load the data</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+    print("Data loaded successfully from:", data_path)
+except FileNotFoundError:
+    print(f"Error: File not found at {data_path}.  Make sure you ran the SQL query and saved the CSV file.")
+    exit()</p>
+<h1>Data Cleaning and Preprocessing</h1>
+<h1>Convert standard_value to numeric, handling potential errors</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value'])  # Remove rows with invalid standard_value</p>
+<h1>Convert IC50/Ki/Kd to pIC50 (or pKi/pKd)</h1>
+<p>def convert_to_pActivity(standard_value):
+  return -np.log10(standard_value/10**9)</p>
+<p>df['pActivity'] = df['standard_value'].apply(convert_to_pActivity)</p>
+<h1>RDKit Feature Calculation</h1>
+<p>def calculate_descriptors(mol):
+    try:
+        mol = Chem.MolFromSmiles(mol)
+        if mol is None:
+            return None
+        descriptors = {
+            'MW': Descriptors.MolWt(mol),
+            'LogP': Descriptors.MolLogP(mol),
+            'HBD': Lipinski.NumHDonors(mol),
+            'HBA': Lipinski.NumHAcceptors(mol),
+            'TPSA': Descriptors.TPSA(mol)
+        }
+        return descriptors
+    except Exception as e:
+        print(f"Error calculating descriptors: {e}")
+        return None</p>
+<h1>Create smiles from molfile</h1>
+<p>def molfile_to_smiles(molfile):
+    try:
+        mol = Chem.MolFromMolBlock(molfile)
+        if mol:
+            smiles = Chem.MolToSmiles(mol)
+            return smiles
+        else:
+            return None
+    except Exception as e:
+        print(f"Error converting molfile to SMILES: {e}")
+        return None</p>
+<p>df['smiles'] = df['molfile'].apply(molfile_to_smiles)
+df = df.dropna(subset=['smiles'])  # Remove rows with invalid smiles</p>
+<h1>Apply descriptior calculation</h1>
+<p>df['descriptors'] = df['smiles'].apply(calculate_descriptors)</p>
+<h1>Convert the dictionary to individual columns in the DataFrame</h1>
+<p>df = pd.concat([df, df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>Drop rows where descriptor calculation failed</h1>
+<p>df = df.dropna(subset=['MW', 'LogP', 'HBD', 'HBA', 'TPSA'])</p>
+<h1>Simple Linear Regression Model</h1>
+<p>X = df[['MW', 'LogP', 'HBD', 'HBA', 'TPSA']]
+y = df['pActivity']</p>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<p>y_pred = model.predict(X_test)</p>
+<p>mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)  # Calculate RMSE manually
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"Mean Squared Error: {mse}")
+print(f"Root Mean Squared Error: {rmse}")
+print(f"R-squared: {r2}")</p>
+<h1>Example Visualization</h1>
+<p>plt.scatter(y_test, y_pred)
+plt.xlabel("Actual pActivity")
+plt.ylabel("Predicted pActivity")
+plt.title("Actual vs. Predicted pActivity")
+plt.show()
+```</p>
+<p><strong>Explanation:</strong></p>
+<ul>
+<li><strong>Import Libraries:</strong> Imports necessary libraries.</li>
+<li><strong>Define Paths:</strong> Defines the base path and data path using <code>os.path.join</code> for platform independence.</li>
+<li><strong>Load Data:</strong> Loads the CSV data into a Pandas DataFrame. Includes error handling for file not found.</li>
+<li><strong>Data Cleaning:</strong><ul>
+<li>Convert <code>standard_value</code> to numeric and handles errors, dropping rows with non-numeric values.</li>
+<li>Converts standard values (IC50, Ki, Kd) to pActivity (e.g., pIC50). This is a common practice in SAR analysis.</li>
+</ul>
+</li>
+<li><strong>RDKit Feature Calculation:</strong><ul>
+<li>The <code>calculate_descriptors</code> function calculates molecular weight (MW), LogP, hydrogen bond donors (HBD), hydrogen bond acceptors (HBA), and topological polar surface area (TPSA) using RDKit.  It handles potential errors during SMILES parsing.</li>
+</ul>
+</li>
+<li><strong>SMILES from molfile:</strong><ul>
+<li>The <code>molfile_to_smiles</code> function converts the molfile to SMILES using RDKit.</li>
+</ul>
+</li>
+<li><strong>Model Building (Linear Regression):</strong><ul>
+<li>Selects features (MW, LogP, HBD, HBA, TPSA) and the target variable (pActivity).</li>
+<li>Splits the data into training and testing sets.</li>
+<li>Creates a Linear Regression model, trains it on the training data, and makes predictions on the testing data.</li>
+<li>Calculates Mean Squared Error (MSE), Root Mean Squared Error (RMSE), and R-squared (R2) to evaluate the model's performance.</li>
+</ul>
+</li>
+<li><strong>Visualization:</strong> Creates a scatter plot of actual vs. predicted pActivity values.</li>
+</ul>
+<p><strong>How to Run:</strong></p>
+<ol>
+<li>Open the Jupyter Notebook (<code>notebooks/Topic_CheMBL_35_15_1_data_exploration.ipynb</code>).</li>
+<li>Run each cell in the notebook sequentially.</li>
+<li>Examine the output, including the model performance metrics and the visualization.</li>
+</ol>
+<p><strong>5 Examples</strong></p>
+<p>Here are 5 example analyses you can perform with this data:</p>
+<ol>
+<li>
+<p><strong>Correlation Analysis:</strong> Calculate the correlation matrix between the molecular descriptors (MW, LogP, HBD, HBA, TPSA) and pActivity to identify the descriptors that are most strongly correlated with activity.  Visualize the correlation matrix using a heatmap.</p>
+<p><code>python
+correlation_matrix = df[['pActivity', 'MW', 'LogP', 'HBD', 'HBA', 'TPSA']].corr()
+sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm")
+plt.title("Correlation Matrix")
+plt.show()</code></p>
+</li>
+<li>
+<p><strong>Distribution Plots:</strong> Create distribution plots (histograms or kernel density estimates) for the molecular descriptors and pActivity to understand their distributions.</p>
+<p>```python
+sns.histplot(df['pActivity'], kde=True)
+plt.title("Distribution of pActivity")
+plt.show()</p>
+<p>sns.histplot(df['LogP'], kde=True)
+plt.title("Distribution of LogP")
+plt.show()
+```</p>
+</li>
+<li>
+<p><strong>Scatter Plots with Regression Lines:</strong> Create scatter plots of each molecular descriptor against pActivity, with a regression line overlaid to visualize the linear relationship.</p>
+<p><code>python
+sns.regplot(x='LogP', y='pActivity', data=df)
+plt.title("LogP vs. pActivity")
+plt.show()</code></p>
+</li>
+<li>
+<p><strong>Lipinski's Rule of Five Analysis:</strong>  Assess how many compounds in your dataset violate Lipinski's Rule of Five (MW &lt;= 500, LogP &lt;= 5, HBD &lt;= 5, HBA &lt;= 10).</p>
+<p>```python
+def lipinski_violations(row):
+    violations = 0
+    if row['MW'] &gt; 500:
+        violations += 1
+    if row['LogP'] &gt; 5:
+        violations += 1
+    if row['HBD'] &gt; 5:
+        violations += 1
+    if row['HBA'] &gt; 10:
+        violations += 1
+    return violations</p>
+<p>df['Lipinski_Violations'] = df.apply(lipinski_violations, axis=1)
+print(df['Lipinski_Violations'].value_counts())
+```</p>
+</li>
+<li>
+<p><strong>Substructure Search:</strong>  Use RDKit to search for compounds containing a specific substructure (e.g., a common pharmacophore).</p>
+<p>```python
+from rdkit.Chem.Draw import IPythonConsole
+from rdkit.Chem import Draw</p>
+<h1>Define the SMARTS pattern for the substructure (example: a pyridine ring)</h1>
+<p>substructure_smarts = "c1ccncc1"
+substructure_pattern = Chem.MolFromSmarts(substructure_smarts)</p>
+<h1>Find compounds containing the substructure</h1>
+<p>def contains_substructure(smiles, pattern):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            return mol.HasSubstructMatch(pattern)
+        else:
+            return False
+    except:
+        return False</p>
+<p>df['Has_Substructure'] = df['smiles'].apply(lambda x: contains_substructure(x, substructure_pattern))
+print(df['Has_Substructure'].value_counts())</p>
+<h1>Visualize a few compounds containing the substructure</h1>
+<p>subset = df[df['Has_Substructure'] == True].head(5)
+mols = [Chem.MolFromSmiles(s) for s in subset['smiles']]
+img = Draw.MolsToGridImage(mols, highlightAtomLists=[mols[i].GetSubstructMatches(substructure_pattern) for i in range(len(mols))], molsPerRow=5)
+img  # Display the image in the notebook
+```</p>
+</li>
+</ol>
+<p><strong>Important Considerations:</strong></p>
+<ul>
+<li><strong>Error Handling:</strong>  The code includes basic error handling (e.g., checking for file existence, handling potential errors during SMILES parsing).  You should add more robust error handling as needed.</li>
+<li><strong>Data Validation:</strong>  Always validate your data to ensure its quality.  Check for missing values, outliers, and inconsistencies.</li>
+<li><strong>Statistical Significance:</strong>  Be mindful of statistical significance when interpreting results, especially with a small dataset (100 rows).</li>
+<li><strong>Model Selection:</strong> Linear Regression is a simple starting point.  Explore other machine learning models (e.g., Random Forest, Support Vector Machines) to see if you can improve prediction accuracy.</li>
+<li><strong>Feature Engineering:</strong>  Experiment with different molecular descriptors and feature engineering techniques to improve model performance.</li>
+<li><strong>Cross-Validation:</strong>  Use cross-validation to get a more reliable estimate of model performance.</li>
+<li><strong>Project Structure:</strong> Organize your code into reusable modules (in the <code>src/</code> directory) to improve maintainability.</li>
+</ul>
+<p><strong>In Summary:</strong></p>
+<p>This comprehensive guide provides you with the SQL and Python code, addresses the errors you encountered, sets up your project structure, and provides examples to get you started with analyzing ChEMBL 35 data for EGFR kinase inhibitors. Remember to adapt the code and analyses to your specific research questions and data characteristics.  Good luck!</p>
+<hr />
+<p><strong>中文翻译：</strong></p>
+<p>好的，我明白了。 我将帮助您使用 AIMLops 模板设置 ChEMBL 35 数据分析项目，解决您遇到的错误，并为您提供“Topic_CheMBL_35_15”主题的示例代码。</p>
+<p><strong>分析模型：</strong></p>
+<p>目标是利用 ChEMBL 35 数据，通过 <code>rdkit</code> 通过 PostgreSQL 访问，为药物研究和开发做出贡献。 您的工作流程包括：</p>
+<ol>
+<li><strong>数据提取 (SQL)：</strong> 使用 SQL 通过 pgAdmin 查询 ChEMBL 35 数据库以检索相关数据，并将其另存为 <code>../data/</code> 目录中的 CSV 文件。 这允许您直接在数据库级别预处理和过滤数据，从而提高效率。</li>
+<li>
+<p><strong>数据分析 (Python/Jupyter Notebook)：</strong> 将提取的 CSV 数据加载到 Jupyter Notebook 环境中。 <code>rdkit</code> 库将用于处理化学结构，您可能会执行以下分析：</p>
+<ul>
+<li><strong>结构-活性关系 (SAR) 分析：</strong> 将化学结构特征（例如，分子描述符、指纹）与活性值（例如，IC50、Ki）相关联。</li>
+<li><strong>数据可视化：</strong> 创建绘图和图表以探索化学特征和活性之间的关系。</li>
+<li><strong>模型构建：</strong> 开发预测模型以根据化学结构估算新化合物的活性。</li>
+</ul>
+</li>
+</ol>
+<p><strong>解决错误：</strong></p>
+<ul>
+<li>
+<p><strong>错误 A：<code>ERROR: operator does not exist: numeric ~ unknown, LINE 12: AND act.standard_value ~ '^[0-9\.]+$'</code></strong></p>
+<p>此错误表明您正在尝试对数字列 (<code>act.standard_value</code>) 使用正则表达式运算符 (<code>~</code>)。 PostgreSQL 可能不允许直接对数字类型进行正则表达式匹配。 您需要在应用正则表达式之前将数字列转换为文本。
+*   <strong>错误 B：<code>old scikit-learn version does not support parameters squared=False in the mean_squared_error function</code></strong></p>
+<p>这意味着您正在使用旧版本的 scikit-learn。 <code>squared=False</code> 参数是在更高版本中添加到 <code>mean_squared_error</code> 的。 您有两种解决方案：1) 升级您的 scikit-learn 安装（推荐），或 2) 删除 <code>squared=False</code> 参数并手动获取结果的平方根以获得均方根误差 (RMSE)。</p>
+</li>
+</ul>
+<p><strong>文件夹结构（基于 AIMLops 模板）：</strong></p>
+<p>假设一个典型的 AIMLops 结构，这是文件夹结构的样子：</p>
+<p><code>my_chembl_project/
+├── data/           # 包含从数据库中提取的 CSV 文件。 例如，activity_data.csv
+├── notebooks/      # 包含您的 Jupyter Notebook。 例如，Topic_CheMBL_35_15_1_data_exploration.ipynb
+├── models/         #（可选）存储保存的模型文件（例如，pickle 的 scikit-learn 模型）。
+├── src/            #（可选）包含可重用代码的 Python 模块。
+├── reports/        #（可选）生成的报告和图形。
+└── README.md</code></p>
+<p><strong>主题：<code>Topic_CheMBL_35_15</code>（假设此主题侧重于特定目标或测定）</strong></p>
+<p>为了演示，让我们假设 <code>Topic_CheMBL_35_15</code> 侧重于 <strong>“EGFR 激酶的抑制剂”</strong>。</p>
+<p><strong>SQL 代码（用于提取数据）：</strong></p>
+<p>```sql
+-- File: ../data/egfr_inhibitors.csv</p>
+<p>SELECT
+    cmp.chembl_id AS compound_chembl_id,
+    cmp.pref_name AS compound_name,
+    act.standard_type,
+    act.standard_value,
+    act.standard_units,
+    act.activity_comment,
+    mol.molfile AS molfile -- 包含 molfile
+FROM
+    activities act
+JOIN
+    molecule_dictionary cmp ON act.molregno = cmp.molregno
+JOIN
+    assays ass ON act.assay_id = ass.assay_id
+JOIN
+    target_dictionary tgt ON ass.tid = tgt.tid
+LEFT JOIN
+    mols mol ON cmp.molregno = mol.molregno
+WHERE
+    tgt.pref_name = 'Epidermal Growth Factor Receptor' -- EGFR 激酶
+    AND act.standard_type IN ('IC50', 'Ki', 'Kd')  -- 常见活性类型
+    AND act.standard_units = 'nM'
+    AND act.standard_value IS NOT NULL
+    AND act.standard_value::text ~ '^[0-9.]+$'   -- 更正的行：转换为文本以进行正则表达式
+ORDER BY
+    act.standard_value ASC
+LIMIT 100;  -- 限制为 100 行
+```</p>
+<p><strong>说明：</strong></p>
+<ul>
+<li><strong><code>cmp.chembl_id, cmp.pref_name</code></strong>：选择化合物的 ChEMBL ID 和首选名称。</li>
+<li><strong><code>act.standard_type, act.standard_value, act.standard_units</code></strong>：选择活性类型（例如，IC50）、值和单位。</li>
+<li><strong><code>tgt.pref_name = 'Epidermal Growth Factor Receptor'</code></strong>：过滤针对 EGFR 的活性。</li>
+<li><strong><code>act.standard_type IN ('IC50', 'Ki', 'Kd')</code></strong>：过滤常见活性类型。</li>
+<li><strong><code>act.standard_units = 'nM'</code></strong>：确保活性值以 nM 为单位。</li>
+<li><strong><code>act.standard_value IS NOT NULL</code></strong>：排除缺少标准值的行。</li>
+<li><strong><code>act.standard_value::text ~ '^[0-9\.]+$'</code></strong>：<strong>重要更正：</strong> 此行过滤 <code>standard_value</code> 以确保它仅包含正数数值（整数或小数）。 它 <em>还</em> 通过在应用正则表达式之前显式地将 <code>act.standard_value</code> 转换为 <code>text</code> 来解决 PostgreSQL 错误。 这允许正则表达式运算符正常工作。</li>
+<li><strong><code>LIMIT 100</code></strong>：将返回的行数限制为 100。 这对于开发期间的性能很重要。</li>
+<li><strong><code>mol.molfile AS molfile</code></strong>: 在数据中包含 molfile</li>
+</ul>
+<p><strong>如何运行：</strong></p>
+<ol>
+<li>打开 pgAdmin。</li>
+<li>连接到您的 PostgreSQL 服务器（IP：192.168.206.136，用户：rd，密码：rd，数据库：chembl_35）。</li>
+<li>打开一个新的查询窗口。</li>
+<li>将 SQL 代码粘贴到查询窗口中。</li>
+<li>执行查询。</li>
+<li>将结果另存为 CSV 文件，命名为 <code>egfr_inhibitors.csv</code>，位于项目的 <code>../data/</code> 目录中。 （确保在保存时选择 CSV 格式）。</li>
+</ol>
+<p><strong>Python 代码（Jupyter Notebook：<code>notebooks/Topic_CheMBL_35_15_1_data_exploration.ipynb</code>）：</strong></p>
+<p>```python
+import os
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+from rdkit.Chem import Lipinski
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np</p>
+<h1>定义项目的基础路径</h1>
+<p>base_path = os.path.abspath(os.path.join(os.getcwd(), ".."))  # 假设 notebook 位于 notebooks/ 中</p>
+<h1>构建数据路径</h1>
+<p>data_path = os.path.join(base_path, "data", "egfr_inhibitors.csv")</p>
+<h1>加载数据</h1>
+<p>try:
+    df = pd.read_csv(data_path)
+    print("数据从以下位置成功加载：", data_path)
+except FileNotFoundError:
+    print(f"错误：在 {data_path} 找不到文件。 请确保您运行了 SQL 查询并保存了 CSV 文件。")
+    exit()</p>
+<h1>数据清洗和预处理</h1>
+<h1>将 standard_value 转换为数值，处理潜在的错误</h1>
+<p>df['standard_value'] = pd.to_numeric(df['standard_value'], errors='coerce')
+df = df.dropna(subset=['standard_value'])  # 删除具有无效 standard_value 的行</p>
+<h1>将 IC50/Ki/Kd 转换为 pIC50（或 pKi/pKd）</h1>
+<p>def convert_to_pActivity(standard_value):
+  return -np.log10(standard_value/10**9)</p>
+<p>df['pActivity'] = df['standard_value'].apply(convert_to_pActivity)</p>
+<h1>RDKit 特征计算</h1>
+<p>def calculate_descriptors(mol):
+    try:
+        mol = Chem.MolFromSmiles(mol)
+        if mol is None:
+            return None
+        descriptors = {
+            'MW': Descriptors.MolWt(mol),
+            'LogP': Descriptors.MolLogP(mol),
+            'HBD': Lipinski.NumHDonors(mol),
+            'HBA': Lipinski.NumHAcceptors(mol),
+            'TPSA': Descriptors.TPSA(mol)
+        }
+        return descriptors
+    except Exception as e:
+        print(f"计算描述符时出错：{e}")
+        return None</p>
+<h1>从 molfile 创建 smiles</h1>
+<p>def molfile_to_smiles(molfile):
+    try:
+        mol = Chem.MolFromMolBlock(molfile)
+        if mol:
+            smiles = Chem.MolToSmiles(mol)
+            return smiles
+        else:
+            return None
+    except Exception as e:
+        print(f"将 molfile 转换为 SMILES 时出错：{e}")
+        return None</p>
+<p>df['smiles'] = df['molfile'].apply(molfile_to_smiles)
+df = df.dropna(subset=['smiles'])  # 删除具有无效 smiles 的行</p>
+<h1>应用描述符计算</h1>
+<p>df['descriptors'] = df['smiles'].apply(calculate_descriptors)</p>
+<h1>将字典转换为 DataFrame 中的单个列</h1>
+<p>df = pd.concat([df, df['descriptors'].apply(pd.Series)], axis=1)</p>
+<h1>删除描述符计算失败的行</h1>
+<p>df = df.dropna(subset=['MW', 'LogP', 'HBD', 'HBA', 'TPSA'])</p>
+<h1>简单的线性回归模型</h1>
+<p>X = df[['MW', 'LogP', 'HBD', 'HBA', 'TPSA']]
+y = df['pActivity']</p>
+<p>X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)</p>
+<p>model = LinearRegression()
+model.fit(X_train, y_train)</p>
+<p>y_pred = model.predict(X_test)</p>
+<p>mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)  # 手动计算 RMSE
+r2 = r2_score(y_test, y_pred)</p>
+<p>print(f"均方误差：{mse}")
+print(f"均方根误差：{rmse}")
+print(f"R 平方：{r2}")</p>
+<h1>示例可视化</h1>
+<p>plt.scatter(y_test, y_pred)
+plt.xlabel("实际 pActivity")
+plt.ylabel("预测 pActivity")
+plt.title("实际与预测 pActivity")
+plt.show()
+```</p>
+<p><strong>说明：</strong></p>
+<ul>
+<li><strong>导入库：</strong> 导入必要的库。</li>
+<li><strong>定义路径：</strong> 使用 <code>os.path.join</code> 定义基础路径和数据路径以实现平台独立性。</li>
+<li><strong>加载数据：</strong> 将 CSV 数据加载到 Pandas DataFrame 中。 包括文件未找到的错误处理。</li>
+<li><strong>数据清洗：</strong><ul>
+<li>将 <code>standard_value</code> 转换为数值并处理错误，删除具有非数值的行。</li>
+<li>将标准值（IC50、Ki、Kd）转换为 pActivity（例如，pIC50）。 这是 SAR 分析中的常见做法。</li>
+</ul>
+</li>
+<li><strong>RDKit 特征计算：</strong><ul>
+<li><code>calculate_descriptors</code> 函数使用 RDKit 计算分子量 (MW)、LogP、氢键供体 (HBD)、氢键受体 (HBA) 和拓扑极性表面积 (TPSA)。 它处理 SMILES 解析期间的潜在错误。</li>
+</ul>
+</li>
+<li><strong>从 molfile 获取 SMILES：</strong><ul>
+<li><code>molfile_to_smiles</code> 函数使用 RDKit 将 molfile 转换为 SMILES。</li>
+</ul>
+</li>
+<li><strong>模型构建（线性回归）：</strong><ul>
+<li>选择特征（MW、LogP、HBD、HBA、TPSA）和目标变量（pActivity）。</li>
+<li>将数据拆分为训练集和测试集。</li>
+<li>创建一个线性回归模型，在训练数据上对其进行训练，并对测试数据进行预测。</li>
+<li>计算均方误差 (MSE)、均方根误差 (RMSE) 和 R 平方 (R2) 以评估模型的性能。</li>
+</ul>
+</li>
+<li><strong>可视化：</strong> 创建实际与预测 pActivity 值的散点图。</li>
+</ul>
+<p><strong>如何运行：</strong></p>
+<ol>
+<li>打开 Jupyter Notebook (<code>notebooks/Topic_CheMBL_35_15_1_data_exploration.ipynb</code>)。</li>
+<li>依次运行 notebook 中的每个单元格。</li>
+<li>检查输出，包括模型性能指标和可视化。</li>
+</ol>
+<p><strong>5 个例子</strong></p>
+<p>以下是您可以使用此数据执行的 5 个示例分析：</p>
+<ol>
+<li>
+<p><strong>相关性分析：</strong> 计算分子描述符（MW、LogP、HBD、HBA、TPSA）和 pActivity 之间的相关性矩阵，以识别与活性最密切相关的描述符。 使用热图可视化相关性矩阵。</p>
+<p><code>python
+correlation_matrix = df[['pActivity', 'MW', 'LogP', 'HBD', 'HBA', 'TPSA']].corr()
+sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm")
+plt.title("相关性矩阵")
+plt.show()</code></p>
+</li>
+<li>
+<p><strong>分布图：</strong> 为分子描述符和 pActivity 创建分布图（直方图或核密度估计），以了解它们的分布。</p>
+<p>```python
+sns.histplot(df['pActivity'], kde=True)
+plt.title("pActivity 的分布")
+plt.show()</p>
+<p>sns.histplot(df['LogP'], kde=True)
+plt.title("LogP 的分布")
+plt.show()
+```</p>
+</li>
+<li>
+<p><strong>带有回归线的散点图：</strong> 创建每个分子描述符与 pActivity 之间的散点图，并覆盖回归线以可视化线性关系。</p>
+<p><code>python
+sns.regplot(x='LogP', y='pActivity', data=df)
+plt.title("LogP vs. pActivity")
+plt.show()</code></p>
+</li>
+<li>
+<p><strong>Lipinski 五规则分析：</strong> 评估数据集中有多少化合物违反了 Lipinski 五规则（MW &lt;= 500、LogP &lt;= 5、HBD &lt;= 5、HBA &lt;= 10）。</p>
+<p>```python
+def lipinski_violations(row):
+    violations = 0
+    if row['MW'] &gt; 500:
+        violations += 1
+    if row['LogP'] &gt; 5:
+        violations += 1
+    if row['HBD'] &gt; 5:
+        violations += 1
+    if row['HBA'] &gt; 10:
+        violations += 1
+    return violations</p>
+<p>df['Lipinski_Violations'] = df.apply(lipinski_violations, axis=1)
+print(df['Lipinski_Violations'].value_counts())
+```</p>
+</li>
+<li>
+<p><strong>子结构搜索：</strong> 使用 RDKit 搜索包含特定子结构（例如，常见药效团）的化合物。</p>
+<p>```python
+from rdkit.Chem.Draw import IPythonConsole
+from rdkit.Chem import Draw</p>
+<h1>定义子结构的 SMARTS 模式（示例：吡啶环）</h1>
+<p>substructure_smarts = "c1ccncc1"
+substructure_pattern = Chem.MolFromSmarts(substructure_smarts)</p>
+<h1>查找包含子结构的化合物</h1>
+<p>def contains_substructure(smiles, pattern):
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            return mol.HasSubstructMatch(pattern)
+        else:
+            return False
+    except:
+        return False</p>
+<p>df['Has_Substructure'] = df['smiles'].apply(lambda x: contains_substructure(x, substructure_pattern))
+print(df['Has_Substructure'].value_counts())</p>
+<h1>可视化一些包含子结构的化合物</h1>
+<p>subset = df[df['Has_Substructure'] == True].head(5)
+mols = [Chem.MolFromSmiles(s) for s in subset['smiles']]
+img = Draw.MolsToGridImage(mols, highlightAtomLists=[mols[i].GetSubstructMatches(substructure_pattern) for i in range(len(mols))], molsPerRow=5)
+img  # 在 notebook 中显示图像
+```</p>
+</li>
+</ol>
+<p><strong>重要注意事项：</strong></p>
+<ul>
+<li><strong>错误处理：</strong> 该代码包括基本的错误处理（例如，检查文件是否存在，处理 SMILES 解析期间的潜在错误）。 您应该根据需要添加更强大的错误处理。</li>
+<li><strong>数据验证：</strong> 始终验证您的数据以确保其质量。 检查缺失值、异常值和不一致之处。</li>
+<li><strong>统计显着性：</strong> 在解释结果时，请注意统计显着性，尤其是在小型数据集（100 行）中。</li>
+<li>**模型</li>
+</ul>
+        </body>
+        </html>
+        
