@@ -64,9 +64,17 @@ $ streamlit run T7_2_streamlit_ligand_dashboard.py
 
 ## 🖼 Screenshots
 
+### pgAdmin manager CheMBL-35 database with RDKit PostgresSQL Cartridge
+No the same pure CheMBL-35 database download 
 
 ![](screenshots/1.png)
+
+### Jupyter Notebook
+
 ![](screenshots/2.png)
+
+Ubuntu Server 24.04.02 by SSH from Windows 11
+
 ![](screenshots/3.png)
 
 ---
@@ -74,12 +82,19 @@ $ streamlit run T7_2_streamlit_ligand_dashboard.py
 ## Figure
 
 ![](images/T4_dist_MolWt.png)
+
 ![](images/T4_overlay_HAcceptors.png)
+
 ![](images/T4_overlay_HDonors.png)
+
 ![](images/T4_overlay_LogP.png)
+
 ![](images/T4_overlay_MolWt.png)
+
 ![](images/T4_dist_HAcceptors.png)
+
 ![](images/T4_dist_HDonors.png)
+
 ![](images/T4_dist_LogP.png)
 
 ---
