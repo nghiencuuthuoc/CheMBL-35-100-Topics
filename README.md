@@ -73,7 +73,7 @@ No the same pure CheMBL-35 database download
 
 ![](screenshots/2.png)
 
-Ubuntu Server 24.04.02 by SSH from Windows 11
+### Ubuntu Server 24.04.02 by SSH from Windows 11
 
 ![](screenshots/3.png)
 
