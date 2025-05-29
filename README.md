@@ -77,6 +77,8 @@ No the same pure CheMBL-35 database download
 
 ![](screenshots/3.png)
 
+### PSQL CheMBL_35 Database 
+![](screenshots/4.png)
 ---
 
 ## Figure
