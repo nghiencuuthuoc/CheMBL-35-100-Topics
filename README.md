@@ -54,6 +54,12 @@ from sqlalchemy import create_engine
 engine = create_engine("postgresql+psycopg2://rd:rd@192.168.206.136/chembl_35")
 ```
 
+```bash
+# Example: streamlit
+$ cd streamlit/
+$ streamlit run T7_2_streamlit_ligand_dashboard.py
+```
+
 ---
 
 ## 🖼 Screenshots
